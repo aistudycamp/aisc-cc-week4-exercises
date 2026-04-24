@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{AGENT_NAME}} — Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#F5F0EB; --cream-light:#FAF7F4; --white:#FFFFFF;
+    --dark:#1C1917; --text:#1C1917; --text2:#78716C; --text3:#A8A29E;
+    --accent:#0D9488; --accent-light:#14B8A6; --accent-bg:rgba(13,148,136,.08);
+    --border:rgba(28,25,23,0.1); --border-strong:rgba(28,25,23,0.2);
+    --font-serif:'Playfair Display',Georgia,serif;
+    --font-sans:'Geist',system-ui,sans-serif;
+    --font-mono:'Geist Mono',monospace;
+  }
+  * {margin:0;padding:0;box-sizing:border-box;}
+  body {background:var(--cream);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .container {max-width:1100px;margin:0 auto;padding:60px 48px 80px;}
+
+  header.hero {border-bottom:1px solid var(--border);padding-bottom:40px;margin-bottom:48px;}
+  .eyebrow {font-family:var(--font-sans);text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:600;color:var(--accent);margin-bottom:16px;}
+  h1 {font-family:var(--font-serif);font-weight:700;font-size:64px;line-height:1.04;letter-spacing:-.02em;margin-bottom:16px;}
+  .lede {font-size:20px;line-height:1.55;color:var(--text2);max-width:760px;}
+  .meta {margin-top:20px;font-family:var(--font-mono);font-size:12px;color:var(--text3);letter-spacing:.04em;}
+
+  .hero-diagram {background:var(--white);border:1px solid var(--border);border-radius:16px;padding:48px 32px;margin-bottom:64px;display:flex;flex-direction:column;align-items:center;gap:24px;}
+  .orch-box {background:var(--dark);color:var(--cream);padding:20px 32px;border-radius:12px;font-family:var(--font-serif);font-weight:600;font-size:24px;letter-spacing:-.01em;position:relative;}
+  .orch-box .orch-tag {display:block;font-family:var(--font-mono);font-size:11px;font-weight:400;color:rgba(245,240,235,.6);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+  .branches {display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:800px;}
+  .branch {border:1px solid var(--border);background:var(--cream-light);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--accent);}
+  .branch h3 {font-family:var(--font-serif);font-weight:600;font-size:18px;}
+  .branch .b-tag {font-family:var(--font-mono);font-size:10.5px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;}
+  .branch ul {list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:4px;}
+  .branch li {font-family:var(--font-mono);font-size:13px;color:var(--text);}
+  .branch li.empty {color:var(--text3);font-style:italic;}
+
+  section.block {margin-bottom:56px;}
+  section.block h2 {font-family:var(--font-serif);font-weight:600;font-size:36px;letter-spacing:-.01em;margin-bottom:8px;}
+  section.block .block-sub {font-size:16px;color:var(--text2);margin-bottom:24px;}
+  .divider {width:48px;height:2px;background:var(--accent);margin:8px 0 20px;}
+
+  .info-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .info-card {background:var(--white);border:1px solid var(--border);border-radius:12px;padding:22px;}
+  .info-card .ic-label {font-family:var(--font-mono);font-size:10.5px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;}
+  .info-card .ic-name {font-family:var(--font-serif);font-weight:600;font-size:22px;margin-top:6px;}
+  .info-card .ic-body {font-size:14px;line-height:1.55;color:var(--text2);margin-top:10px;}
+  .info-card .ic-foot {margin-top:14px;padding-top:10px;border-top:1px dashed var(--border);font-family:var(--font-mono);font-size:12px;color:var(--text3);}
+
+  .flow {background:var(--white);border:1px solid var(--border);border-radius:12px;padding:28px 32px;font-size:16px;line-height:1.7;color:var(--text);}
+  .flow em {font-style:italic;color:var(--accent);}
+
+  footer {margin-top:72px;padding-top:32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  footer .logo {font-family:var(--font-sans);font-size:13px;font-weight:600;letter-spacing:.02em;}
+  footer .meta {font-family:var(--font-mono);font-size:11px;color:var(--text2);letter-spacing:.03em;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">Agent Architecture · AISC Cohort {{COHORT}}</div>
+    <h1>{{AGENT_NAME}}</h1>
+    <p class="lede">{{AGENT_ROLE}}</p>
+    <div class="meta">Built by {{STUDENT_NAME}} · {{DATE}}</div>
+  </header>
+
+  <!-- HERO DIAGRAM -->
+  <div class="hero-diagram">
+    <div class="orch-box">
+      {{AGENT_NAME}}
+      <span class="orch-tag">orchestrator</span>
+    </div>
+    <div class="branches">
+      <div class="branch">
+        <span class="b-tag">skills</span>
+        <ul>
+          {{SKILLS_LIST}}
+        </ul>
+      </div>
+      <div class="branch">
+        <span class="b-tag">tools</span>
+        <ul>
+          {{TOOLS_LIST}}
+        </ul>
+      </div>
+      <div class="branch">
+        <span class="b-tag">sub-agents</span>
+        <ul>
+          {{SUBAGENTS_LIST}}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORCHESTRATOR DETAIL -->
+  <section class="block">
+    <h2>The orchestrator</h2>
+    <div class="divider"></div>
+    <p class="block-sub">The brain. It doesn't do the work itself — it decides which specialist to call and when.</p>
+    <div class="info-card">
+      <span class="ic-label">role</span>
+      <div class="ic-name">{{AGENT_NAME}}</div>
+      <div class="ic-body">{{AGENT_ROLE}}</div>
+      <div class="ic-foot">Triggered by: {{AGENT_TRIGGERS}}</div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="block">
+    <h2>Skills</h2>
+    <div class="divider"></div>
+    <p class="block-sub">Packaged workflows the orchestrator runs. One skill = one job.</p>
+    <div class="info-grid">
+      {{SKILLS_DETAIL}}
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="block">
+    <h2>Tools</h2>
+    <div class="divider"></div>
+    <p class="block-sub">How the orchestrator sees the outside world. MCPs connect live services. Local files ground it in your data.</p>
+    <div class="info-grid">
+      {{TOOLS_DETAIL}}
+    </div>
+  </section>
+
+  <!-- SUB-AGENTS -->
+  <section class="block">
+    <h2>Sub-agents</h2>
+    <div class="divider"></div>
+    <p class="block-sub">Specialists with their own fresh context. The orchestrator dispatches heavy work and gets a small, structured answer back.</p>
+    <div class="info-grid">
+      {{SUBAGENTS_DETAIL}}
+    </div>
+  </section>
+
+  <!-- HOW IT FLOWS -->
+  <section class="block">
+    <h2>How it flows</h2>
+    <div class="divider"></div>
+    <p class="block-sub">A typical request, from trigger to result.</p>
+    <div class="flow">
+      {{FLOW_NARRATIVE}}
+    </div>
+  </section>
+
+  <footer>
+    <span class="logo">[ ai study camp · agent sprint ]</span>
+    <span class="meta">{{AGENT_NAME}} / {{DATE}}</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

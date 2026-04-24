@@ -47,32 +47,72 @@ Have the student run their agent through **one real task** — something from th
 
 ## Step 3: Generate the HTML visualization (8 min)
 
-Now the fun part. You'll invoke the `visualization` skill to build an HTML diagram of their agent.
+Now the fun part. You'll generate a single-file HTML diagram of the student's agent, using the template that ships with this module.
 
-Read these files to gather the architecture state:
+### 3a. Read the student's agent state
+
+Read these files:
 - `student-output/<agent-name>/AGENT.md`
 - `student-output/<agent-name>/tools.md`
-- All files in `student-output/<agent-name>/skills/`
-- All files in `student-output/<agent-name>/sub-agents/`
+- All `SKILL.md` files under `student-output/<agent-name>/skills/`
+- All files under `student-output/<agent-name>/sub-agents/`
 
-Then use the `visualization` skill (available in the student's broader Claude Code environment) to generate a single-file HTML.
+### 3b. Read the template
 
-The visualization should:
+Read the template at `.claude/skills/module-6/architecture-template.html`. It has placeholders in double curly braces (`{{AGENT_NAME}}`, `{{SKILLS_LIST}}`, etc.) that you'll fill in.
 
-- **Title:** "<Agent Name> — Architecture"
-- **Subtitle:** the agent's one-line role from AGENT.md
-- **Hero diagram:** the orchestrator at top, with skills / tools / sub-agents branching below. Use the same AISC deck design language (cream/dark palette, Playfair serif headings, teal accent `#0D9488`, Geist sans body).
-- **Sections below:**
-  - **Orchestrator** — role, personality, when-to-use
-  - **Skills** — card per skill with name + trigger + output
-  - **Tools** — card per tool with name + type (MCP / local) + purpose
-  - **Sub-agents** — card per sub-agent with role + trigger + returns
-  - **How it flows** — a short narrative: "When you ask X, orchestrator dispatches Y, which reads Z, returns W."
-- **Footer:** built in AISC Agent Sprint, cohort date, student's name
+### 3c. Fill in the placeholders
 
-Save to `student-output/<agent-name>-architecture.html`.
+Produce values for each placeholder by reading the student's files. The template uses the AISC design language (cream/dark palette, Playfair serif, teal `#0D9488` accent) — leave the CSS alone, just substitute content.
 
-Open it in the browser so they can see it:
+| Placeholder | How to fill |
+|-------------|-------------|
+| `{{AGENT_NAME}}` | The agent folder name (e.g., `writing-buddy`) |
+| `{{AGENT_ROLE}}` | The first sentence under `## Role` in their AGENT.md |
+| `{{AGENT_TRIGGERS}}` | Comma-separated trigger phrases from `## When to use` in AGENT.md |
+| `{{STUDENT_NAME}}` | Ask the student if you don't know it yet |
+| `{{COHORT}}` | The current cohort number (ask or leave as "5") |
+| `{{DATE}}` | Today's date in `YYYY-MM-DD` format |
+| `{{SKILLS_LIST}}` | `<li>`s, one per skill — format: `<li>/<skill-name></li>`. If none: `<li class="empty">(none yet)</li>` |
+| `{{TOOLS_LIST}}` | `<li>`s, one per tool — format: `<li><tool-name></li>`. If none: `<li class="empty">(none yet)</li>` |
+| `{{SUBAGENTS_LIST}}` | `<li>`s, one per sub-agent — format: `<li><sub-agent-name></li>`. If none: `<li class="empty">(none yet)</li>` |
+| `{{SKILLS_DETAIL}}` | One `<div class="info-card">` per skill (template below) |
+| `{{TOOLS_DETAIL}}` | One `<div class="info-card">` per tool (template below) |
+| `{{SUBAGENTS_DETAIL}}` | One `<div class="info-card">` per sub-agent (template below) |
+| `{{FLOW_NARRATIVE}}` | A short paragraph (80-150 words) describing what happens when the student makes a typical request. Use `<em>` tags around specialist names. |
+
+**Card template for each SKILLS_DETAIL / TOOLS_DETAIL / SUBAGENTS_DETAIL entry:**
+
+```html
+<div class="info-card">
+  <span class="ic-label">skill / tool / sub-agent</span>
+  <div class="ic-name">/skill-name or tool-name</div>
+  <div class="ic-body">One-sentence description of what it does, pulled from the file.</div>
+  <div class="ic-foot">Trigger: "example phrase" · Returns: what you get back</div>
+</div>
+```
+
+If a section is empty (e.g. they have no sub-agents yet), fill with a single card:
+```html
+<div class="info-card">
+  <span class="ic-label">—</span>
+  <div class="ic-name">(none yet)</div>
+  <div class="ic-body">You haven't added any here yet. That's fine — you can always extend later.</div>
+</div>
+```
+
+**For `{{FLOW_NARRATIVE}}`**, write something that tells the actual story. Example for a personal-os agent:
+
+> When you ask <em>morning-brief</em> "what's my day?", the orchestrator reads your priorities.md, queries the <em>gmail</em> and <em>calendar</em> tools for live data, and if your inbox has more than 15 unread it dispatches the <em>gmail-summarizer</em> sub-agent. The summarizer reads, sorts, and returns a triage. The orchestrator then assembles the briefing and hands it back — under 15 lines, scan-friendly, no filler.
+
+### 3d. Write the final HTML
+
+Save the filled-in HTML to:
+```
+student-output/<agent-name>-architecture.html
+```
+
+### 3e. Open it in the browser
 
 ```bash
 open student-output/<agent-name>-architecture.html
@@ -101,11 +141,11 @@ Tell them:
 
 ## Handling edge cases
 
-- **The HTML viz fails to generate** — fall back to an ASCII diagram in a markdown file. Still a deliverable.
+- **Placeholder didn't get replaced** — re-scan the HTML for any `{{…}}` strings before declaring done. Students will see them if you don't.
 - **They want to change their agent significantly in polish** — fine, but time-box it. Big changes can happen after the sprint.
 - **Something doesn't work in the final test** — debug with them, but reframe: "This is good — real agents break in production. Now you know what to fix."
 
 ## Reference
 
-- The `visualization` skill (should be globally available in Claude Code)
-- AISC deck design language: reference `ben-socratic-seminar-deck.html` or `claude-suite-extensions-deck.html` for the palette/typography
+- Template: `.claude/skills/module-6/architecture-template.html` (ships with this repo, self-contained — no external dependencies beyond Google Fonts)
+- AISC deck design language: cream/dark palette, Playfair serif headings, Geist sans body, teal accent `#0D9488`
