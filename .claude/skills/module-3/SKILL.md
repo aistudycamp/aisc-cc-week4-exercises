@@ -100,19 +100,19 @@ open frontend/index.html       # Mac
 # or: just double-click it in Finder/Explorer
 ```
 
-Walk them through:
-- The 3 nodes connected: `[A transcript] → [The Conductor] → [A report]`
-- Below the orchestrator: the two sub-agent helpers (Summarizer + Extractor) — *they're not active yet, that's Stage 3*
-- **Click the orchestrator node.** The right panel switches to inspect mode. Show them:
-  - "What this is" — plain English
+It opens on the **Stage 1 tab** by default — three nodes in a row: `[A transcript] → [The Analyst] → [A report]`. That's exactly the agent they just built and ran. Walk them through:
+
+- **Top tabs** show all three stages — Stage 1 (where they are), Stage 2, Stage 3. Each tab is a different version of their agent. They can click ahead to see what's coming, but warn them: *"What you see in tabs 2 and 3 is your future self. We get there in the next few modules."*
+- **Click the Analyst node.** The right panel switches to inspect mode. Show them:
+  - "What this is" — plain English description
   - **"Its instructions (system prompt)"** — the exact text from `prompts/system.md` they were just editing
   - "Connects to" — the data flow
 
 > "See how the system prompt you were just editing in your text editor *also* shows up here in the visualization? Same file. Same content. The frontend reads what you wrote. The agent reads what you wrote. **The system prompt is the source of truth for what the agent does.**"
 
-Have them hit "Run Agent" once to see the animation. Set the expectation:
+Have them hit "Run Agent" once to watch the Stage 1 animation play out — input lights up, Analyst processes, report appears.
 
-> "Right now this is showing what *will* happen in Stage 3, when all 3 nodes activate. After Modules 4–6, this animation will reflect your real working agent."
+> "That's your Stage 1 agent visualized. Three nodes. One API call. Same thing your terminal just did, in picture form."
 
 ## Step 7: Wrap and commit (1 min)
 

@@ -18,24 +18,28 @@ Say:
 
 > "Module 7. You already did the hard work in Module 6 — you built the multi-agent system. Today is about *seeing* what you built. Open the visualization, watch it run, and click into each piece to confirm: yes, that's the prompt I edited in Module 3. Yes, that's the function I read in Module 6. The diagram is just a window into the actual files on your machine."
 
-## Step 2: Open the frontend (1 min)
+## Step 2: Open the frontend and switch to Stage 3 (1 min)
 
 ```bash
 open frontend/index.html        # Mac
 # or just double-click it in your file explorer
 ```
 
-It opens in the browser.
+It opens in the browser. **Click the "agentic system" tab** at the top (or press `3`). The canvas swaps from the simple Stage 1/2 chain to the full 5-node multi-agent diagram.
 
 ## Step 3: Tour the canvas (4 min)
 
 Walk them through what they're looking at:
 
-> "Look at the layout. Top row, left to right: **A transcript → The Conductor → A report.** That's your main flow. Data goes in on the left, the orchestrator processes it, the report comes out on the right.
+> "Look at the layout. Top row, left to right: **A transcript → The Conductor → A report.** That's the main flow. Data goes in on the left, the orchestrator processes it, the report comes out on the right.
 >
 > Below the orchestrator: **The Summarizer** and **The Extractor.** Those are sub-agents — helpers the orchestrator calls. Notice the dashed lines connecting them upward to the orchestrator? That's because they're 'internal calls' — the orchestrator dispatches down to them, gets answers back. The user never sees those.
 >
 > Five nodes. Four connections. Same architecture you built in Module 6."
+
+Quick contrast moment — have them click the Stage 1 tab, then Stage 2, then back to Stage 3:
+
+> "Look at this evolution. Stage 1 had 3 nodes: input, agent, output. Stage 2 had the same 3 nodes but with an automated trigger. Stage 3 keeps the same input and output, but the *agent in the middle* exploded into an orchestrator plus two sub-agents. That's the whole arc you just built — and you can see it visually here."
 
 ## Step 4: Inspect each node (8 min)
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Sprint · Canvas v3</title>
+<title>Agent Sprint · Visualization</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -84,6 +84,8 @@
     font-family: var(--mono); font-size: 11.5px;
     color: var(--ink-3); padding: 7px 14px;
     border-radius: 6px; cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
   }
   .top-tab:hover { color: var(--ink); background: #F0EDE6; }
   .top-tab.active { color: var(--ink); background: #F0EDE6; font-weight: 500; }
@@ -139,20 +141,27 @@
     pointer-events: none;
   }
 
-  /* "Main Flow" lane label */
-  .flow-label {
+  .stage-banner {
     position: absolute;
-    top: 18%;
+    top: 18px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 1;
+    background: var(--canvas);
+    padding: 4px 14px;
     font-family: var(--mono);
     font-size: 10px;
     color: var(--ink-3);
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    z-index: 1;
-    background: var(--canvas);
-    padding: 4px 14px;
+  }
+  .stage-banner em {
+    font-family: var(--serif);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-2);
+    font-size: 13px;
   }
 
   .sub-label {
@@ -176,7 +185,7 @@
     background: var(--panel); border: 1px solid var(--line);
     border-radius: 8px; padding: 12px 16px;
     font-family: var(--mono); font-size: 11px; color: var(--ink-2);
-    min-width: 200px; z-index: 5;
+    min-width: 220px; z-index: 5;
   }
   .meta-row { display: flex; justify-content: space-between; padding: 3px 0; }
   .meta-row .l { color: var(--ink-3); }
@@ -207,14 +216,14 @@
   .conn-path.active { stroke: var(--orch); stroke-width: 3; stroke-dasharray: 0; }
   .conn-path.complete { stroke: var(--ink-3); stroke-width: 2; stroke-dasharray: 0; }
 
-  /* NODES */
+  /* NODES — base */
   .node {
     position: absolute;
     background: var(--panel);
     border: 1.5px solid var(--line-strong);
     border-radius: 14px;
     z-index: 3;
-    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     cursor: pointer;
     overflow: hidden;
   }
@@ -234,7 +243,22 @@
   .node.active.input { border-color: var(--input); box-shadow: 0 0 0 4px rgba(74, 85, 104, 0.3), 0 12px 32px rgba(0,0,0,0.08); }
   .node.active.output { border-color: var(--output); box-shadow: 0 0 0 4px rgba(92, 122, 46, 0.3), 0 12px 32px rgba(0,0,0,0.08); }
 
-  /* INPUT / OUTPUT — small chunky pills, like n8n triggers */
+  /* Stage visibility — body[data-stage="N"] shows .stage-N nodes only */
+  .node[data-stages]              { display: none; }
+  body[data-stage="1"] .node[data-stages~="1"] { display: block; }
+  body[data-stage="2"] .node[data-stages~="2"] { display: block; }
+  body[data-stage="3"] .node[data-stages~="3"] { display: block; }
+
+  /* Same for stage labels */
+  .stage-banner[data-stages]      { display: none; }
+  body[data-stage="1"] .stage-banner[data-stages~="1"] { display: block; }
+  body[data-stage="2"] .stage-banner[data-stages~="2"] { display: block; }
+  body[data-stage="3"] .stage-banner[data-stages~="3"] { display: block; }
+
+  .sub-label[data-stages]         { display: none; }
+  body[data-stage="3"] .sub-label[data-stages~="3"] { display: block; }
+
+  /* IO NODES */
   .node-io { width: 180px; }
   .node-io .io-header {
     padding: 14px 16px;
@@ -286,17 +310,14 @@
     color: var(--ink-2);
   }
 
-  /* ORCHESTRATOR — large central node */
-  .node-orchestrator {
-    width: 280px;
-    background: var(--panel);
-  }
-  .node-orchestrator .orch-header {
+  /* AGENT NODE (chat assistant for Stage 1/2, orchestrator for Stage 3) */
+  .node-agent { width: 280px; background: var(--panel); }
+  .node-agent .ag-header {
     padding: 16px 18px 14px;
     border-bottom: 1px solid var(--line);
     display: flex; align-items: center; gap: 12px;
   }
-  .orch-icon {
+  .ag-icon {
     width: 44px; height: 44px;
     border-radius: 11px;
     background: var(--orch-soft);
@@ -306,8 +327,8 @@
     font-size: 24px; padding-bottom: 3px;
     flex-shrink: 0;
   }
-  .orch-info { flex: 1; min-width: 0; }
-  .orch-tag {
+  .ag-info { flex: 1; min-width: 0; }
+  .ag-tag {
     font-family: var(--mono);
     font-size: 9.5px;
     text-transform: uppercase;
@@ -315,28 +336,28 @@
     color: var(--ink-3);
     margin-bottom: 3px;
   }
-  .node-orchestrator.active .orch-tag { color: var(--orch); }
-  .orch-name {
+  .node-agent.active .ag-tag { color: var(--orch); }
+  .ag-name {
     font-family: var(--serif);
     font-size: 24px;
     line-height: 1.05;
     letter-spacing: -0.01em;
   }
-  .orch-name em { font-style: italic; color: var(--orch); }
-  .orch-dot {
+  .ag-name em { font-style: italic; color: var(--orch); }
+  .ag-dot {
     width: 9px; height: 9px; border-radius: 50%;
     background: var(--ink-4);
     flex-shrink: 0;
     transition: all 0.3s;
   }
-  .node-orchestrator.active .orch-dot { background: var(--orch); box-shadow: 0 0 0 4px var(--orch-glow); animation: dotPulse 1.4s ease-in-out infinite; }
-  .node-orchestrator.complete .orch-dot { background: var(--sub); }
+  .node-agent.active .ag-dot { background: var(--orch); box-shadow: 0 0 0 4px var(--orch-glow); animation: dotPulse 1.4s ease-in-out infinite; }
+  .node-agent.complete .ag-dot { background: var(--sub); }
 
-  .orch-body {
+  .ag-body {
     padding: 12px 18px;
     background: var(--panel-soft);
   }
-  .orch-desc {
+  .ag-desc {
     font-family: var(--serif);
     font-style: italic;
     font-size: 14px;
@@ -344,26 +365,24 @@
     line-height: 1.4;
     margin-bottom: 12px;
   }
-  .orch-meta-grid {
+  .ag-meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px 14px;
     font-family: var(--mono);
     font-size: 10.5px;
   }
-  .orch-meta-grid .k { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; }
-  .orch-meta-grid .v { color: var(--ink); font-weight: 500; }
+  .ag-meta-grid .k { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; }
+  .ag-meta-grid .v { color: var(--ink); font-weight: 500; }
 
-  .orch-foot {
+  .ag-foot {
     padding: 8px 18px;
     border-top: 1px solid var(--line);
     display: flex; justify-content: space-between; align-items: center;
     font-family: var(--mono); font-size: 10px; color: var(--ink-3);
   }
-  .orch-foot .state-label { color: var(--ink-2); font-weight: 500; }
 
-  /* Down-arrow connector to sub-agents */
-  .orch-attach {
+  .ag-attach {
     position: absolute;
     left: 50%; bottom: -16px;
     transform: translateX(-50%);
@@ -372,8 +391,10 @@
     background: var(--ink-4);
     z-index: 0;
   }
+  body[data-stage="3"] .ag-attach { display: block; }
+  body:not([data-stage="3"]) .ag-attach { display: none; }
 
-  /* SUB-AGENTS — smaller, attached below orchestrator */
+  /* SUB-AGENTS (Stage 3 only) */
   .node-sub-agent { width: 220px; }
   .node-sub-agent .sa-header {
     padding: 12px 14px 10px;
@@ -442,14 +463,22 @@
     50% { transform: scale(1.4); }
   }
 
-  /* POSITIONS — clean horizontal flow */
-  #nodeInput  { left: 32px;  top: 32%; }
-  #nodeOrch   { left: 50%; top: 22%; transform: translateX(-50%); }
-  #nodeOrch.selected, #nodeOrch.active, #nodeOrch.complete, #nodeOrch:hover { transform: translateX(-50%); }
-  #nodeOrch.active { transform: translateX(-50%) translateY(-2px); }
-  #nodeOutput { right: 32px;  top: 32%; }
-  #nodeSumm   { left: 26%; top: 70%; }
-  #nodeExtr   { right: 26%; top: 70%; }
+  /* POSITIONS — Stage 1 (3 horizontal nodes) */
+  body[data-stage="1"] #s1-input  { left: 80px;       top: 50%; transform: translateY(-50%); }
+  body[data-stage="1"] #s1-agent  { left: 50%;        top: 50%; transform: translate(-50%, -50%); }
+  body[data-stage="1"] #s1-output { right: 80px;      top: 50%; transform: translateY(-50%); }
+
+  /* POSITIONS — Stage 2 (3 horizontal nodes, same positions) */
+  body[data-stage="2"] #s2-input  { left: 80px;       top: 50%; transform: translateY(-50%); }
+  body[data-stage="2"] #s2-agent  { left: 50%;        top: 50%; transform: translate(-50%, -50%); }
+  body[data-stage="2"] #s2-output { right: 80px;      top: 50%; transform: translateY(-50%); }
+
+  /* POSITIONS — Stage 3 (5 nodes, existing layout) */
+  body[data-stage="3"] #s3-input  { left: 32px;       top: 32%; }
+  body[data-stage="3"] #s3-agent  { left: 50%;        top: 22%; transform: translateX(-50%); }
+  body[data-stage="3"] #s3-output { right: 32px;      top: 32%; }
+  body[data-stage="3"] #s3-summ   { left: 26%;        top: 70%; }
+  body[data-stage="3"] #s3-extr   { right: 26%;       top: 70%; }
 
   /* PARTICLES */
   .particle {
@@ -626,7 +655,7 @@
     margin-top: 4px;
   }
 
-  /* INSPECT MODE — simplified */
+  /* INSPECT MODE */
   .inspect { display: none; }
   .inspect.visible { display: block; animation: outIn 0.4s ease; }
 
@@ -722,9 +751,7 @@
     line-height: 1;
     flex-shrink: 0;
   }
-  .connection-row .target {
-    font-weight: 500;
-  }
+  .connection-row .target { font-weight: 500; }
   .connection-row .note { color: var(--ink-3); margin-left: auto; font-size: 12px; font-style: italic; font-family: var(--serif); }
 
   .file-list { display: flex; flex-direction: column; gap: 6px; }
@@ -748,7 +775,7 @@
   }
 </style>
 </head>
-<body>
+<body data-stage="1">
 
 <div class="app">
 
@@ -758,12 +785,12 @@
       <div class="brand-mark">a</div>
       <div>
         <div class="brand-text">Agent <em>Sprint</em></div>
-        <div class="brand-sub">Week 4 · Stage 3</div>
+        <div class="brand-sub">Week 4 · Visualization</div>
       </div>
-      <div class="top-tabs">
-        <span class="top-tab"><span class="num">01</span>chat assistant</span>
-        <span class="top-tab"><span class="num">02</span>workflow</span>
-        <span class="top-tab active"><span class="num">03</span>agentic system</span>
+      <div class="top-tabs" id="topTabs">
+        <span class="top-tab active" data-tab="1"><span class="num">01</span>chat assistant</span>
+        <span class="top-tab" data-tab="2"><span class="num">02</span>workflow</span>
+        <span class="top-tab" data-tab="3"><span class="num">03</span>agentic system</span>
       </div>
     </div>
     <div></div>
@@ -785,20 +812,121 @@
 
       <div class="canvas-meta">
         <div class="meta-row"><span class="l">workflow</span><span class="v">transcripts → insights</span></div>
-        <div class="meta-row"><span class="l">main flow</span><span class="v">3 nodes</span></div>
-        <div class="meta-row"><span class="l">sub-agents</span><span class="v">2</span></div>
+        <div class="meta-row"><span class="l">stage</span><span class="v" id="metaStage">1 · chat assistant</span></div>
+        <div class="meta-row"><span class="l">nodes</span><span class="v" id="metaNodes">3</span></div>
         <div class="meta-row"><span class="l">status</span><span class="v live" id="canvasStatus">● ready</span></div>
       </div>
 
-      <div class="flow-label">— Main Flow —</div>
-      <div class="sub-label">— Orchestrator's <em>sub-agents</em> —</div>
+      <!-- Stage banners -->
+      <div class="stage-banner" data-stages="1">— Stage 1 · <em>One agent, one job</em> —</div>
+      <div class="stage-banner" data-stages="2">— Stage 2 · <em>Same agent, automatic trigger</em> —</div>
+      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Orchestrator + sub-agents</em> —</div>
+
+      <div class="sub-label" data-stages="3">— Orchestrator's <em>sub-agents</em> —</div>
 
       <svg class="canvas-svg" id="svg"></svg>
 
-      <!-- INPUT -->
-      <div class="node node-io input" id="nodeInput" data-node="input">
+      <!-- =============== STAGE 1 NODES =============== -->
+
+      <div class="node node-io input" id="s1-input" data-stages="1" data-node="s1-input">
         <div class="io-header">
           <div class="io-icon">↗</div>
+          <div class="io-text">
+            <div class="io-tag">Input</div>
+            <div class="io-name">A <em>transcript</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">you paste it in</div>
+      </div>
+
+      <div class="node node-agent orch" id="s1-agent" data-stages="1" data-node="s1-agent">
+        <div class="ag-header">
+          <div class="ag-icon">a</div>
+          <div class="ag-info">
+            <div class="ag-tag">Chat assistant</div>
+            <div class="ag-name">The <em>Analyst</em></div>
+          </div>
+          <div class="ag-dot"></div>
+        </div>
+        <div class="ag-body">
+          <div class="ag-desc">A single agent. Reads the transcript, finds themes, finds actions, writes the report — all in one API call.</div>
+          <div class="ag-meta-grid">
+            <div><div class="k">brain</div><div class="v">Claude</div></div>
+            <div><div class="k">runs</div><div class="v">once per call</div></div>
+          </div>
+        </div>
+        <div class="ag-foot">
+          <span id="s1-agentState">idle</span>
+          <span id="s1-agentTime">—</span>
+        </div>
+      </div>
+
+      <div class="node node-io output" id="s1-output" data-stages="1" data-node="s1-output">
+        <div class="io-header">
+          <div class="io-icon">↘</div>
+          <div class="io-text">
+            <div class="io-tag">Output</div>
+            <div class="io-name">A <em>report</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">printed to terminal</div>
+      </div>
+
+      <!-- =============== STAGE 2 NODES =============== -->
+
+      <div class="node node-io input" id="s2-input" data-stages="2" data-node="s2-input">
+        <div class="io-header">
+          <div class="io-icon">⇡</div>
+          <div class="io-text">
+            <div class="io-tag">Trigger</div>
+            <div class="io-name">File <em>drop</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">watches transcripts/</div>
+      </div>
+
+      <div class="node node-agent orch" id="s2-agent" data-stages="2" data-node="s2-agent">
+        <div class="ag-header">
+          <div class="ag-icon">a</div>
+          <div class="ag-info">
+            <div class="ag-tag">Chat assistant</div>
+            <div class="ag-name">The <em>Analyst</em></div>
+          </div>
+          <div class="ag-dot"></div>
+        </div>
+        <div class="ag-body">
+          <div class="ag-desc">Same agent as Stage 1. The only thing that changed is who's pressing "go" — now a folder watcher instead of you.</div>
+          <div class="ag-meta-grid">
+            <div><div class="k">brain</div><div class="v">Claude</div></div>
+            <div><div class="k">trigger</div><div class="v">automatic</div></div>
+          </div>
+        </div>
+        <div class="ag-foot">
+          <span id="s2-agentState">idle</span>
+          <span id="s2-agentTime">—</span>
+        </div>
+      </div>
+
+      <div class="node node-io output" id="s2-output" data-stages="2" data-node="s2-output">
+        <div class="io-header">
+          <div class="io-icon">⇣</div>
+          <div class="io-text">
+            <div class="io-tag">Output</div>
+            <div class="io-name">Saved <em>file</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">written to outputs/</div>
+      </div>
+
+      <!-- =============== STAGE 3 NODES =============== -->
+
+      <div class="node node-io input" id="s3-input" data-stages="3" data-node="s3-input">
+        <div class="io-header">
+          <div class="io-icon">⇡</div>
           <div class="io-text">
             <div class="io-tag">Input</div>
             <div class="io-name">A <em>transcript</em></div>
@@ -808,32 +936,30 @@
         <div class="io-foot">comes from a file</div>
       </div>
 
-      <!-- ORCHESTRATOR -->
-      <div class="node node-orchestrator orch" id="nodeOrch" data-node="orch">
-        <div class="orch-header">
-          <div class="orch-icon">o</div>
-          <div class="orch-info">
-            <div class="orch-tag">Orchestrator</div>
-            <div class="orch-name">The <em>Conductor</em></div>
+      <div class="node node-agent orch" id="s3-agent" data-stages="3" data-node="s3-agent">
+        <div class="ag-header">
+          <div class="ag-icon">o</div>
+          <div class="ag-info">
+            <div class="ag-tag">Orchestrator</div>
+            <div class="ag-name">The <em>Conductor</em></div>
           </div>
-          <div class="orch-dot"></div>
+          <div class="ag-dot"></div>
         </div>
-        <div class="orch-body">
-          <div class="orch-desc">Reads the transcript, decides who should do what, and writes the final report.</div>
-          <div class="orch-meta-grid">
+        <div class="ag-body">
+          <div class="ag-desc">No longer one agent. Now a conductor that dispatches to specialists, then synthesizes the final report.</div>
+          <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
             <div><div class="k">helpers</div><div class="v">2 sub-agents</div></div>
           </div>
         </div>
-        <div class="orch-foot">
-          <div class="state-label" id="orchStateLabel">idle</div>
-          <div id="orchTime">—</div>
+        <div class="ag-foot">
+          <span id="s3-agentState">idle</span>
+          <span id="s3-agentTime">—</span>
         </div>
-        <div class="orch-attach"></div>
+        <div class="ag-attach"></div>
       </div>
 
-      <!-- OUTPUT -->
-      <div class="node node-io output" id="nodeOutput" data-node="output">
+      <div class="node node-io output" id="s3-output" data-stages="3" data-node="s3-output">
         <div class="io-header">
           <div class="io-icon">↘</div>
           <div class="io-text">
@@ -845,8 +971,7 @@
         <div class="io-foot">saved as a file</div>
       </div>
 
-      <!-- SUMMARIZER -->
-      <div class="node node-sub-agent sub" id="nodeSumm" data-node="sub">
+      <div class="node node-sub-agent sub" id="s3-summ" data-stages="3" data-node="s3-summ">
         <div class="sa-header">
           <div class="sa-icon">s</div>
           <div class="sa-info">
@@ -857,13 +982,12 @@
         </div>
         <div class="sa-body">Finds 3 key themes in the transcript.</div>
         <div class="sa-foot">
-          <span id="subStateLabel">idle</span>
-          <span id="subTime">—</span>
+          <span id="s3-summState">idle</span>
+          <span id="s3-summTime">—</span>
         </div>
       </div>
 
-      <!-- EXTRACTOR -->
-      <div class="node node-sub-agent extr" id="nodeExtr" data-node="extr">
+      <div class="node node-sub-agent extr" id="s3-extr" data-stages="3" data-node="s3-extr">
         <div class="sa-header">
           <div class="sa-icon">e</div>
           <div class="sa-info">
@@ -874,8 +998,8 @@
         </div>
         <div class="sa-body">Pulls out who-said-what and action items.</div>
         <div class="sa-foot">
-          <span id="extrStateLabel">idle</span>
-          <span id="extrTime">—</span>
+          <span id="s3-extrState">idle</span>
+          <span id="s3-extrTime">—</span>
         </div>
       </div>
 
@@ -895,7 +1019,7 @@
       <div class="right-header">
         <div class="rh-block" id="rhDefault">
           <div class="rh-eyebrow live">Live · Run Detail</div>
-          <div class="rh-title">What's <em>happening?</em></div>
+          <div class="rh-title" id="rhTitle">What's <em>happening?</em></div>
         </div>
         <div class="rh-block" id="rhInspect" style="display:none;">
           <div class="rh-eyebrow" id="inspectEyebrow">Inspecting</div>
@@ -908,9 +1032,7 @@
 
         <div id="defaultView">
           <div class="live-section" id="feed">
-            <div class="feed-empty">
-              Press <em>Run Agent</em> to begin.
-            </div>
+            <div class="feed-empty" id="feedEmpty">Press <em>Run Agent</em> to begin.</div>
             <div class="feed-hint">
               <b>Try this:</b> click any node on the left to peek inside.<br>
               You'll see exactly what's making it tick — including the actual instructions it follows.
@@ -956,222 +1078,358 @@
 </div>
 
 <script>
-  // ============ SIMPLIFIED INSPECT DATA ============
-  const nodeData = {
-    input: {
-      eyebrow: "Inspecting · Input",
-      title: "A <em>transcript</em>",
-      sections: [
-        {
-          label: "What this is",
-          type: "desc",
-          content: `The starting point. <em>Whenever a new transcript file lands in the </em><code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/</code><em> folder, the agent wakes up and starts working.</em>`
-        },
-        {
-          label: "What goes in / out",
-          type: "ioflow",
-          content: { in: "📄 a .txt file", out: "📝 the transcript text" }
-        },
-        {
-          label: "Recent files",
-          type: "files",
-          content: [
-            { name: "sample-transcript.txt", meta: "just now" },
-            { name: "standup-2026-04-26.txt", meta: "yesterday" },
-            { name: "design-review.txt", meta: "2 days ago" },
-          ]
-        },
-        {
-          label: "Connects to",
-          type: "connections",
-          content: [
-            { arrow: "→", target: "The Conductor", note: "passes the transcript" }
-          ]
-        }
-      ]
-    },
+  // ============ NODE INSPECT DATA (per stage) ============
 
-    orch: {
-      eyebrow: "Inspecting · Orchestrator",
-      title: "The <em>Conductor</em>",
-      sections: [
-        {
-          label: "What this is",
-          type: "desc",
-          content: `The <em>brain</em> of the system. It receives the transcript, decides which sub-agents to call, waits for their answers, then writes the final report.`
-        },
-        {
-          label: "What goes in / out",
-          type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 a final report" }
-        },
-        {
-          label: "Its instructions (system prompt)",
-          type: "prompt",
-          content: `<span class="role">You are the orchestrator</span> for a meeting analysis system.
+  // Shared system prompt (the orchestrator/synthesizer prompt)
+  const promptSystem = `<span class="role">You are a meeting analyst.</span>
 
-When you receive a transcript, your job is:
+When given a meeting transcript, return a clean,
+structured insights report.
 
-<span class="num">1.</span> Decide who needs to look at it:
-   • <span class="key">The Summarizer</span> — to find the key themes
-   • <span class="key">The Extractor</span> — to pull out action items
-
-<span class="num">2.</span> Wait for both of them to come back.
-
-<span class="num">3.</span> Combine their answers into a clean report:
-
-<span class="em">--- final report format ---</span>
-<span class="key">KEY THEMES</span>
-   <span class="str">- [theme]: [one sentence]</span>
-
-<span class="key">ACTION ITEMS</span>
-   <span class="str">- [person]: [task]</span>
-
-<span class="key">RECOMMENDED NEXT STEP</span>
-   <span class="str">[one sentence]</span>
-
-Be specific. Use names from the transcript.
-Don't invent anything that isn't there.`
-        },
-        {
-          label: "Connects to",
-          type: "connections",
-          content: [
-            { arrow: "←", target: "The transcript", note: "reads input" },
-            { arrow: "↓", target: "The Summarizer", note: "asks for themes" },
-            { arrow: "↓", target: "The Extractor", note: "asks for actions" },
-            { arrow: "→", target: "The report", note: "writes final" },
-          ]
-        }
-      ]
-    },
-
-    sub: {
-      eyebrow: "Inspecting · Sub-agent",
-      title: "The <em>Summarizer</em>",
-      sections: [
-        {
-          label: "What this is",
-          type: "desc",
-          content: `A <em>helper</em> the orchestrator calls when it needs themes pulled from a transcript. It does one thing well: reads, finds 3 patterns, returns them.`
-        },
-        {
-          label: "What goes in / out",
-          type: "ioflow",
-          content: { in: "📝 a transcript", out: "🏷️ 3 themes" }
-        },
-        {
-          label: "Its instructions (system prompt)",
-          type: "prompt",
-          content: `<span class="role">You are a meeting summarizer.</span>
-
-Given a transcript, find the <span class="num">3</span> most important themes
-discussed in the conversation.
-
-Return your answer as a list:
+Always respond in this format:
 
 <span class="em">--- format ---</span>
-<span class="key">Theme 1:</span> <span class="str">[label]</span>
-   <span class="str">[one-sentence summary]</span>
+<span class="key">**KEY THEMES**</span>
+- <span class="str">[Theme name]: [one-sentence summary]</span>
 
-<span class="key">Theme 2:</span> <span class="str">[label]</span>
-   <span class="str">[one-sentence summary]</span>
+<span class="key">**ACTION ITEMS**</span>
+- <span class="str">[Person]: [task] (by [date if mentioned])</span>
 
-<span class="key">Theme 3:</span> <span class="str">[label]</span>
-   <span class="str">[one-sentence summary]</span>
+<span class="key">**RECOMMENDED NEXT STEP**</span>
+<span class="str">[One sentence — the single most important thing to do next.]</span>
 
-<span class="com">Be concrete. Use names from the transcript.</span>
-<span class="com">Don't pad with filler.</span>`
-        },
-        {
-          label: "Connects to",
-          type: "connections",
-          content: [
-            { arrow: "↑", target: "The Conductor", note: "called by, returns to" }
-          ]
-        }
-      ]
-    },
+<span class="com">// Use names from the transcript. Never invent people.</span>
+<span class="com">// Be specific. Don't pad with filler.</span>`;
 
-    extr: {
-      eyebrow: "Inspecting · Sub-agent",
-      title: "The <em>Extractor</em>",
-      sections: [
-        {
-          label: "What this is",
-          type: "desc",
-          content: `Another <em>helper</em>. The orchestrator calls this one to pull out specific action items — who's doing what and by when.`
-        },
-        {
-          label: "What goes in / out",
-          type: "ioflow",
-          content: { in: "📝 a transcript", out: "✅ a list of actions" }
-        },
-        {
-          label: "Its instructions (system prompt)",
-          type: "prompt",
-          content: `<span class="role">You are an action item extractor.</span>
+  const promptSummarizer = `<span class="role">You are a meeting summarizer.</span>
+
+Given a transcript, identify the <span class="num">3</span> most important themes
+discussed.
+
+Return ONLY a JSON object:
+
+{
+  <span class="key">"themes"</span>: [
+    { <span class="key">"label"</span>: <span class="str">"Theme name"</span>, <span class="key">"summary"</span>: <span class="str">"One sentence."</span> },
+    { <span class="key">"label"</span>: <span class="str">"..."</span>, <span class="key">"summary"</span>: <span class="str">"..."</span> },
+    { <span class="key">"label"</span>: <span class="str">"..."</span>, <span class="key">"summary"</span>: <span class="str">"..."</span> }
+  ]
+}
+
+<span class="com">// Be concrete. Use names. Don't invent.</span>`;
+
+  const promptExtractor = `<span class="role">You are an action item extractor.</span>
 
 Given a transcript, find every commitment, task, or
 next step that came up in the conversation.
 
-For each one, capture:
-   <span class="key">• Who</span> is responsible (name, or "Unknown")
-   <span class="key">• What</span> they need to do
-   <span class="key">• When</span> they need to do it (or null)
+Return ONLY a JSON object:
 
-Return them as a clean list.
+{
+  <span class="key">"actions"</span>: [
+    {
+      <span class="key">"owner"</span>: <span class="str">"Name or Unknown"</span>,
+      <span class="key">"task"</span>: <span class="str">"Description"</span>,
+      <span class="key">"deadline"</span>: <span class="str">"Date or null"</span>
+    }
+  ]
+}
 
-<span class="com">Use exact wording from the transcript when you can.</span>
-<span class="com">If no owner is named, write "Unknown".</span>
-<span class="com">Don't make anything up.</span>`
-        },
-        {
-          label: "Connects to",
-          type: "connections",
-          content: [
-            { arrow: "↑", target: "The Conductor", note: "called by, returns to" }
-          ]
-        }
+<span class="com">// Use exact wording from the transcript when possible.</span>`;
+
+  const nodeData = {
+    // --- Stage 1 ---
+    's1-input': {
+      eyebrow: "Inspecting · Input",
+      title: "A <em>transcript</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The starting point. <em>You paste a meeting transcript and the agent runs once. Stage 1 is manual — Stage 2 will automate it.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 raw text", out: "📝 the transcript text" } },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "→", target: "The Analyst", note: "passes the transcript" }] }
       ]
     },
-
-    output: {
+    's1-agent': {
+      eyebrow: "Inspecting · Chat assistant",
+      title: "The <em>Analyst</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The whole agent. <em>One Claude API call with a system prompt. It reads the transcript, finds themes, finds actions, and writes the final report all by itself.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 a transcript", out: "📊 a final report" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "The transcript", note: "reads input" },
+            { arrow: "→", target: "The report", note: "writes output" }
+          ] }
+      ]
+    },
+    's1-output': {
       eyebrow: "Inspecting · Output",
       title: "A <em>report</em>",
       sections: [
-        {
-          label: "What this is",
-          type: "desc",
-          content: `The end of the line. Once the orchestrator finishes synthesizing, the report is <em>saved as a markdown file</em> with today's date — ready for you to open, share, or paste into Slack.`
-        },
-        {
-          label: "What goes in / out",
-          type: "ioflow",
-          content: { in: "📊 a final report", out: "📄 a saved file" }
-        },
-        {
-          label: "Recent reports",
-          type: "files",
+        { label: "What this is", type: "desc",
+          content: `The result. <em>Stage 1 just prints it to your terminal. In Stage 2 we'll save it to a file automatically.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📊 the analyst's report", out: "📺 printed to terminal" } },
+        { label: "Connects from", type: "connections",
+          content: [{ arrow: "←", target: "The Analyst", note: "receives the report" }] }
+      ]
+    },
+
+    // --- Stage 2 ---
+    's2-input': {
+      eyebrow: "Inspecting · Trigger",
+      title: "File <em>drop</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `An <em>automatic trigger</em>. A folder watcher sits in the background. Whenever a new <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">.txt</code> file lands in <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/</code>, the agent wakes up.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📁 file appears", out: "📝 the transcript text" } },
+        { label: "Recent files", type: "files",
+          content: [
+            { name: "sample-transcript.txt", meta: "just now" },
+            { name: "standup-2026-04-26.txt", meta: "yesterday" },
+            { name: "design-review.txt", meta: "2 days ago" }
+          ] },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "→", target: "The Analyst", note: "fires it on every new file" }] }
+      ]
+    },
+    's2-agent': {
+      eyebrow: "Inspecting · Chat assistant",
+      title: "The <em>Analyst</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `<em>The same agent from Stage 1.</em> Same code, same system prompt. The only thing that changed is who pressed "go" — now a folder watcher instead of you.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 a transcript", out: "📊 a final report" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "File drop", note: "triggered automatically" },
+            { arrow: "→", target: "Saved file", note: "writes the report" }
+          ] }
+      ]
+    },
+    's2-output': {
+      eyebrow: "Inspecting · Output",
+      title: "Saved <em>file</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `Now the report <em>persists</em>. Each run writes a timestamped markdown file in <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">outputs/</code> — open it, share it, paste it into Slack.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📊 the report", out: "📄 markdown file" } },
+        { label: "Recent reports", type: "files",
           content: [
             { name: "2026-04-27-1042.md", meta: "just now" },
-            { name: "2026-04-26-0915.md", meta: "yesterday" },
-            { name: "2026-04-25-1430.md", meta: "2 days ago" },
-          ]
-        },
-        {
-          label: "Connects from",
-          type: "connections",
+            { name: "2026-04-26-0915.md", meta: "yesterday" }
+          ] },
+        { label: "Connects from", type: "connections",
+          content: [{ arrow: "←", target: "The Analyst", note: "receives the report" }] }
+      ]
+    },
+
+    // --- Stage 3 ---
+    's3-input': {
+      eyebrow: "Inspecting · Input",
+      title: "A <em>transcript</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The starting point. <em>Same trigger as Stage 2 — a file landing in </em><code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/</code><em>. What changes is what happens next.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📁 file appears", out: "📝 the transcript text" } },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "→", target: "The Conductor", note: "passes the transcript" }] }
+      ]
+    },
+    's3-agent': {
+      eyebrow: "Inspecting · Orchestrator",
+      title: "The <em>Conductor</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The brain. <em>It doesn't read the transcript itself — it dispatches to its sub-agents, waits for their answers, then writes the final report.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 a transcript", out: "📊 a final report" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
+        { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "The Conductor", note: "receives the final report" }
-          ]
-        }
+            { arrow: "←", target: "The transcript", note: "reads input" },
+            { arrow: "↓", target: "The Summarizer", note: "asks for themes" },
+            { arrow: "↓", target: "The Extractor", note: "asks for actions" },
+            { arrow: "→", target: "The report", note: "writes final" }
+          ] }
+      ]
+    },
+    's3-output': {
+      eyebrow: "Inspecting · Output",
+      title: "A <em>report</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `Same destination as Stage 2 — a saved markdown file. <em>The difference is the report itself is now synthesized from two specialist sub-agents instead of written in one shot.</em>` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📊 the synthesized report", out: "📄 saved markdown" } },
+        { label: "Recent reports", type: "files",
+          content: [
+            { name: "2026-04-27-1042.md", meta: "just now" },
+            { name: "2026-04-26-0915.md", meta: "yesterday" }
+          ] },
+        { label: "Connects from", type: "connections",
+          content: [{ arrow: "←", target: "The Conductor", note: "receives the synthesis" }] }
+      ]
+    },
+    's3-summ': {
+      eyebrow: "Inspecting · Sub-agent",
+      title: "The <em>Summarizer</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `A <em>helper</em> the orchestrator calls when it needs themes pulled from a transcript. It does one thing well: reads, finds 3 patterns, returns them.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 a transcript", out: "🏷️ 3 themes" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptSummarizer },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns to" }] }
+      ]
+    },
+    's3-extr': {
+      eyebrow: "Inspecting · Sub-agent",
+      title: "The <em>Extractor</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `Another <em>helper</em>. The orchestrator calls this one to pull out specific action items — who's doing what, by when.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 a transcript", out: "✅ a list of actions" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptExtractor },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns to" }] }
       ]
     }
   };
 
+  // ============ STAGE-SPECIFIC ANIMATION SEQUENCES ============
+
+  const sequences = {
+    1: [
+      { t: 0,    src: 'input', srcLabel: 'A transcript', msg: 'Pasted a transcript · 442 words.', node: 's1-input', state: 'active' },
+      { t: 350,  src: 'input', srcLabel: 'A transcript', msg: 'Sending <span class="arrow">→</span> The Analyst.', particle: 's1-input>s1-agent', complete: 's1-input' },
+      { t: 800,  src: 'orch',  srcLabel: 'The Analyst',  msg: 'Got it. Reading the transcript…', node: 's1-agent', state: 'active' },
+      { t: 1500, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Finding themes, action items, recommended next step.' },
+      { t: 2400, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Done. <span class="arrow">→</span> Sending the report.', particle: 's1-agent>s1-output', complete: 's1-agent' },
+      { t: 2900, src: 'output',srcLabel: 'A report',     msg: 'Printed to terminal. <em>Stage 1 done.</em>', node: 's1-output', state: 'active', report: true, complete: 's1-output' }
+    ],
+    2: [
+      { t: 0,    src: 'input', srcLabel: 'File drop',    msg: 'New file <code>sample-transcript.txt</code> landed in <code>transcripts/</code>.', node: 's2-input', state: 'active' },
+      { t: 350,  src: 'input', srcLabel: 'File drop',    msg: 'Watcher fired <span class="arrow">→</span> sending to The Analyst.', particle: 's2-input>s2-agent', complete: 's2-input' },
+      { t: 800,  src: 'orch',  srcLabel: 'The Analyst',  msg: 'Got it. Same agent as Stage 1, same prompt.', node: 's2-agent', state: 'active' },
+      { t: 1500, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Reading the transcript and writing the report.' },
+      { t: 2400, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Done. <span class="arrow">→</span> Saving to a file.', particle: 's2-agent>s2-output', complete: 's2-agent' },
+      { t: 2900, src: 'output',srcLabel: 'Saved file',   msg: 'Wrote <code>outputs/2026-04-27-1042.md</code>. <em>Pipeline complete.</em>', node: 's2-output', state: 'active', report: true, complete: 's2-output' }
+    ],
+    3: [
+      { t: 0,    src: 'input', srcLabel: 'A transcript', msg: 'New file <code>sample-transcript.txt</code> · 442 words.', node: 's3-input', state: 'active' },
+      { t: 350,  src: 'input', srcLabel: 'A transcript', msg: 'Sending <span class="arrow">→</span> The Conductor.', particle: 's3-input>s3-agent', complete: 's3-input' },
+      { t: 750,  src: 'orch',  srcLabel: 'The Conductor', msg: 'Got it. Reading the transcript…', node: 's3-agent', state: 'active' },
+      { t: 1200, src: 'orch',  srcLabel: 'The Conductor', msg: 'I need themes <em>and</em> action items. I\'ll ask both helpers.' },
+      { t: 1700, src: 'orch',  srcLabel: 'The Conductor', msg: 'Calling <code>The Summarizer</code>…', particle: 's3-agent>s3-summ' },
+      { t: 2100, src: 'sub',   srcLabel: 'The Summarizer', msg: 'On it. Reading the transcript.', node: 's3-summ', state: 'active' },
+      { t: 2600, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Found 3 themes. Handing back.' },
+      { t: 3100, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Returning <span class="arrow">↑</span> to The Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
+      { t: 3500, src: 'orch',  srcLabel: 'The Conductor', msg: 'Got the themes. Now calling <code>The Extractor</code>…', particle: 's3-agent>s3-extr' },
+      { t: 3900, src: 'extr',  srcLabel: 'The Extractor',  msg: 'On it. Looking for action items.', node: 's3-extr', state: 'active' },
+      { t: 4500, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Found 5 actions with owners.' },
+      { t: 5000, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Sending <span class="arrow">↑</span> to The Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
+      { t: 5400, src: 'orch',  srcLabel: 'The Conductor', msg: 'Both helpers done. Writing the final report.' },
+      { t: 6100, src: 'orch',  srcLabel: 'The Conductor', msg: 'Report ready. Sending <span class="arrow">→</span> Output.', particle: 's3-agent>s3-output', complete: 's3-agent' },
+      { t: 6500, src: 'output',srcLabel: 'A report',     msg: 'Saved as <code>2026-04-27-1042.md</code>. <em>All done.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
+    ]
+  };
+
+  // ============ STAGE-SPECIFIC SVG CONNECTIONS ============
+
+  function buildConnections() {
+    const svg = $('svg');
+    svg.innerHTML = '';
+    const wrap = svg.parentElement.getBoundingClientRect();
+    const stage = document.body.dataset.stage;
+    const pathRefs = {};
+    const anchors = [];
+
+    function rect(id) { return $(id).getBoundingClientRect(); }
+    function ptR(r) { return { x: r.right - wrap.left, y: r.top + r.height/2 - wrap.top }; }
+    function ptL(r) { return { x: r.left - wrap.left,  y: r.top + r.height/2 - wrap.top }; }
+    function ptB(r) { return { x: r.left + r.width/2 - wrap.left, y: r.bottom - wrap.top }; }
+    function ptT(r) { return { x: r.left + r.width/2 - wrap.left, y: r.top - wrap.top }; }
+
+    let paths = [];
+
+    if (stage === '1') {
+      const inR = rect('s1-input'), agR = rect('s1-agent'), outR = rect('s1-output');
+      const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), outputLeft = ptL(outR);
+      paths = [
+        { id: 's1-input>s1-agent',  d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
+        { id: 's1-agent>s1-output', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' }
+      ];
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft);
+    } else if (stage === '2') {
+      const inR = rect('s2-input'), agR = rect('s2-agent'), outR = rect('s2-output');
+      const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), outputLeft = ptL(outR);
+      paths = [
+        { id: 's2-input>s2-agent',  d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
+        { id: 's2-agent>s2-output', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' }
+      ];
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft);
+    } else if (stage === '3') {
+      const inR = rect('s3-input'), agR = rect('s3-agent'), outR = rect('s3-output'), summR = rect('s3-summ'), extrR = rect('s3-extr');
+      const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), agentBot = ptB(agR), outputLeft = ptL(outR);
+      const summTop = ptT(summR), extrTop = ptT(extrR);
+      paths = [
+        { id: 's3-input>s3-agent',  d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
+        { id: 's3-agent>s3-output', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
+        { id: 's3-agent>s3-summ',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 30}, ${summTop.x} ${summTop.y - 30}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
+        { id: 's3-agent>s3-extr',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 30}, ${extrTop.x} ${extrTop.y - 30}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' }
+      ];
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop);
+    }
+
+    paths.forEach(p => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      el.setAttribute('d', p.d);
+      el.setAttribute('class', 'conn-path ' + p.cls);
+      svg.appendChild(el);
+      pathRefs[p.id] = el;
+    });
+
+    // arrowheads on main paths
+    paths.filter(p => p.cls === 'main').forEach(p => {
+      const points = p.d.match(/[\d.]+/g);
+      const endX = parseFloat(points[points.length - 2]);
+      const endY = parseFloat(points[points.length - 1]);
+      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      arrow.setAttribute('points', `${endX},${endY} ${endX-8},${endY-4} ${endX-8},${endY+4}`);
+      arrow.setAttribute('fill', '#95908A');
+      svg.appendChild(arrow);
+    });
+
+    anchors.forEach(pt => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', 3);
+      c.setAttribute('fill', '#FAF8F4');
+      c.setAttribute('stroke', '#95908A');
+      c.setAttribute('stroke-width', 1.5);
+      svg.appendChild(c);
+    });
+
+    return pathRefs;
+  }
+
   // ============ DOM HELPERS ============
   const $ = (id) => document.getElementById(id);
+
+  let currentStage = '1';
+  let pathRefs = {};
 
   // ============ INSPECT RENDERING ============
   function renderInspect(nodeKey) {
@@ -1197,36 +1455,22 @@ Return them as a clean list.
         html += `<div class="inspect-desc">${section.content}</div>`;
       } else if (section.type === 'ioflow') {
         html += `<div class="io-flow">
-                   <div class="io-box">
-                     <div class="io-box-label">In</div>
-                     ${section.content.in}
-                   </div>
+                   <div class="io-box"><div class="io-box-label">In</div>${section.content.in}</div>
                    <div class="io-arrow">→</div>
-                   <div class="io-box">
-                     <div class="io-box-label">Out</div>
-                     ${section.content.out}
-                   </div>
+                   <div class="io-box"><div class="io-box-label">Out</div>${section.content.out}</div>
                  </div>`;
       } else if (section.type === 'prompt') {
         html += `<div class="prompt-block">${section.content}</div>`;
       } else if (section.type === 'files') {
         html += `<div class="file-list">`;
         for (const f of section.content) {
-          html += `<div class="file-row">
-                     <span class="file-icon">📄</span>
-                     <span class="file-name">${f.name}</span>
-                     <span class="file-meta">${f.meta}</span>
-                   </div>`;
+          html += `<div class="file-row"><span class="file-icon">📄</span><span class="file-name">${f.name}</span><span class="file-meta">${f.meta}</span></div>`;
         }
         html += `</div>`;
       } else if (section.type === 'connections') {
         html += `<div class="connection-list">`;
         for (const c of section.content) {
-          html += `<div class="connection-row">
-                     <span class="arrow">${c.arrow}</span>
-                     <span class="target">${c.target}</span>
-                     <span class="note">${c.note}</span>
-                   </div>`;
+          html += `<div class="connection-row"><span class="arrow">${c.arrow}</span><span class="target">${c.target}</span><span class="note">${c.note}</span></div>`;
         }
         html += `</div>`;
       }
@@ -1248,122 +1492,39 @@ Return them as a clean list.
     document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
   }
 
-  document.querySelectorAll('.node').forEach(n => {
-    n.addEventListener('click', () => renderInspect(n.dataset.node));
-  });
-  $('backBtn').addEventListener('click', exitInspect);
-
-  // ============ SVG CONNECTIONS ============
-  const svg = $('svg');
-  let pathRefs = {};
-
-  function buildConnections() {
-    svg.innerHTML = '';
-    pathRefs = {};
-    const wrap = svg.parentElement.getBoundingClientRect();
-
-    const inputR  = $('nodeInput').getBoundingClientRect();
-    const orchR   = $('nodeOrch').getBoundingClientRect();
-    const outputR = $('nodeOutput').getBoundingClientRect();
-    const summR   = $('nodeSumm').getBoundingClientRect();
-    const extrR   = $('nodeExtr').getBoundingClientRect();
-
-    const inputRight = { x: inputR.right - wrap.left, y: inputR.top + inputR.height/2 - wrap.top };
-    const orchLeft   = { x: orchR.left - wrap.left,   y: orchR.top + orchR.height/2 - wrap.top };
-    const orchRight  = { x: orchR.right - wrap.left,  y: orchR.top + orchR.height/2 - wrap.top };
-    const orchBot    = { x: orchR.left + orchR.width/2 - wrap.left, y: orchR.bottom - wrap.top };
-    const outputLeft = { x: outputR.left - wrap.left, y: outputR.top + outputR.height/2 - wrap.top };
-    const summTop    = { x: summR.left + summR.width/2 - wrap.left, y: summR.top - wrap.top };
-    const extrTop    = { x: extrR.left + extrR.width/2 - wrap.left, y: extrR.top - wrap.top };
-
-    const paths = [
-      // MAIN FLOW (top): input → orch → output
-      { id: 'inputOrch',  d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${orchLeft.x - 80} ${orchLeft.y}, ${orchLeft.x} ${orchLeft.y}`, cls: 'main' },
-      { id: 'orchOutput', d: `M ${orchRight.x} ${orchRight.y} C ${orchRight.x + 80} ${orchRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
-      // SUB-AGENT calls (down): orch ↕ summ, orch ↕ extr — dashed to indicate "internal call"
-      { id: 'orchSumm',   d: `M ${orchBot.x} ${orchBot.y} C ${orchBot.x} ${orchBot.y + 30}, ${summTop.x} ${summTop.y - 30}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
-      { id: 'orchExtr',   d: `M ${orchBot.x} ${orchBot.y} C ${orchBot.x} ${orchBot.y + 30}, ${extrTop.x} ${extrTop.y - 30}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' },
-    ];
-
-    paths.forEach(p => {
-      const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      el.setAttribute('d', p.d);
-      el.setAttribute('class', 'conn-path ' + p.cls);
-      svg.appendChild(el);
-      pathRefs[p.id] = el;
+  // ============ STAGE SWITCHING ============
+  function switchStage(stageNum) {
+    currentStage = String(stageNum);
+    document.body.dataset.stage = currentStage;
+    document.querySelectorAll('.top-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === currentStage);
     });
+    const labels = { '1': '1 · chat assistant', '2': '2 · workflow', '3': '3 · agentic system' };
+    const titles = { '1': 'What\'s <em>happening?</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
+    const nodeCounts = { '1': '3', '2': '3', '3': '5' };
+    $('metaStage').textContent = labels[currentStage];
+    $('metaNodes').textContent = nodeCounts[currentStage];
+    $('rhTitle').innerHTML = titles[currentStage];
 
-    // arrowheads on main flow
-    paths.slice(0, 2).forEach(p => {
-      const points = p.d.match(/[\d.]+/g);
-      const endX = parseFloat(points[points.length - 2]);
-      const endY = parseFloat(points[points.length - 1]);
-      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      arrow.setAttribute('points', `${endX},${endY} ${endX-8},${endY-4} ${endX-8},${endY+4}`);
-      arrow.setAttribute('fill', '#95908A');
-      svg.appendChild(arrow);
-    });
-
-    // anchor circles
-    [inputRight, orchLeft, orchRight, outputLeft, orchBot, summTop, extrTop].forEach(pt => {
-      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', 3);
-      c.setAttribute('fill', '#FAF8F4');
-      c.setAttribute('stroke', '#95908A');
-      c.setAttribute('stroke-width', 1.5);
-      svg.appendChild(c);
-    });
+    exitInspect();
+    fullReset();
+    pathRefs = buildConnections();
   }
 
-  buildConnections();
-  window.addEventListener('resize', buildConnections);
-
   // ============ ANIMATION ============
-  const sequence = [
-    { t: 0,    src: 'input',  srcLabel: 'A transcript',     msg: 'New file <code>sample-transcript.txt</code> · 442 words.', node: 'input', state: 'active' },
-    { t: 350,  src: 'input',  srcLabel: 'A transcript',     msg: 'Sending <span class="arrow">→</span> The Conductor.', particle: 'inputOrch', complete: 'input' },
-    { t: 750,  src: 'orch',   srcLabel: 'The Conductor',    msg: 'Got it. Reading the transcript…', node: 'orch', state: 'active' },
-    { t: 1200, src: 'orch',   srcLabel: 'The Conductor',    msg: 'I need themes <em>and</em> action items. I\'ll ask both helpers.' },
-    { t: 1700, src: 'orch',   srcLabel: 'The Conductor',    msg: 'Calling <code>The Summarizer</code>…', particle: 'orchSumm' },
-    { t: 2100, src: 'sub',    srcLabel: 'The Summarizer',   msg: 'On it. Reading the transcript.', node: 'sub', state: 'active' },
-    { t: 2600, src: 'sub',    srcLabel: 'The Summarizer',   msg: 'Found 3 themes. Let me hand them back.' },
-    { t: 3100, src: 'sub',    srcLabel: 'The Summarizer',   msg: 'Returning <span class="arrow">↑</span> to The Conductor.', particle: 'orchSummReverse', complete: 'sub' },
-    { t: 3500, src: 'orch',   srcLabel: 'The Conductor',    msg: 'Got the themes. Now calling <code>The Extractor</code>…', particle: 'orchExtr' },
-    { t: 3900, src: 'extr',   srcLabel: 'The Extractor',    msg: 'On it. Looking for action items.', node: 'extr', state: 'active' },
-    { t: 4500, src: 'extr',   srcLabel: 'The Extractor',    msg: 'Found 5 actions with owners. Returning.' },
-    { t: 5000, src: 'extr',   srcLabel: 'The Extractor',    msg: 'Sending <span class="arrow">↑</span> to The Conductor.', particle: 'orchExtrReverse', complete: 'extr' },
-    { t: 5400, src: 'orch',   srcLabel: 'The Conductor',    msg: 'Both helpers done. Writing the final report.' },
-    { t: 6100, src: 'orch',   srcLabel: 'The Conductor',    msg: 'Report ready. Sending <span class="arrow">→</span> Output.', particle: 'orchOutput', complete: 'orch' },
-    { t: 6500, src: 'output', srcLabel: 'A report',         msg: 'Saved as <code>2026-04-27-1042.md</code>. <em>All done.</em>', node: 'output', state: 'active', report: true, complete: 'output' },
-  ];
-
-  const runBtn = $('runBtn');
-  const feed = $('feed');
-
   function fmt(ms) { return (ms / 1000).toFixed(2) + 's'; }
 
-  function reset() {
-    feed.innerHTML = `
+  function fullReset() {
+    $('feed').innerHTML = `
       <div class="feed-empty">Press <em>Run Agent</em> to begin.</div>
       <div class="feed-hint">
         <b>Try this:</b> click any node on the left to peek inside.<br>
         You'll see exactly what's making it tick — including the actual instructions it follows.
       </div>
     `;
-    ['Input','Orch','Output'].forEach(k => {
-      const node = $('node' + k);
-      node.classList.remove('active','complete');
-    });
-    ['Summ','Extr'].forEach(k => {
-      const node = $('node' + k);
-      node.classList.remove('active','complete');
-    });
-    ['orch','sub','extr'].forEach(k => {
-      const lbl = $(k + 'StateLabel');
-      const tm = $(k + 'Time');
-      if (lbl) lbl.textContent = 'idle';
-      if (tm) tm.textContent = '—';
-    });
+    document.querySelectorAll('.node').forEach(n => n.classList.remove('active','complete'));
+    document.querySelectorAll('[id$="State"], [id$="StateLabel"]').forEach(el => el.textContent = 'idle');
+    document.querySelectorAll('[id$="Time"]').forEach(el => el.textContent = '—');
     Object.keys(pathRefs).forEach(p => pathRefs[p].classList.remove('active','complete'));
     $('outEmpty').style.display = '';
     $('outContent').classList.remove('visible');
@@ -1372,6 +1533,7 @@ Return them as a clean list.
   }
 
   function addFeed(e) {
+    const feed = $('feed');
     if (feed.querySelector('.feed-empty')) feed.innerHTML = '';
     const div = document.createElement('div');
     div.className = 'feed-item';
@@ -1388,26 +1550,22 @@ Return them as a clean list.
     body.scrollTop = body.scrollHeight;
   }
 
-  const nodeMap = { input: 'nodeInput', orch: 'nodeOrch', sub: 'nodeSumm', extr: 'nodeExtr', output: 'nodeOutput' };
-  const labelMap = { input: null, orch: 'orchStateLabel', sub: 'subStateLabel', extr: 'extrStateLabel', output: null };
-  const timeMap = { input: null, orch: 'orchTime', sub: 'subTime', extr: 'extrTime', output: null };
-
-  function setNode(key, state) {
-    const node = $(nodeMap[key]);
+  function setNode(nodeId, state) {
+    const node = $(nodeId);
+    if (!node) return;
     node.classList.remove('active','complete');
-    if (state === 'active') {
-      node.classList.add('active');
-      const lbl = labelMap[key]; if (lbl) $(lbl).textContent = 'working…';
-    } else if (state === 'complete') {
-      node.classList.add('complete');
-      const lbl = labelMap[key]; if (lbl) $(lbl).textContent = 'done';
+    if (state) node.classList.add(state);
+    const stateLabel = $(nodeId + 'State');
+    if (stateLabel) {
+      stateLabel.textContent = state === 'active' ? 'working…' : state === 'complete' ? 'done' : 'idle';
     }
   }
 
-  function flyParticle(particleId, fromKey, toKey) {
+  function flyParticle(particleId, fromNodeId, toNodeId) {
+    const svg = $('svg');
     const wrap = svg.parentElement.getBoundingClientRect();
-    const fromRect = $(nodeMap[fromKey]).getBoundingClientRect();
-    const toRect = $(nodeMap[toKey]).getBoundingClientRect();
+    const fromRect = $(fromNodeId).getBoundingClientRect();
+    const toRect = $(toNodeId).getBoundingClientRect();
 
     let fromX, fromY, toX, toY;
     if (Math.abs(fromRect.left - toRect.left) > 50) {
@@ -1457,12 +1615,24 @@ Return them as a clean list.
     if (state) path.classList.add(state);
   }
 
+  // pick a particle id appropriate for the source color
+  function pickParticleFor(fromNodeId) {
+    if (fromNodeId.includes('input')) return 'p1';
+    if (fromNodeId.includes('summ')) return 'p3';
+    if (fromNodeId.includes('extr')) return 'p5';
+    if (fromNodeId.includes('output')) return 'p6';
+    return 'p2'; // default: orch color
+  }
+
   async function run() {
     exitInspect();
-    reset();
+    fullReset();
+    const runBtn = $('runBtn');
     runBtn.disabled = true;
     runBtn.innerHTML = 'Running… <span class="kbd">⌘R</span>';
     $('canvasStatus').textContent = '● running';
+
+    const sequence = sequences[currentStage];
     const startTimes = {};
     const start = performance.now();
 
@@ -1478,16 +1648,15 @@ Return them as a clean list.
       if (e.complete) {
         setNode(e.complete, 'complete');
         const elapsed = e.t - (startTimes[e.complete] || 0);
-        const tm = timeMap[e.complete];
-        if (tm) $(tm).textContent = fmt(elapsed);
+        const tm = $(e.complete + 'Time');
+        if (tm) tm.textContent = fmt(elapsed);
       }
       if (e.particle) {
-        if (e.particle === 'inputOrch')        { flyParticle('p1', 'input', 'orch'); setPath('inputOrch', 'active'); setTimeout(() => setPath('inputOrch', 'complete'), 1000); }
-        else if (e.particle === 'orchSumm')    { flyParticle('p2', 'orch', 'sub');   setPath('orchSumm', 'active'); }
-        else if (e.particle === 'orchSummReverse') { flyParticle('p3', 'sub', 'orch'); setTimeout(() => setPath('orchSumm', 'complete'), 1000); }
-        else if (e.particle === 'orchExtr')    { flyParticle('p4', 'orch', 'extr');  setPath('orchExtr', 'active'); }
-        else if (e.particle === 'orchExtrReverse') { flyParticle('p5', 'extr', 'orch'); setTimeout(() => setPath('orchExtr', 'complete'), 1000); }
-        else if (e.particle === 'orchOutput')  { flyParticle('p6', 'orch', 'output'); setPath('orchOutput', 'active'); setTimeout(() => setPath('orchOutput', 'complete'), 1000); }
+        const [from, to] = e.particle.split('>');
+        const pid = pickParticleFor(from);
+        flyParticle(pid, from, to);
+        setPath(e.particle, 'active');
+        setTimeout(() => setPath(e.particle, 'complete'), 1000);
       }
       if (e.report) {
         $('outEmpty').style.display = 'none';
@@ -1501,12 +1670,42 @@ Return them as a clean list.
     runBtn.innerHTML = 'Run Again <span class="kbd">⌘R</span>';
   }
 
-  runBtn.addEventListener('click', run);
-  $('resetBtn').addEventListener('click', () => { exitInspect(); reset(); });
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'r' && !runBtn.disabled) { e.preventDefault(); run(); }
-    if (e.key === 'Escape') exitInspect();
+  // ============ EVENT WIRING ============
+  document.querySelectorAll('.top-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchStage(tab.dataset.tab));
   });
+
+  document.addEventListener('click', (e) => {
+    const node = e.target.closest('.node');
+    if (node && node.dataset.node) {
+      renderInspect(node.dataset.node);
+    }
+  });
+
+  $('backBtn').addEventListener('click', exitInspect);
+  $('runBtn').addEventListener('click', run);
+  $('resetBtn').addEventListener('click', () => { exitInspect(); fullReset(); });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'r' && !$('runBtn').disabled) {
+      e.preventDefault();
+      run();
+    }
+    if (e.key === 'Escape') exitInspect();
+    if (e.key === '1' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('1');
+    }
+    if (e.key === '2' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('2');
+    }
+    if (e.key === '3' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('3');
+    }
+  });
+
+  // initial build
+  pathRefs = buildConnections();
+  window.addEventListener('resize', () => { pathRefs = buildConnections(); });
 </script>
 </body>
 </html>

@@ -98,7 +98,28 @@ Tell them how to stop the watcher:
 
 > "When you're done playing, hit `Ctrl+C` in the watcher's terminal to stop it. The agent stops listening; nothing else changes."
 
-## Step 7: The big idea (2 min)
+## Step 7: See it in the frontend (3 min)
+
+Open `frontend/index.html` in their browser (if it's not already), and have them click the **Stage 2 tab** at the top:
+
+```bash
+open frontend/index.html
+```
+
+Walk them through:
+
+> "Look at this layout. Same shape as Stage 1, but two things changed:
+>
+> - The input on the left is no longer 'A transcript' — it's now '**File drop**.' That's the chokidar watcher you just built.
+> - The output on the right is no longer 'A report' (printed) — it's now '**Saved file**.' That's the markdown file in `outputs/`.
+>
+> The agent in the middle is **identical** to Stage 1. Same Analyst, same code, same system prompt. *Only the trigger and the destination changed.*"
+
+Have them click the **File drop** node — show them the inspect panel: it describes the watcher, lists recent files, points to the connection. Then hit **Run Agent** to watch the Stage 2 animation play.
+
+> "That's the visual proof: same agent in the middle, automated trigger on the input, persistent destination on the output."
+
+## Step 8: The big idea (2 min)
 
 Pause and zoom out:
 
@@ -111,7 +132,7 @@ Pause and zoom out:
 >
 > Once you see this pattern, you can swap *any* trigger and *any* destination. A scheduled cron. An incoming email. A Slack message. A webhook from your CRM. The agent doesn't care. **The trigger and destination are pluggable.**"
 
-## Step 8: Wrap and commit (2 min)
+## Step 9: Wrap and commit (2 min)
 
 1. Have them clean up the test files if they want:
    ```bash
