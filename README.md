@@ -26,8 +26,8 @@ You don't need to be a JavaScript expert. The code is short, plain, and heavily 
 ## Getting started
 
 ```bash
-git clone https://github.com/aistudycamp/aisc-cc-agent-sprint.git
-cd aisc-cc-agent-sprint
+git clone https://github.com/aistudycamp/aisc-cc-week4-exercises.git
+cd aisc-cc-week4-exercises
 claude
 ```
 
