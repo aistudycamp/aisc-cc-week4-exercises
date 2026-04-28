@@ -1,134 +1,128 @@
 ---
 name: module-1
-description: Tour the System — Module 1 of the AISC Agent Sprint. Triggered when a student types "module-1". Gives students a guided tour of the repo as a systems-thinking exercise, showing how agents, skills, sub-agents, and tools compose together.
+description: Tour the System — Module 1 of the AISC Agent Sprint. Triggered when a student types "module-1". Gives a guided systems-thinking tour of what an agentic system looks like, using the example-transcripts-insights walkthrough. No code yet — just mental model.
 ---
 
 # Module 1: Tour the System
 
 **Time:** ~15 minutes
-**You'll produce:** a mental model for how agents are actually architected — no code yet, but you'll see the pieces fit together
+**You'll produce:** a mental model for how agents are architected — orchestrator, sub-agents, system prompts, and the data flow between them.
 
 ## Coach Instructions
 
-You are guiding the student through a tour of this repo as a *systems* — not a pile of files. The point of this module is to make them *see* how agents compose before they build one. Keep it conversational. Use the ASCII diagrams. Ask them questions along the way to keep them active.
+The point of this module: students *see* how an agentic system composes before they build one. Keep it conversational. Use the ASCII diagrams. Ask them questions along the way.
 
 ## Step 1: Set the frame (1 min)
 
-Open with something like:
+Say:
 
-> "Welcome to Module 1. Before we build anything, let's look at what an agent actually *is*. Most people hear 'agent' and picture a chatbot that can do stuff on its own — but that's only half the story. An agent is really a *system* of pieces working together. Today you'll see those pieces laid out in this repo. By the end of this module, when someone says 'orchestrator' or 'sub-agent', you'll know exactly what they mean and where they live."
+> "Module 1. Before we touch any code, let's look at what an agent actually *is*. Most people hear 'agent' and picture a chatbot that does things on its own. That's only half the picture. An agent is really a *system* of pieces working together. Today you'll see those pieces laid out. By the end of this module, when someone says 'orchestrator' or 'sub-agent', you'll know exactly what they mean and where they live."
 
-## Step 2: Show them the big picture (3 min)
+## Step 2: Show the big picture (3 min)
 
-Print this ASCII diagram:
+Print this ASCII:
 
 ```
-                 ╭─────────────────────────────╮
-                 │   ORCHESTRATOR (the agent)  │
-                 │   "I decide what to do"     │
-                 ╰──────────────┬──────────────╯
-                                │
-              ┌─────────────────┼──────────────────┐
-              │                 │                  │
-              ▼                 ▼                  ▼
-        ┌──────────┐      ┌──────────┐       ┌──────────┐
-        │  SKILLS  │      │   TOOLS  │       │  SUB-    │
-        │          │      │  (MCPs)  │       │  AGENTS  │
-        │ packaged │      │ external │       │ focused  │
-        │ workflows│      │ senses   │       │ helpers  │
-        └──────────┘      └──────────┘       └──────────┘
+       ┌────────────────┐         ┌─────────────────────┐         ┌────────────────┐
+       │     INPUT      │   →     │   THE ORCHESTRATOR  │   →     │     OUTPUT     │
+       │ a transcript   │         │  "decides what to do"│         │ a saved report │
+       └────────────────┘         └──────────┬──────────┘         └────────────────┘
+                                             │
+                                  ┌──────────┴──────────┐
+                                  │                     │
+                                  ▼                     ▼
+                       ┌─────────────────┐   ┌─────────────────┐
+                       │  THE SUMMARIZER │   │  THE EXTRACTOR  │
+                       │  finds 3 themes │   │  finds actions  │
+                       └─────────────────┘   └─────────────────┘
+                              ↑                       ↑
+                              └──── sub-agents ───────┘
+                              (the orchestrator's helpers)
 ```
 
-Then explain in plain language:
+Then explain:
 
-> "Think of the orchestrator as a project manager. It doesn't do the hard work itself — it routes work to the right specialist. The three kinds of specialists are:
+> "Read this left-to-right. The transcript comes in. The orchestrator reads it. It dispatches to two specialists — the Summarizer (which finds themes) and the Extractor (which finds action items). Both come back to the orchestrator with their answers. The orchestrator synthesizes everything into a final report and saves it.
 >
-> - **Skills** — packaged processes. 'When someone asks me to do X, here's how I do it.'
-> - **Tools (MCPs)** — connections to the outside world. Gmail, GitHub, a database. Live data, not memory.
-> - **Sub-agents** — focused helpers with their own fresh context. Good for deep work that shouldn't clutter the main thread.
->
-> Every agent in this repo has some or all of these pieces. Let's look at one."
+> That's the whole shape of every agentic system you'll ever build. Different inputs, different outputs, different specialists — but always: **input → orchestrator → specialists → orchestrator → output.**"
 
-## Step 3: Walk them through an example (5 min)
+## Step 3: Walk through the example (5 min)
 
-Open `examples/example-content-creator.md` together:
+Open `examples/example-transcripts-insights.md` together.
 
-1. Tell them you're going to read it with them
-2. Point out the **AGENT.md section** — that's the orchestrator's brain. Its role, its personality, when to act.
-3. Point out the **tools section** — what MCPs/sources this agent needs to work
-4. Point out the **skills section** — the specific workflows this agent runs
-5. Point out the **sub-agents section** — what it delegates to
-
-After reading, print this ASCII for the content-creator example:
-
-```
-        ┌─ content-creator (orchestrator)
-        │   "I draft content in your voice"
-        │
-        ├── skills/
-        │   ├── /draft-post       ← takes a topic, produces a post
-        │   └── /polish           ← tightens up existing drafts
-        │
-        ├── tools/
-        │   ├── web-search        ← research current events
-        │   └── style-reference   ← your voice, captured in a file
-        │
-        └── sub-agents/
-            └── researcher        ← deep-dive for complex topics
-```
-
-Ask them:
-
-> "Do you see how the orchestrator doesn't contain the 'doing' itself? It contains the *map* of who does what. That's systems thinking."
-
-## Step 4: The three principles (3 min)
-
-Now tell them:
-
-> "There are three principles behind why agents are built this way. Memorize these — they'll make every design decision easier."
-
-1. **Separation of concerns.** Each piece does one thing well. A skill doesn't try to be a tool. A tool doesn't try to be a sub-agent. Small pieces compose cleanly.
-2. **Just-in-time context.** Sub-agents get fresh context windows. They read only what they need, return only what matters. The main orchestrator stays clean.
-3. **Escalate by complexity.** Start with a skill. Add a tool when you need live data. Add a sub-agent when a task is big enough to deserve its own focus.
-
-## Step 5: Reflection (3 min)
+Read it with them. Point out:
+1. **The architecture diagram** — same shape as what you just drew.
+2. **The actual report output** — show them what the agent produces. This is what they're working toward.
+3. **The 3 system prompts** — each agent has its own. The Summarizer's prompt is different from the Extractor's, which is different from the Orchestrator's.
+4. **The orchestrator function** (~15 lines of code) — point out how thin it is. It just calls the others.
 
 Ask:
 
-> "Before we move on, think about an agent you might want to build. You don't have to know yet — but if you had to guess:
-> - What would its *one job* be?
-> - What tools would it need to see (Gmail? a spreadsheet? the web?)
-> - What workflow do you repeat often enough that you'd want a skill for it?
+> "Notice something? The orchestrator never actually reads the transcript itself. It hands the transcript to its specialists, waits for them to come back, then writes the final report. It's purely a *conductor*. Why do you think we'd architect it that way instead of having one big agent do everything?"
+
+Wait for their answer. If they're stuck, prompt:
+
+> "Two reasons. First — **focus.** Each specialist has one job and a focused system prompt for that one job. They're better at their narrow task than a generalist would be. Second — **parallel work.** Because the Summarizer and Extractor don't depend on each other, we can run them at the same time. Faster."
+
+## Step 4: The three principles (3 min)
+
+Tell them:
+
+> "Three principles to hold onto. They'll make every design decision easier from here on:"
+
+1. **Separation of concerns.** Each piece does one thing well. The orchestrator orchestrates. The summarizer summarizes. The extractor extracts. Don't mix them up.
+2. **Each agent gets its own prompt.** The system prompt IS the agent. Three agents = three prompts = three files.
+3. **Compose; don't conflate.** Build small pieces, then chain them. A bigger agent isn't always a better agent.
+
+## Step 5: Where you're headed (2 min)
+
+Print the staircase:
+
+```
+       Stage 1                Stage 2                 Stage 3
+       ───────                ───────                 ───────
+
+       chat.js           →    watcher.js        →    orchestrator.js
+       1 function             1 function +           4 functions
+                              file trigger           (orch + 2 subs + synth)
+
+       1 prompt          →    1 prompt          →    3 prompts
+
+       you paste              file lands             file lands
+       a transcript           in folder              in folder
+                              triggers agent         triggers agentic system
+```
+
+> "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across multiple specialists.
 >
-> Don't over-think it. We'll pick an archetype in Module 2 that gets you 80% of the way."
+> One agent at a time."
 
-Listen to what they say. If they're stuck, suggest one of:
-- "You do a lot of writing — maybe content-creator"
-- "You want your day planned — maybe personal-os"
-- "You're tracking something over time — maybe domain-coach"
+## Step 6: Reflection (1 min)
 
-## Step 6: Wrap and commit (2 min)
+Ask:
 
-Say:
-
-> "Beautiful. You now understand the basic shape of every agent — orchestrator + skills + tools + sub-agents, composed on systems-thinking principles. That's the mental model the rest of this sprint builds on.
+> "Before we move on, hold onto this picture in your head. After Module 8, when you go back to your day job, the question you'll ask about *any* problem is:
 >
-> Let me save your progress and we'll move on."
+> - What's the input?
+> - What's the output?
+> - What sub-agents would I need in between?
+>
+> Three questions. The whole pattern."
 
-Do these three things:
+## Step 7: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:`
-2. **Commit**:
+2. **Commit:**
    ```bash
-   git add CLAUDE.md
-   git commit -m "Complete Module 1: Tour the System"
+   cd student-output && git add -A && git commit -m "Complete Module 1: Tour the System" || (cd .. && git add -A && git commit -m "Complete Module 1: Tour the System")
    ```
-3. **Invite them forward**:
-   > "Done. When you're ready, type `module-2` and we'll actually build your agent."
+3. Say:
+
+> "Beautiful. You now understand the shape of every agentic system — input, orchestrator, sub-agents, output, all glued together by system prompts. That's the skeleton. In Module 2 you'll send your first API call and see how a single agent comes alive. Type `module-2` when you're ready."
 
 ## Optional deeper reading
 
-If the student is curious and has time, point them to:
-- `concepts/systems-thinking.md`
+If they're curious:
 - `concepts/what-is-an-agent.md`
 - `concepts/what-is-an-orchestrator.md`
+- `concepts/systems-thinking.md`

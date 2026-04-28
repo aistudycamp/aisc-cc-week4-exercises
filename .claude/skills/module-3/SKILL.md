@@ -1,126 +1,131 @@
 ---
 name: module-3
-description: Wire Your Tools — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Walks the student through installing at least one MCP or local tool for their agent, verifying it works, and updating their agent's tools.md.
+description: Chat Assistant + System Prompt — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student reads what-is-a-system-prompt.md, opens prompts/system.md, modifies it, and re-runs to see how the prompt shapes everything. Then opens the frontend to see Stage 1 visualized.
 ---
 
-# Module 3: Wire Your Tools
+# Module 3: Chat Assistant + System Prompt
 
-**Time:** ~30 minutes
-**You'll produce:** one live MCP or local tool connected to your agent, verified working
+**Time:** ~20 minutes
+**You'll produce:** a deeper understanding of the system prompt — the leverage point of every AI agent. You'll modify one yourself and watch the output change.
 
 ## Coach Instructions
 
-The goal here is to give the student's agent its first real connection to the outside world. Tools are *senses* — without them, the agent only knows what's in its head. With them, it can read live data. Focus on getting **one tool working end-to-end**. Depth over breadth.
-
-The student's agent lives at `student-output/<agent-name>/`. Read its `tools.md` first so you know which tools it needs.
+In Module 2 they ran the agent once. Module 3 is about understanding *why* it produced that exact output. Spoiler: the system prompt. Let them feel the change by editing it themselves.
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Module 3 is where your agent stops being a shell and starts being useful. Right now your agent is like a brain in a jar — it can think, but it can't *see* anything outside its training. That's what tools fix.
+> "In Module 2, you ran the agent and got back a structured insights report — themes, actions, next step. The format was specific. The voice was specific. That wasn't an accident. Every word of that output was shaped by **the system prompt** — the hidden instructions that came with the API call.
 >
-> Tools come in two flavors:
-> - **MCPs** (Model Context Protocol) — connections to external services. Gmail, GitHub, Notion, databases. The big win is live data.
-> - **Local tools** — files on your computer. A CSV of your workouts, a markdown reference of your writing style. Simpler but still powerful.
->
-> We're going to wire up **one tool today**, end-to-end. You'll see it work before we move on."
+> Today's question: how does that work, and how do you control it?"
 
-## Step 2: Check their tools.md (2 min)
+## Step 2: Read the concept doc (3 min)
 
-Read `student-output/<agent-name>/tools.md`. It lists the tools their archetype needs. Go through each one and tell the student:
+Open `concepts/what-is-a-system-prompt.md` together. Read it with them.
 
-- What it does for their agent
-- Whether it's an MCP or a local file
-- What's involved in setting it up
+The two beats to land:
+1. **The system prompt is the product.** Same Claude, different prompt = different product entirely.
+2. **System prompts live in their own files.** Code reads them at runtime. That's why you can tune your agent without touching code.
 
-Help them pick **one** to start with. If they're torn, recommend the simplest one — usually the local file — so they get a working feedback loop fast.
+## Step 3: Open prompts/system.md (4 min)
 
-## Step 3A: If they picked a local tool (10 min)
+Open `student-output/prompts/system.md`. Read it together.
 
-Local tools are easier. Walk them through:
+Walk through:
+- **The role:** "You are a meeting analyst."
+- **The format:** the exact KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP shape.
+- **The rules:** "Use names from the transcript. Never invent people."
 
-1. Create the file in their agent folder (e.g., `student-output/<agent-name>/style-reference.md` or `logs/workouts.csv`)
-2. Help them fill it with real content — not placeholder text. The agent will read this, so it matters.
-3. Update their `AGENT.md` to reference the file: "Always read `style-reference.md` before drafting."
+> "This file is what makes the agent do what it does. The code in `chat.js` is generic — it could analyze meeting transcripts, OR it could write poetry, OR it could review legal contracts. *What it actually does is determined entirely by this file.*"
 
-Test it: have them ask their agent to do something that uses the file. Verify it reads the file and uses the content.
+## Step 4: Tune it (5 min)
 
-## Step 3B: If they picked an MCP (15 min)
+Now have them experiment. Two micro-edits, one at a time:
 
-MCPs take more setup but are worth it. General flow:
+### Edit A: Change the role
 
-1. **Find the MCP** — most popular ones are on the [MCP registry](https://github.com/modelcontextprotocol/servers) or the plugin marketplace from Week 3 Module 4.
-2. **Get credentials** — if it's Gmail/Calendar/GitHub, they'll need a token or OAuth. Walk them through the auth step.
-3. **Add to `.mcp.json`** — either at the student-output level or project level. Show them the JSON shape:
-
-   ```json
-   {
-     "mcpServers": {
-       "<tool-name>": {
-         "command": "npx",
-         "args": ["-y", "@modelcontextprotocol/server-<tool>"],
-         "env": { "<TOKEN_VAR>": "<their-token>" }
-       }
-     }
-   }
-   ```
-
-4. **Restart Claude Code** so it picks up the new MCP.
-5. **Test it.** Ask the agent to do something concrete: "Check my last 5 emails from Nicole" or "List my next 3 calendar events."
-
-If any step fails, debug with them. Common issues:
-- Token doesn't have the right scopes → help them adjust
-- MCP name typo in .mcp.json → check spelling
-- Forgot to restart Claude Code → restart
-
-## Step 4: Update their agent's state (3 min)
-
-Now update their files to reflect the wired tool:
-
-1. In `student-output/<agent-name>/tools.md`, mark the tool as ✅ connected, note the install command/config
-2. In `student-output/<agent-name>/AGENT.md`, add a line under "How to respond" mentioning the tool: "Use the `<tool>` MCP when the student asks about X."
-
-## Step 5: Show the diagram (2 min)
-
-Print the updated architecture. Example for `morning-brief` with Gmail MCP wired:
+Have them edit the first line of `prompts/system.md` to something specific:
 
 ```
-        ┌─ morning-brief (orchestrator)
-        │
-        ├── skills/
-        │   └── /today             ✓ starter skill
-        │
-        ├── tools/
-        │   ├── gmail              ✓ CONNECTED (new!)
-        │   └── calendar           — setup pending
-        │
-        └── sub-agents/
-            └── (none yet)
+You are a sarcastic meeting analyst who has seen too many standups.
 ```
 
-Celebrate. Say:
+Save the file. Re-run:
 
-> "That's a real connection. Your agent can now *see* live Gmail data. That's the difference between an agent and a chatbot."
+```bash
+npm run stage-1
+```
 
-## Step 6: Wrap and commit (2 min)
+Watch what happens. The structure stays the same (because the format rules are still there) but the *voice* changes — Claude gets dryer, more pointed.
 
-1. Update `CLAUDE.md`: check off Module 3
-2. Commit:
+> "See that? You changed nothing in the code. You changed seven words of instruction. The agent's personality flipped. That's the leverage."
+
+### Edit B: Change the output format
+
+Now have them edit the format section. Replace the `KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP` block with something different — maybe:
+
+```
+**TLDR**
+[One sentence — what happened in this meeting?]
+
+**WHO OWES WHAT**
+- [Person]: [task]
+
+**SHOULD I CARE?**
+[Yes/No, and why.]
+```
+
+Save, re-run. Now Claude returns a totally different shape — more casual, more direct.
+
+> "Same code. Same Claude. New format. The system prompt isn't a setting — it's the entire product spec. This is what every AI startup does: they pick a domain, write a really good system prompt, wrap it in a UI."
+
+## Step 5: Restore the original (2 min)
+
+Have them revert their changes (or copy back from the template):
+
+```bash
+cp ../templates/transcripts-to-insights/prompts/system.md prompts/system.md
+```
+
+Run one more time to confirm the original behavior is back. We need it intact for Modules 4–7.
+
+## Step 6: See it visualized (3 min)
+
+Now open `frontend/index.html` in their browser:
+
+```bash
+open frontend/index.html       # Mac
+# or: xdg-open frontend/index.html   # Linux
+# or: just double-click it in Finder/Explorer
+```
+
+Walk them through:
+- The 3 nodes connected: `[A transcript] → [The Conductor] → [A report]`
+- Below the orchestrator: the two sub-agent helpers (Summarizer + Extractor) — *they're not active yet, that's Stage 3*
+- **Click the orchestrator node.** The right panel switches to inspect mode. Show them:
+  - "What this is" — plain English
+  - **"Its instructions (system prompt)"** — the exact text from `prompts/system.md` they were just editing
+  - "Connects to" — the data flow
+
+> "See how the system prompt you were just editing in your text editor *also* shows up here in the visualization? Same file. Same content. The frontend reads what you wrote. The agent reads what you wrote. **The system prompt is the source of truth for what the agent does.**"
+
+Have them hit "Run Agent" once to see the animation. Set the expectation:
+
+> "Right now this is showing what *will* happen in Stage 3, when all 3 nodes activate. After Modules 4–6, this animation will reflect your real working agent."
+
+## Step 7: Wrap and commit (1 min)
+
+1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:`
+2. **Commit:**
    ```bash
-   git add -A
-   git commit -m "Complete Module 3: Wire <tool-name> to <agent-name>"
+   git add -A && git commit -m "Complete Module 3: Chat Assistant + System Prompt"
    ```
-3. Invite forward:
-   > "Beautiful. Next up, Module 4 — you'll write a skill that uses this tool. Type `module-4` when you're ready."
+3. Hand off:
 
-## Handling edge cases
+> "Stage 1 is done. You have a working chat assistant — a single API call that turns a transcript into insights. Next up: Stage 2. We'll wrap your agent in an automation so it runs *without you* every time a new file shows up. Type `module-4` when you're ready."
 
-- **MCP won't authenticate** — help them regenerate the token with correct scopes. If time's running out, fall back to a local tool so they don't leave Module 3 with nothing working.
-- **They want more than one tool** — great instinct, but gently push them to land one working before adding a second. We'll add more in Module 6.
-- **Their archetype only uses local files** — that's fine. Walk them through a high-quality local file setup. Local tools are not a downgrade.
+## Optional deeper reading
 
-## Reference
-
-- Week 3 concept doc: `what-is-mcp.md` in the aisc-cc-modules repo
-- MCP registry: https://github.com/modelcontextprotocol/servers
+- `concepts/what-is-a-system-prompt.md`
+- Try editing `prompts/summarizer.md` or `prompts/action_extractor.md` — note that those return JSON, so be careful with format changes.

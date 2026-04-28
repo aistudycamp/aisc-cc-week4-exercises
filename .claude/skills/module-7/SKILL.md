@@ -1,198 +1,100 @@
 ---
 name: module-7
-description: Capstone — Slack Face (optional) — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Walks the student through wrapping their agent in a Slack app so they can interact with it in Slack instead of terminal.
+description: See the System — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Student opens frontend/index.html in browser, hits Run Agent, watches the animated flow, clicks each node to see the actual system prompt and config inside. The shareable "I built this" moment.
 ---
 
-# Module 7: Capstone — Slack Face *(optional)*
+# Module 7: See the System
 
-**Time:** ~60–90 minutes
-**You'll produce:** a Slack app that routes messages to your agent, running on your laptop
+**Time:** ~20 minutes
+**You'll produce:** a screenshot of your working agentic system as a visualization, with a real understanding of what every piece of the diagram represents.
 
 ## Coach Instructions
 
-This module is the stretch. Only take it on if the student finished Modules 1-6 and wants to go further. It's a significant time investment and has parts that will feel different from the rest of the course (Slack API, manifests, OAuth). Set expectations clearly up front.
+This is the celebration module. The student already built the system in Module 6 — now they get to *see* it. Take a moment of pride before pushing forward to Module 8.
 
-The goal is to give their agent a *face* — a place to interact with it that isn't their terminal. Slack is a natural fit because many students already live there.
-
-## Step 1: Decide whether to do it (2 min)
+## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Module 7 is the capstone. It's optional — you've already completed everything required for the sprint in Module 6. This one takes another 60–90 minutes and involves setting up a Slack app. It's a different flavor of work than the rest of the course: less agent-shaping, more API plumbing.
->
-> Reasons to do it:
-> - You want your agent living where you already work
-> - You want to share it with your team
-> - You're genuinely curious how this wiring works
->
-> Reasons to skip:
-> - You're tired — totally fine. Module 6 is a complete stopping point.
-> - You don't use Slack day-to-day.
->
-> What do you want to do?"
+> "Module 7. You already did the hard work in Module 6 — you built the multi-agent system. Today is about *seeing* what you built. Open the visualization, watch it run, and click into each piece to confirm: yes, that's the prompt I edited in Module 3. Yes, that's the function I read in Module 6. The diagram is just a window into the actual files on your machine."
 
-If they want to stop, celebrate and skip to the final commit.
-
-## Step 2: Set the frame (3 min)
-
-If they're proceeding:
-
-> "Alright. Here's the shape of what we'll build. Your agent becomes the *brain*. Slack becomes the *face*. Messages sent in Slack route to your agent; the agent's responses come back into Slack.
->
-> ```
-> You in Slack  ─────▶  Slack app  ─────▶  Your agent  ─────▶  Slack app  ─────▶  You in Slack
->                       (relay)            (thinking,                (reply)
->                                           using tools,
->                                           skills, subagents)
-> ```
->
-> Two options for where the agent runs:
-> 1. **Simple:** your agent runs locally on your laptop (Claude Code has to be open). Good for solo use.
-> 2. **Advanced:** deploy the relay to a cloud service (Vercel/Railway) so it runs 24/7. More setup, more real.
->
-> We'll do option 1 today. Option 2 is a natural next step."
-
-## Step 3: Create the Slack app (15 min)
-
-Walk them through:
-
-1. Go to https://api.slack.com/apps → Create New App → From scratch
-2. App name: `<agent-name>-bot`, workspace: their personal or team workspace
-3. Add OAuth scopes: `chat:write`, `app_mentions:read`, `im:history`, `im:read`, `im:write`
-4. Enable **Socket Mode** (avoids needing a public URL — simpler for local dev)
-5. Generate an **App-Level Token** with `connections:write` scope — save it
-6. Install the app to the workspace — save the **Bot User OAuth Token**
-
-Tell them to put both tokens in their `.env` or `~/.zshrc`:
+## Step 2: Open the frontend (1 min)
 
 ```bash
-export SLACK_APP_TOKEN="xapp-..."
-export SLACK_BOT_TOKEN="xoxb-..."
+open frontend/index.html        # Mac
+# or just double-click it in your file explorer
 ```
 
-## Step 4: Build the relay (20 min)
+It opens in the browser.
 
-Create `student-output/<agent-name>/slack-relay/` folder. In it:
+## Step 3: Tour the canvas (4 min)
 
-### `package.json`
-```json
-{
-  "name": "agent-slack-relay",
-  "version": "0.1.0",
-  "type": "module",
-  "dependencies": {
-    "@slack/bolt": "^3.17.0"
-  }
-}
-```
+Walk them through what they're looking at:
 
-### `relay.js`
-```javascript
-import bolt from '@slack/bolt';
-import { spawn } from 'child_process';
-import path from 'path';
+> "Look at the layout. Top row, left to right: **A transcript → The Conductor → A report.** That's your main flow. Data goes in on the left, the orchestrator processes it, the report comes out on the right.
+>
+> Below the orchestrator: **The Summarizer** and **The Extractor.** Those are sub-agents — helpers the orchestrator calls. Notice the dashed lines connecting them upward to the orchestrator? That's because they're 'internal calls' — the orchestrator dispatches down to them, gets answers back. The user never sees those.
+>
+> Five nodes. Four connections. Same architecture you built in Module 6."
 
-const app = new bolt.App({
-  token: process.env.SLACK_BOT_TOKEN,
-  appToken: process.env.SLACK_APP_TOKEN,
-  socketMode: true,
-});
+## Step 4: Inspect each node (8 min)
 
-const AGENT_DIR = path.resolve('..'); // student-output/<agent-name>
+This is the killer move. Click each node and walk through what's inside.
 
-// Send message to Claude Code, get response
-async function askAgent(message) {
-  return new Promise((resolve, reject) => {
-    const claude = spawn('claude', ['-p', message], {
-      cwd: AGENT_DIR,
-      env: process.env,
-    });
-    let output = '';
-    claude.stdout.on('data', (d) => (output += d.toString()));
-    claude.stderr.on('data', (d) => console.error(d.toString()));
-    claude.on('close', (code) => {
-      if (code === 0) resolve(output.trim());
-      else reject(new Error(`Claude exited with code ${code}`));
-    });
-  });
-}
+### Click "A transcript" (input)
 
-// When mentioned in a channel
-app.event('app_mention', async ({ event, say }) => {
-  const message = event.text.replace(/<@[A-Z0-9]+>/g, '').trim();
-  try {
-    await say(`Thinking...`);
-    const response = await askAgent(message);
-    await say(response);
-  } catch (err) {
-    await say(`Hit an error: ${err.message}`);
-  }
-});
+> "What this is: the starting point. Whenever a new file lands, the agent wakes up.
+>
+> **The 'recent files' section?** Those would be your real transcripts in real life. Right now it's mocked. After Module 8, when you start dropping your actual files in, this list becomes real history."
 
-// When DM'd
-app.message(async ({ message, say }) => {
-  if (message.channel_type !== 'im') return;
-  try {
-    const response = await askAgent(message.text);
-    await say(response);
-  } catch (err) {
-    await say(`Hit an error: ${err.message}`);
-  }
-});
+### Click "The Conductor" (orchestrator)
 
-(async () => {
-  await app.start();
-  console.log('⚡ <agent-name> Slack relay running');
-})();
-```
+> "The big one. Look at 'Its instructions (system prompt).' **That's the actual content of `prompts/system.md` on your disk.** The same file you edited in Module 3. The same file `orchestrator.js` reads at runtime. Code reads the file. Frontend reads the file. One source of truth.
+>
+> Look at 'Connects to.' Four arrows: it reads from the transcript, dispatches to both sub-agents, writes to the report. Same architecture as the JS code."
 
-Then:
-```bash
-cd student-output/<agent-name>/slack-relay
-npm install
-node relay.js
-```
+### Click "The Summarizer"
 
-## Step 5: Test it (10 min)
+> "Same idea. Its instructions are in `prompts/summarizer.md` — and they're shown right here. Notice this prompt is *different* from the orchestrator's. It tells Claude to return JSON, not prose. Different job, different prompt."
 
-1. In Slack, DM the bot or @mention it in a channel the bot is in
-2. Say "hello" or something your agent would handle
-3. Watch the relay output in the terminal
-4. Debug if needed
+### Click "The Extractor"
 
-Common issues:
-- Tokens not exported → re-export and restart
-- Bot not invited to channel → `/invite @<agent-name>-bot`
-- `claude -p` not in PATH → use absolute path to the claude binary
+> "Same. Different prompt. Different focused job. Returns its own JSON."
 
-## Step 6: Celebrate + document (5 min)
+### Click "A report" (output)
 
-Have them take a screenshot of the interaction. Create a `student-output/<agent-name>/slack-relay/README.md` documenting:
+> "End of the line. Where the synthesized report lands. Same `outputs/` folder Module 4's watcher writes to."
 
-- How to start the relay (`node relay.js`)
-- Required env vars
-- Known limits (laptop must be on, Claude Code must be installed)
-- Next step if they want production: deploy to Railway/Vercel with a cloud relay
+## Step 5: Run the animation (2 min)
 
-## Step 7: Wrap and commit
+Have them hit the **"Run Agent"** button.
 
-1. Update `CLAUDE.md`: check off Module 7
-2. Commit:
+Watch the 9-message animated flow play out:
+1. Transcript arrives → Conductor activates
+2. Conductor → dispatches to Summarizer (particle flies)
+3. Summarizer → returns to Conductor
+4. Conductor → dispatches to Extractor (particle flies)
+5. Extractor → returns to Conductor
+6. Conductor → synthesizes
+7. Final report appears in the right panel
+
+> "That animation isn't fake — it's the actual sequence of API calls your `orchestrator.js` runs. The order matches. The output panel shows what your real agent produced for the sample transcript."
+
+## Step 6: Screenshot moment (2 min)
+
+> "This is the share-worthy moment. Take a screenshot of the running canvas — full diagram, animated mid-flow, output panel populated. Save it.
+>
+> A week ago, you'd never built an agent. Right now you have a working multi-agent system you understand line-by-line *and* a clean visualization of how it's wired. That's a real artifact. Send it to your team. Drop it in the cohort Slack."
+
+Have them save the screenshot somewhere accessible (Desktop, screenshots folder).
+
+## Step 7: Wrap and commit (1 min)
+
+1. **Update `CLAUDE.md`**: change `- [ ] Module 7:` to `- [x] Module 7:`
+2. **Commit:**
    ```bash
-   git add -A
-   git commit -m "Complete Module 7: Slack face for <agent-name>"
+   git add -A && git commit -m "Complete Module 7: See the System"
    ```
-3. Close with real celebration:
-   > "You now have a full-stack agent. Brain in Claude Code, face in Slack, tools wired to real services, skills you wrote, sub-agents you composed. This is the capstone of the capstone. Go share it."
+3. Hand off:
 
-## Handling edge cases
-
-- **They hit an auth error in Slack** — token scope issue 90% of the time. Re-check the scopes list.
-- **`claude -p` runs but returns nothing** — the agent's prompt isn't routing right. Have them test `claude -p "hello"` in the agent folder first.
-- **They want multi-user / team deployment** — out of scope for this module. Point them at the "Advanced: cloud deployment" path as a future project.
-
-## Reference
-
-- Slack Bolt docs: https://slack.dev/bolt-js/
-- Socket Mode: https://api.slack.com/apis/socket-mode
-- Claude Code `-p` flag: non-interactive print mode
+> "One module to go. The agent works on meeting transcripts — but what if it worked on *your* thing? Module 8 is where you make it yours. Type `module-8` when you're ready."

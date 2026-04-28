@@ -1,0 +1,20 @@
+{
+  "name": "transcripts-to-insights",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "AISC Agent Sprint — turns meeting transcripts into structured insight reports.",
+  "scripts": {
+    "stage-1": "node stage-1/chat.js transcripts/sample-transcript.txt",
+    "stage-2": "node stage-2/watcher.js",
+    "stage-3": "node stage-3/orchestrator.js transcripts/sample-transcript.txt"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "chokidar": "^4.0.1",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

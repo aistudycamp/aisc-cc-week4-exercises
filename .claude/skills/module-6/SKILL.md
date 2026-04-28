@@ -1,151 +1,172 @@
 ---
 name: module-6
-description: Make It Yours + Visualize — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Final polish pass on the student's agent, then uses the visualization skill to generate an HTML architecture diagram they can share.
+description: The Orchestrator Pattern — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student opens stage-3/orchestrator.js, walks through the 4-function structure (orchestrator + 2 sub-agents + synthesizer), runs it, and sees how multi-agent dispatch produces better output than a single API call.
 ---
 
-# Module 6: Make It Yours + Visualize
+# Module 6: The Orchestrator Pattern
 
-**Time:** ~20 minutes
-**You'll produce:** an HTML architecture diagram of your agent at `student-output/<agent-name>-architecture.html`
+**Time:** ~30 minutes
+**You'll produce:** a working multi-agent system. One orchestrator + two sub-agents (Summarizer + Extractor) + a synthesizer. Three system prompts. Four functions. Real agentic architecture.
 
 ## Coach Instructions
 
-This is the bring-it-home module. Two parts: (1) a final polish pass where the student tightens everything so their agent feels *theirs*, and (2) a visualization pass where you use the `visualization` skill to generate a single-file HTML diagram of their agent that they can share.
+This is the conceptual peak of the sprint. Take it slow. The single biggest thing they need to *feel* is: the orchestrator never reads the transcript itself — it dispatches. That insight unlocks everything.
 
-## Step 1: Set the frame (1 min)
+## Step 1: Set the frame (3 min)
 
 Say:
 
-> "Module 6 — the bring-it-home module. You've got all the pieces: orchestrator, tools, skills, sub-agents. Today we do two things: tighten it up so it feels *yours*, and build a visual you can show off."
+> "Welcome to Stage 3. We're about to do something that sounds intimidating but is actually really simple: split your single agent into a multi-agent system.
+>
+> In Stage 1 you had **one agent doing everything** — read the transcript, find themes, find actions, format the report. One API call. One system prompt. It worked, but the agent was a generalist. It was okay at every step but mastered none.
+>
+> In Stage 3 we split that one agent into three:"
 
-## Step 2: Polish pass (10 min)
+Print this:
 
-Walk through their `student-output/<agent-name>/` folder and tighten. Work through each file with the student:
-
-### AGENT.md
-- Is the voice right? Does it sound like *them*?
-- Are the triggers for skills and sub-agents specific enough?
-- Any jargon to strip?
-
-Have them make 2-3 concrete edits. Small edits, meaningful.
-
-### skills/
-- Do the skill descriptions clearly say when to trigger?
-- Do the steps have zero ambiguity?
-- Run each skill once. If it feels rough, tighten.
-
-### sub-agents/
-- Is the boundary clear? Any scope creep sneaking in?
-- Does it return a predictable shape?
-
-### tools.md
-- Is every connected tool actually used somewhere (in a skill or AGENT.md reference)?
-- If a tool is unused, either use it or remove it.
-
-### Final test
-Have the student run their agent through **one real task** — something from their actual life or work. This is the moment of truth. If something breaks, fix it. If it works, celebrate.
-
-## Step 3: Generate the HTML visualization (8 min)
-
-Now the fun part. You'll generate a single-file HTML diagram of the student's agent, using the template that ships with this module.
-
-### 3a. Read the student's agent state
-
-Read these files:
-- `student-output/<agent-name>/AGENT.md`
-- `student-output/<agent-name>/tools.md`
-- All `SKILL.md` files under `student-output/<agent-name>/skills/`
-- All files under `student-output/<agent-name>/sub-agents/`
-
-### 3b. Read the template
-
-Read the template at `.claude/skills/module-6/architecture-template.html`. It has placeholders in double curly braces (`{{AGENT_NAME}}`, `{{SKILLS_LIST}}`, etc.) that you'll fill in.
-
-### 3c. Fill in the placeholders
-
-Produce values for each placeholder by reading the student's files. The template uses the AISC design language (cream/dark palette, Playfair serif, teal `#0D9488` accent) — leave the CSS alone, just substitute content.
-
-| Placeholder | How to fill |
-|-------------|-------------|
-| `{{AGENT_NAME}}` | The agent folder name (e.g., `writing-buddy`) |
-| `{{AGENT_ROLE}}` | The first sentence under `## Role` in their AGENT.md |
-| `{{AGENT_TRIGGERS}}` | Comma-separated trigger phrases from `## When to use` in AGENT.md |
-| `{{STUDENT_NAME}}` | Ask the student if you don't know it yet |
-| `{{COHORT}}` | The current cohort number (ask or leave as "5") |
-| `{{DATE}}` | Today's date in `YYYY-MM-DD` format |
-| `{{SKILLS_LIST}}` | `<li>`s, one per skill — format: `<li>/<skill-name></li>`. If none: `<li class="empty">(none yet)</li>` |
-| `{{TOOLS_LIST}}` | `<li>`s, one per tool — format: `<li><tool-name></li>`. If none: `<li class="empty">(none yet)</li>` |
-| `{{SUBAGENTS_LIST}}` | `<li>`s, one per sub-agent — format: `<li><sub-agent-name></li>`. If none: `<li class="empty">(none yet)</li>` |
-| `{{SKILLS_DETAIL}}` | One `<div class="info-card">` per skill (template below) |
-| `{{TOOLS_DETAIL}}` | One `<div class="info-card">` per tool (template below) |
-| `{{SUBAGENTS_DETAIL}}` | One `<div class="info-card">` per sub-agent (template below) |
-| `{{FLOW_NARRATIVE}}` | A short paragraph (80-150 words) describing what happens when the student makes a typical request. Use `<em>` tags around specialist names. |
-
-**Card template for each SKILLS_DETAIL / TOOLS_DETAIL / SUBAGENTS_DETAIL entry:**
-
-```html
-<div class="info-card">
-  <span class="ic-label">skill / tool / sub-agent</span>
-  <div class="ic-name">/skill-name or tool-name</div>
-  <div class="ic-body">One-sentence description of what it does, pulled from the file.</div>
-  <div class="ic-foot">Trigger: "example phrase" · Returns: what you get back</div>
-</div>
+```
+                    ┌────────────────────┐
+                    │  THE ORCHESTRATOR  │
+                    │   "I decide who    │
+                    │    does what"      │
+                    └─────────┬──────────┘
+                              │
+           ┌──────────────────┴──────────────────┐
+           │                                     │
+           ▼                                     ▼
+    ┌──────────────┐                    ┌──────────────┐
+    │   SUMMARIZER │                    │   EXTRACTOR  │
+    │ finds themes │                    │ finds actions│
+    │  (returns    │                    │   (returns   │
+    │    JSON)     │                    │     JSON)    │
+    └──────┬───────┘                    └──────┬───────┘
+           │                                   │
+           └─────────────┬─────────────────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   SYNTHESIZER   │
+                │  combines both  │
+                │  into the final │
+                │     report      │
+                └─────────────────┘
 ```
 
-If a section is empty (e.g. they have no sub-agents yet), fill with a single card:
-```html
-<div class="info-card">
-  <span class="ic-label">—</span>
-  <div class="ic-name">(none yet)</div>
-  <div class="ic-body">You haven't added any here yet. That's fine — you can always extend later.</div>
-</div>
-```
+> "Three roles. Three system prompts. Each one focused. The orchestrator decides what's needed and dispatches. The specialists do the focused work. The synthesizer combines.
+>
+> The big idea: **the orchestrator never reads the transcript itself.** It just dispatches. The specialists return structured JSON. The synthesizer composes the prose. Clean separation."
 
-**For `{{FLOW_NARRATIVE}}`**, write something that tells the actual story. Example for a personal-os agent:
+## Step 2: Read the orchestrator concept (3 min)
 
-> When you ask <em>morning-brief</em> "what's my day?", the orchestrator reads your priorities.md, queries the <em>gmail</em> and <em>calendar</em> tools for live data, and if your inbox has more than 15 unread it dispatches the <em>gmail-summarizer</em> sub-agent. The summarizer reads, sorts, and returns a triage. The orchestrator then assembles the briefing and hands it back — under 15 lines, scan-friendly, no filler.
+Open `concepts/what-is-an-orchestrator.md` together. Read it. The two beats to land:
 
-### 3d. Write the final HTML
+1. **The orchestrator is the choreographer**, not the worker. It decides who does what.
+2. **Each agent gets its own system prompt.** Three agents = three prompts.
 
-Save the filled-in HTML to:
-```
-student-output/<agent-name>-architecture.html
-```
+## Step 3: Open the code (5 min)
 
-### 3e. Open it in the browser
+Open `student-output/stage-3/orchestrator.js`. Walk through the 4 functions.
+
+### `summarize(transcript)`
+> "Reads a transcript, returns `{ themes: [...] }` as JSON. Notice it has its own system prompt — `prompts/summarizer.md`. It's a focused little agent that does one thing."
+
+### `extractActions(transcript)`
+> "Same shape. Reads a transcript, returns `{ actions: [...] }` as JSON. Different system prompt — `prompts/action_extractor.md`. Different focused job."
+
+### `synthesize({ themes, actions })`
+> "Takes the JSON from the two specialists and combines them into the final markdown report. Uses the `prompts/system.md` prompt. This is the third API call."
+
+### `orchestrator(transcript)`
+> "The conductor. Three lines:
+>
+> ```js
+> const [themes, actions] = await Promise.all([summarize(t), extractActions(t)]);
+> return await synthesize({ themes, actions });
+> ```
+>
+> See that `Promise.all`? Both sub-agents run **in parallel**. They don't depend on each other, so we don't wait for one before starting the other. The whole thing finishes faster."
+
+## Step 4: Run it (4 min)
+
+Have them run:
 
 ```bash
-open student-output/<agent-name>-architecture.html
+npm run stage-3
 ```
 
-Celebrate with them when it renders. This is the moment.
+The terminal will print the live trace:
 
-## Step 4: Share moment (1 min)
+```
+🎼 Orchestrator: dispatching specialists in parallel...
+  📋 Summarizer: reading transcript...
+  ✅ Extractor: scanning for action items...
+  ✓ Summarizer returned 3 themes
+  ✓ Extractor returned 5 actions
+  🧠 Synthesizing final report...
+✓ Orchestration complete.
+────────────────────────────────────────────────────────────
+**KEY THEMES**
+- ...
+```
 
-Tell them:
+Watch the order of the log lines. Both specialists start at the same time. They finish in whatever order they finish (often near-simultaneously). The synthesizer only runs after both are done.
 
-> "You built a full agent, from scratch, and you have a visual to show for it. Take a screenshot. Post it if you want. Show your team. This is the artifact."
+> "See that? Two API calls running simultaneously. Then a third when both are done. Three calls in the time of about 1.5 calls."
 
-## Step 5: Wrap and commit (1 min)
+## Step 5: Compare to Stage 1 (4 min)
 
-1. Update `CLAUDE.md`: check off Module 6
-2. Commit:
+Now compare:
+
+> "Run `npm run stage-1` again. Look at the report it produces. Then run `npm run stage-3`. Look at the report it produces. Notice anything?"
+
+Give them a moment. Then point out:
+
+> "The Stage 3 output is **noticeably better** for this kind of task. Why? Because each step had a focused agent with a focused prompt. The Summarizer wasn't trying to also find action items. The Extractor wasn't trying to also write prose. The Synthesizer wasn't trying to also analyze the transcript. Each step was someone's only job.
+>
+> This is the payoff of the orchestrator pattern. **Specialization beats generalization** when the work has multiple distinct sub-tasks."
+
+## Step 6: Look at the JSON shapes (4 min)
+
+Open `prompts/summarizer.md` and `prompts/action_extractor.md` together. Show them:
+
+> "Both of these prompts say 'return ONLY a JSON object.' Why? Because the orchestrator needs *machine-readable structure*, not prose. The Summarizer doesn't write a paragraph; it returns:
+>
+> ```json
+> { "themes": [{ "label": "...", "summary": "..." }, ...] }
+> ```
+>
+> Then in `orchestrator.js` we have:
+>
+> ```js
+> const result = parseJson(response.content[0].text);
+> ```
+>
+> That's where the JSON gets parsed. We use `parseJson` (a small helper that strips markdown fences if Claude adds them) and turn the string into a real JavaScript object. Now the orchestrator can pass `{ themes, actions }` to the synthesizer.
+>
+> **Sub-agents return JSON. The orchestrator returns prose.** Easy way to remember it."
+
+## Step 7: When NOT to use this pattern (3 min)
+
+> "Last thing. Don't reach for the orchestrator pattern for everything. If your task is small and unified, one agent with a good prompt beats three. The pattern wins when:
+>
+> - The work splits cleanly into sub-tasks (themes vs. actions)
+> - Sub-tasks can run in parallel (don't depend on each other)
+> - You want each step to use a different prompt or even a different model
+>
+> If you'd just be writing the same prompt three times, don't bother. **Compose, don't conflate.**"
+
+## Step 8: Wrap and commit (2 min)
+
+1. **Update `CLAUDE.md`**: change `- [ ] Module 6:` to `- [x] Module 6:`
+2. **Commit:**
    ```bash
-   git add -A
-   git commit -m "Complete Module 6: Polish + visualize <agent-name>"
+   git add -A && git commit -m "Complete Module 6: The Orchestrator Pattern"
    ```
-3. Invite forward:
-   > "You've completed the Agent Sprint. Seriously — that's huge. You have a working agent, real tools wired up, your own skills and sub-agent, and a visual diagram of how it all fits.
-   >
-   > **Optional Module 7** is the Slack capstone — wrap your agent in a Slack app so you interact with it where you already work. Type `module-7` if you want to take it further, or stop here and use what you've built."
+3. Hand off:
 
-## Handling edge cases
+> "You just built a multi-agent system. Take a beat — that's the actual peak of this sprint. The next two modules are about *seeing* what you built and *making it yours*. Type `module-7` when you're ready."
 
-- **Placeholder didn't get replaced** — re-scan the HTML for any `{{…}}` strings before declaring done. Students will see them if you don't.
-- **They want to change their agent significantly in polish** — fine, but time-box it. Big changes can happen after the sprint.
-- **Something doesn't work in the final test** — debug with them, but reframe: "This is good — real agents break in production. Now you know what to fix."
+## Optional deeper reading
 
-## Reference
-
-- Template: `.claude/skills/module-6/architecture-template.html` (ships with this repo, self-contained — no external dependencies beyond Google Fonts)
-- AISC deck design language: cream/dark palette, Playfair serif headings, Geist sans body, teal accent `#0D9488`
+- `concepts/what-is-an-orchestrator.md`
+- `examples/example-transcripts-insights.md`

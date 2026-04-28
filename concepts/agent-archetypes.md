@@ -1,66 +1,62 @@
-# Agent Archetypes
+# What You're Building (and What's Next)
 
-When you build your first agent, you don't start from a blank page. We've bundled four **archetypes** — starter scaffolds for the most common kinds of agents people actually build. Pick one in Module 2.
+## The stock use case: transcripts → insights
 
-## 1. content-creator
+For this sprint, every student builds the **same thing**: an agent that turns a meeting transcript into a clean insights report (key themes, action items, recommended next step).
 
+Why one stock use case for everyone? Two reasons:
+
+1. **The arc is the lesson.** Going from a chat assistant → a workflow → an agentic system is the spine of what you'll learn. We want every student feeling the same "aha" at the same moment.
+2. **It's genuinely useful.** Transcripts are everywhere — meetings, calls, voice notes. By the end of Stage 3, you'll have a tool that actually saves you time.
+
+You'll get to **personalize** the system prompts in Module 8 — that's where you make the agent yours. Until then, you're following the same path as everyone else.
+
+## What you'll build, by stage
+
+| Stage | What | How it feels |
+|-------|------|--------------|
+| **Stage 1** | A chat assistant. Paste a transcript, get insights. | "Oh — that's all an AI app *is*?" |
+| **Stage 2** | A workflow. Drop a file, agent runs automatically, output saves. | "I just built an automation in 30 lines." |
+| **Stage 3** | An agentic system. Orchestrator + 2 sub-agents working together. | "I built a multi-agent system." |
+
+Each stage is ~45–60 minutes. Total: ~3 hours of focused work.
+
+## What to build next (post-sprint archetypes)
+
+After the sprint, your skills transfer. You can swap the stock use case for any of these archetypes — same pattern, different prompts.
+
+### content-creator
 **Drafts content in your voice.** Blog posts, LinkedIn posts, newsletters, emails.
 
-**Good if:** you write a lot, want your voice matched, and want drafts faster.
+- Stage 1 prompt: "You write in [user's voice]. Given a topic, draft a post."
+- Stage 2 trigger: drop a file with a topic + outline
+- Stage 3 sub-agents: `researcher` (finds 5 sources) + `editor` (tightens prose)
 
-**Ships with:**
-- `/draft-post` skill — takes a topic, produces a draft in your style
-- `web-search` tool — grounds posts in current events
-- `style-reference.md` tool — a file you fill with your own voice
-- Space for a `researcher` sub-agent you add in Module 5
+### personal-os
+**Your daily operating system.** Morning briefings, inbox triage, calendar.
 
-**Great for:** ops folks writing team updates, founders writing on LinkedIn, consultants writing client emails.
+- Stage 1 prompt: "You are my morning briefing assistant. Given today's calendar + inbox, prioritize."
+- Stage 2 trigger: cron schedule (every morning at 7am)
+- Stage 3 sub-agents: `gmail-summarizer` + `calendar-analyzer`
 
-## 2. personal-os
+### domain-coach
+**Tracks and reflects on a domain you care about.** Cooking, fitness, finance, learning.
 
-**Your daily operating system.** Morning briefings, inbox triage, calendar, task prioritization.
+- Stage 1 prompt: "You track my [domain] goals. Given today's logs, give feedback."
+- Stage 2 trigger: drop a CSV log file
+- Stage 3 sub-agents: `pattern-finder` + `goal-evaluator`
 
-**Good if:** you want your day pre-organized for you before you open your laptop.
+### custom
+**Whatever you actually need at work.** Internal tooling, contract review, valuation engines, customer support flows.
 
-**Ships with:**
-- `/today` skill — morning briefing (calendar + inbox highlights + priorities)
-- `gmail` tool — reads your inbox
-- `calendar` tool — reads your schedule
-- Space for a `gmail-summarizer` sub-agent you add in Module 5
+You already have ideas. The sprint gives you the pattern. Now apply it.
 
-**Great for:** PMs, founders, anyone who wants their attention protected.
+## How to think about extending it
 
-## 3. domain-coach
+Once you've finished the sprint, here's the mental shortcut for any new agent you want to build:
 
-**Tracks and reflects on a domain you care about.** You pick the domain — cooking, fitness, finance, learning.
+1. **What's the input?** A file? A user message? A scheduled trigger?
+2. **What's the output?** Where does it land? File, Slack, Notion, dashboard?
+3. **What sub-agents do you need?** What pieces of the work deserve their own focus?
 
-**Good if:** you want to build awareness over time, log what you do, and get reflective nudges.
-
-**Ships with:**
-- `/log-entry` skill — quickly log something in your domain
-- `/check-progress` skill — see patterns over time
-- `logs.csv` tool — local log file
-- Space for an `analyzer` sub-agent you add in Module 5
-
-**Great for:** health-conscious folks (meals, workouts), people building financial awareness, anyone doing a habit experiment.
-
-## 4. custom
-
-**Blank template.** For when you already know what you want and none of the above match.
-
-**Ships with:**
-- Minimal `AGENT.md` with placeholder role
-- Empty `skills/` and `sub-agents/` folders
-- You'll fill it out starting in Module 2
-
-**Great for:** Anthony's contract crawler, William's valuation engine, Dmytro's internal PM tool, Max's solar EMS — anyone with a specific work project.
-
-## How to pick
-
-Don't over-think. You can always start over. But a rough guide:
-
-- **You already know exactly what you want?** → custom
-- **You want something useful immediately with minimal customization?** → personal-os or content-creator
-- **You want to build a habit-reflection loop?** → domain-coach
-
-When in doubt, start with **personal-os**. Everyone benefits from a better morning.
+Three questions. The whole pattern. Everything else is just *more system prompts, arranged thoughtfully*.

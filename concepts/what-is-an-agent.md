@@ -30,23 +30,42 @@ That's it. The loop is the key. A chatbot doesn't loop — it responds once and 
 
 Same question, different capability. The agent acts.
 
-## What makes an agent *yours*
+## What an agent looks like in code
 
-Anyone can use a generic agent. Yours becomes valuable when you give it:
+Now that you know what an agent *does*, here's what it actually *is* — at the code level — in the sprint you're about to build:
 
-- **Context about you** — your CLAUDE.md, your files, your workflows
-- **Tools you use** — not just generic web search, but *your* Gmail, *your* data, *your* services
-- **Skills that match your work** — your repeatable processes, encoded once
-- **Sub-agents for your heavy jobs** — focused helpers that do the work too big for the main thread
+```js
+// the simplest possible agent
+async function agent(userInput) {
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-6",
+    system: readFile("prompts/system.md"),    // its instructions
+    messages: [{ role: "user", content: userInput }]
+  });
+  return response.content[0].text;
+}
+```
 
-By the end of this sprint, yours will have all of that.
+That's a Stage 1 agent. About 6 lines.
 
-## Where this fits
+A Stage 3 agent — with sub-agents and an orchestrator — is the same shape, just *more functions calling each other*:
 
-In this sprint:
-- The **orchestrator** = the agent's brain (one AGENT.md file)
-- The **tools** = what the orchestrator uses to see the world (MCPs + local files)
-- The **skills** = the orchestrator's repeatable workflows
-- The **sub-agents** = the specialists the orchestrator dispatches to
+```js
+async function orchestrator(transcript) {
+  const themes  = await summarize(transcript);          // sub-agent
+  const actions = await extractActions(transcript);     // sub-agent
+  return await synthesize(themes, actions);             // final API call
+}
+```
 
-The whole system is the agent.
+Each function is an API call with its own system prompt. The orchestrator is the function that decides who calls who. **That's the whole machine.**
+
+## Where this fits in the sprint
+
+You'll build agents at three levels of complexity:
+
+- **Stage 1 — Chat assistant.** One function, one system prompt, one API call.
+- **Stage 2 — Workflow.** Same agent, but triggered automatically when a file lands.
+- **Stage 3 — Agentic system.** An orchestrator function that calls 2 sub-agent functions, then synthesizes.
+
+By the end, you'll see how each layer is just *more API calls, arranged thoughtfully*.
