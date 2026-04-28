@@ -60,12 +60,45 @@ async function orchestrator(transcript) {
 
 Each function is an API call with its own system prompt. The orchestrator is the function that decides who calls who. **That's the whole machine.**
 
-## Where this fits in the sprint
+## The three-level hierarchy you'll build
 
-You'll build agents at three levels of complexity:
+Agents come in three levels of sophistication — and each level **contains the previous one** as a building block:
 
-- **Stage 1 — Chat assistant.** One function, one system prompt, one API call.
-- **Stage 2 — Workflow.** Same agent, but triggered automatically when a file lands.
-- **Stage 3 — Agentic system.** An orchestrator function that calls 2 sub-agent functions, then synthesizes.
+```
+Agentic System
+└── contains → Workflow
+                └── contains → Chat Assistant
+```
 
-By the end, you'll see how each layer is just *more API calls, arranged thoughtfully*.
+| Level | What it is | Key trait |
+|-------|-----------|-----------|
+| **Chat Assistant** | One system prompt, one conversation. | Interactive. You ask, it answers. |
+| **Workflow** | A fixed multi-step pipeline. The LLM is one step. | Event-driven. A file drops, the pipeline fires. |
+| **Agentic System** | An orchestrator that examines input and picks tools dynamically. | Reasoned dispatch. It decides what to run. |
+
+Each stage is genuinely different — not just a wrapper around the same API call.
+
+### Stage 1 — Chat Assistant
+
+An interactive chat loop. `messages[]` grows with each turn so Claude remembers what you said before. You paste in a transcript, then ask follow-up questions.
+
+The key export: `ask(question, context)` — a stateless one-shot function that Stage 2 and Stage 3 reuse.
+
+### Stage 2 — Workflow
+
+A fixed pipeline: **Read → Call → Format → Save**. The chat assistant is *one step* in that pipeline — not the whole thing. The trigger is a file appearing in a folder, not a human typing a message.
+
+```js
+import { ask } from '../stage-1/chat.js';   // reuses Stage 1
+```
+
+### Stage 3 — Agentic System
+
+A planner LLM call decides *which tools to invoke*. Then the orchestrator dispatches to the chat assistant, the workflow, or specialist sub-agents — depending on what the planner chose. The output is synthesized into a final report.
+
+```js
+import { ask }         from '../stage-1/chat.js';    // reuses Stage 1
+import { runWorkflow } from '../stage-2/workflow.js'; // reuses Stage 2
+```
+
+By the end of the sprint, you'll have built each of those boxes — and you'll understand exactly what makes them different.

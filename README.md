@@ -4,13 +4,19 @@ This is **Week 4** of the Vibe Coding course — the week you build a real, work
 
 ## The 3-stage arc
 
-You'll build the same use case three times, each level harder than the last:
+Each stage is a genuinely different type of system — and each one **uses the previous as a building block**:
 
-| Stage | What you build | Time | New idea |
-|-------|---------------|------|----------|
-| **Stage 1** | A chat assistant that turns a transcript into insights | ~1 hr | The API. The system prompt. |
-| **Stage 2** | An automation: drop a file, agent runs, report saves | ~45 min | Triggers + destinations. |
-| **Stage 3** | An agentic system: orchestrator + 2 sub-agents | ~1 hr | Multi-agent dispatch + synthesis. |
+| Stage | What you build | Time | Key trait |
+|-------|---------------|------|-----------|
+| **Stage 1** | A **chat assistant** — interactive multi-turn conversation | ~1 hr | You ask, it answers. Exports `ask()` for reuse. |
+| **Stage 2** | A **workflow** — fixed pipeline triggered by a file drop | ~45 min | Event-driven. Imports `ask()` from Stage 1 as one pipeline step. |
+| **Stage 3** | An **agentic system** — planner + dynamic tool dispatch | ~1 hr | Decides what to run. Imports both Stage 1 and Stage 2 as tools. |
+
+```
+Agentic System (Stage 3)
+└── uses → Workflow (Stage 2)
+             └── uses → Chat Assistant (Stage 1)
+```
 
 **Total: ~3 hours** of guided work, plus an optional Module 8 where you personalize the agent for your own use case.
 
@@ -40,10 +46,10 @@ Just say hi. Claude will greet you and guide you from there. No need to memorize
 | `stage-1-intro` | — | Set up Node, get an API key, scaffold project | ~10 min |
 | `module-1` | 1 | Tour the System (mental model, no code) | ~15 min |
 | `module-2` | 2 | Your First API Call (the demystify moment) | ~20 min |
-| `module-3` | 3 | Chat Assistant + System Prompt | ~20 min |
-| `module-4` | 4 | Automate the Trigger (folder watcher) | ~20 min |
-| `module-5` | 5 | Output Destinations | ~25 min |
-| `module-6` | 6 | The Orchestrator Pattern (multi-agent) | ~30 min |
+| `module-3` | 3 | Build the Chat Assistant (interactive loop + system prompt) | ~25 min |
+| `module-4` | 4 | Build the Workflow (pipeline using Stage 1 as a building block) | ~25 min |
+| `module-5` | 5 | Extend the Workflow (add more pipeline steps) | ~20 min |
+| `module-6` | 6 | The Agentic System (planner + dynamic dispatch over Stages 1+2) | ~30 min |
 | `module-7` | 7 | See the System (frontend visualization) | ~20 min |
 | `module-8` | 8 | Make It Yours (personalize for your work) | ~25 min |
 
@@ -72,19 +78,20 @@ aisc-cc-agent-sprint/
 ├── concepts/                      ← read-anytime conceptual docs
 │   ├── what-is-an-api.md
 │   ├── what-is-a-system-prompt.md
-│   ├── what-is-an-agent.md
-│   ├── what-is-an-orchestrator.md
+│   ├── what-is-an-agent.md          ← includes the 3-level hierarchy
+│   ├── what-is-a-workflow.md        ← new: explains workflow vs. chat assistant
+│   ├── what-is-an-orchestrator.md   ← includes planner + tool-picking
 │   ├── systems-thinking.md
 │   └── agent-archetypes.md
 ├── examples/                      ← worked example for reference
 │   └── example-transcripts-insights.md
 ├── templates/                     ← starter scaffold (Module 0 copies this)
 │   └── transcripts-to-insights/
-│       ├── prompts/               ← 3 system prompts
+│       ├── prompts/               ← 4 system prompts (system, summarizer, extractor, router)
 │       ├── transcripts/           ← input goes here
-│       ├── stage-1/chat.js        ← Stage 1 code
-│       ├── stage-2/watcher.js     ← Stage 2 code
-│       └── stage-3/orchestrator.js ← Stage 3 code
+│       ├── stage-1/chat.js        ← Chat assistant — exports ask() for reuse
+│       ├── stage-2/workflow.js    ← Workflow pipeline — imports ask() from Stage 1
+│       └── stage-3/orchestrator.js ← Agentic system — imports from both Stages 1+2
 ├── frontend/
 │   └── index.html                 ← the visual viewer
 └── student-output/                ← your working folder (created in stage-1-intro)

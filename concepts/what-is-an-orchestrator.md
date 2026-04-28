@@ -59,23 +59,62 @@ Compare to the summarizer's prompt — which tells Claude exactly how to read a 
 
 **Each agent in the system gets its own focused prompt.** That's what makes the system work.
 
+## The planner: deciding which tools to use
+
+A more powerful orchestrator doesn't hard-code which tools to call. Instead, it runs a **planner** — a dedicated LLM call that reads the input and decides what's needed:
+
+```js
+async function planner(transcript) {
+  // System prompt: "You are a router. Look at the input and pick which tools to call.
+  //   Tools: chat (quick Q&A), workflow (full pipeline + save), summarize, extract.
+  //   Return JSON: { tools: [...] }"
+  const response = await client.messages.create({
+    system: promptRouter,
+    messages: [{ role: "user", content: transcript.slice(0, 800) }],
+  });
+  return JSON.parse(response.content[0].text); // e.g. { tools: ["summarize", "extract"] }
+}
+```
+
+Then the orchestrator dispatches based on what the planner decided:
+
+```js
+async function orchestrator(transcript) {
+  const plan = await planner(transcript); // Step 1: decide
+
+  const results = {};
+  if (plan.tools.includes("chat"))      results.chat    = await ask("Quick summary?", transcript);
+  if (plan.tools.includes("workflow"))  results.workflow = await runWorkflow(transcript);
+  if (plan.tools.includes("summarize")) results.themes  = await summarize(transcript);
+  if (plan.tools.includes("extract"))   results.actions = await extractActions(transcript);
+
+  return await synthesize(results); // Step 3: combine
+}
+```
+
+The orchestrator doesn't decide what to do — the planner does. This separation is what makes the system genuinely agentic: the path through the system varies based on the input.
+
 ## Where this fits
 
-In Stage 3 you'll have three system prompts and three functions:
+In Stage 3 you'll have four system prompts and a set of functions — each one a separate building block:
 
 ```
 prompts/
-├── system.md            ← orchestrator's brain
+├── system.md            ← synthesis brain
 ├── summarizer.md        ← finds themes
-└── action_extractor.md  ← finds action items
+├── action_extractor.md  ← finds action items
+└── router.md            ← planner: decides which tools to invoke
 ```
 
 ```
 stage-3/orchestrator.js
-├── async function summarize(...)        ← calls API w/ summarizer.md
-├── async function extractActions(...)   ← calls API w/ action_extractor.md
-├── async function synthesize(...)       ← calls API w/ system.md
-└── async function orchestrator(...)     ← calls all three above
+├── import { ask }         from '../stage-1/chat.js'    ← Stage 1 building block
+├── import { runWorkflow } from '../stage-2/workflow.js' ← Stage 2 building block
+├── async function planner(...)         ← LLM picks tools
+├── async function summarize(...)       ← specialist
+├── async function extractActions(...)  ← specialist
+├── async function synthesize(...)      ← combines all results
+└── export async function orchestrator(...) ← coordinates everything
 ```
 
-Three prompts. Four functions. One agentic system.
+Four prompts. Six functions. Two imported building blocks. One agentic system — and every piece of it is something you built.

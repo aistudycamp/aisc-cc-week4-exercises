@@ -1,39 +1,79 @@
 ---
 name: module-4
-description: Automate the Trigger — Module 4 of the AISC Agent Sprint. Triggered when a student types "module-4". Walks the student through stage-2/watcher.js — a chokidar folder watcher that runs the agent automatically every time a new transcript file shows up, and saves the report to outputs/.
+description: Build the Workflow — Module 4 of the AISC Agent Sprint. Triggered when a student types "module-4". Student opens stage-2/workflow.js, sees how it imports ask() from Stage 1, walks through the 5-step pipeline, runs the folder watcher, drops files, sees the pipeline fire. End: opens frontend Stage 2 tab to see the chat assistant nested inside the workflow box.
 ---
 
-# Module 4: Automate the Trigger
+# Module 4: Build the Workflow
 
-**Time:** ~20 minutes
-**You'll produce:** a working folder watcher. Drop any `.txt` file into `transcripts/` and your agent runs automatically, saving the report to `outputs/`.
+**Time:** ~25 minutes
+**You'll produce:** a working workflow pipeline. Drop any `.txt` file into `transcripts/` and the pipeline fires automatically — reading the file, calling the chat assistant, formatting the output, and saving a report to `outputs/`.
 
 ## Coach Instructions
 
-This is the first taste of "agents that work without you." Keep the energy high — there's a real magic moment when they drop a file and the terminal lights up.
+The magic moment here is *two things at once*: the file drop triggering the pipeline, and the student seeing the `import { ask }` line that reuses Stage 1. Don't rush past either. The conceptual point is that a workflow is genuinely different from a chat assistant — it's not just a wrapper.
 
-## Step 1: Set the frame (2 min)
+## Step 1: Set the frame (3 min)
 
 Say:
 
-> "Welcome to Stage 2. In Stage 1 you built a chat assistant that runs once when you tell it to. Today, we automate the trigger. The agent stays running in the background, watching a folder. Whenever a new transcript shows up, it runs itself and saves the result.
+> "In Stage 1 you built a chat assistant. It's interactive — you type, it responds, you type more. Today we build something structurally different: a **workflow**.
 >
-> No button to click. No command to type each time. **The agent works while you do something else.** That's a workflow."
+> A workflow doesn't wait for you to type. An *event* triggers it. A file appears in a folder. A webhook fires. A cron job ticks. The pipeline runs automatically, through a fixed sequence of steps, and produces a persistent result.
+>
+> Here's the key question: is the chat assistant inside the workflow? Or is the workflow inside the chat assistant?
+>
+> **The chat assistant is one step inside the workflow.** We import it."
 
-## Step 2: Open the watcher (3 min)
+## Step 2: Open what-is-a-workflow.md (2 min)
 
-Open `student-output/stage-2/watcher.js`. Read it together top to bottom.
+Open `concepts/what-is-a-workflow.md` together. Read the "The short version" and the comparison table at the bottom. Land:
 
-The 3 logical pieces:
-1. **`runAgent(transcript)`** — same logic as `chat.js`, just wrapped in a function. The agent's brain is unchanged from Stage 1.
-2. **`saveReport(report, sourceFilename)`** — writes the result to `outputs/[timestamp]-[name].md`.
-3. **`chokidar.watch(...)`** — the trigger. Every time a new `.txt` file shows up in `transcripts/`, fire the `add` handler.
+> "A workflow trades interactivity for automation. You configure it once; it runs forever."
 
-Point out:
+## Step 3: Open workflow.js and read the import (4 min)
 
-> "Look at how little is new. The agent itself is the same code from Stage 1. We added two things: a *trigger* (chokidar watching a folder) and a *destination* (write the report to a file). That's it. Stage 2 = Stage 1 + trigger + destination."
+Open `student-output/stage-2/workflow.js`. The very first thing to point to:
 
-## Step 3: Start it (3 min)
+```js
+import { ask } from '../stage-1/chat.js'; // ← Stage 1 is one step in this pipeline
+```
+
+> "There it is. This isn't a copy-paste of Stage 1's code. It's a *literal import*. The workflow calls `ask()` — the function we just built — as step 2 of its pipeline. Stage 1 is a building block. Stage 2 uses it."
+
+Now walk through the full pipeline inside `runWorkflow()`:
+
+```js
+export async function runWorkflow(transcript, sourceFilename) {
+  // Step 2: call the chat assistant
+  const reportText = await ask(
+    'Generate the standard insights report for this transcript.',
+    transcript
+  );
+
+  // Step 3: format as markdown
+  const body = `# Insights Report\n\n${reportText}`;
+
+  // Step 4: save to outputs/
+  fs.writeFileSync(outPath, body, 'utf-8');
+
+  // Step 5: return saved path
+  return outPath;
+}
+```
+
+> "Five steps. Read → Call ask() → Format → Save → Return. The LLM does step 2. The workflow does everything else. That's the distinction: the agent is one step; the pipeline is the whole thing."
+
+Also note the export:
+
+> "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this, just like this file imports `ask()` from Stage 1."
+
+### The watcher gating
+
+Point to the `if (import.meta.url === ...)` block at the bottom:
+
+> "Same pattern as Stage 1. When you run `npm run stage-2` directly, the folder watcher starts. When Stage 3 imports this file, only `runWorkflow()` loads — the watcher never fires. Clean separation."
+
+## Step 4: Start the workflow (3 min)
 
 Have them run:
 
@@ -44,105 +84,91 @@ npm run stage-2
 They should see:
 
 ```
+⚙️  Workflow — Transcript Pipeline
 👀 Watching .../transcripts for new .txt files...
-    Drop a transcript into that folder to run the agent.
+    Drop a transcript into that folder to run the pipeline.
 ```
 
-Then it just sits there, listening.
+> "It's running. Quietly watching. Nothing happens until a file appears."
 
-> "It's running. Right now it's quietly watching the folder, doing nothing. Until something happens."
+## Step 5: Trigger it (5 min)
 
-## Step 4: Trigger it (4 min)
-
-Now the magic moment. In a **second terminal window** (keep the watcher running in the first), have them copy the sample transcript with a new name:
+In a **second terminal window**, drop a file:
 
 ```bash
 cd student-output
 cp transcripts/sample-transcript.txt transcripts/test-run-1.txt
 ```
 
-Watch the watcher terminal. They should see:
+Watch the watcher terminal:
 
 ```
 📄 New file detected: test-run-1.txt
-⚡️ Running agent...
-✓ Saved → outputs/2026-04-28-1042-test-run-1.md
+⚡️ Running pipeline...
+✓ Workflow complete → outputs/2026-04-28-1042-test-run-1.md
 ```
 
-The agent ran by itself. No `npm run` needed.
-
-> "That. Just happened. You created a file. The agent woke up, processed it, and saved the result. Open `outputs/` and look — there's a markdown file with the full report."
-
-Have them open the saved file:
+> "The pipeline fired. You didn't type anything. You dropped a file. The workflow woke up, called the chat assistant, formatted the output, saved it. Open outputs/ and look."
 
 ```bash
 cat outputs/*.md
 ```
 
-## Step 5: Trigger again (3 min)
-
-Have them try a few more files. Drop them in, watch the agent fire.
+Drop a few more files to show the pattern repeating:
 
 ```bash
 cp transcripts/sample-transcript.txt transcripts/test-run-2.txt
-echo "Quick chat with the team about the launch." > transcripts/tiny.txt
+echo "Quick sync: Alex says launch delayed to next Friday." > transcripts/tiny.txt
 ```
 
-Each one fires the agent. Each one produces a report in `outputs/`.
+## Step 6: Stop the watcher cleanly (1 min)
 
-> "This is the difference between an *assistant* and a *workflow*. An assistant waits for you. A workflow runs on its own. You just built a workflow in 30 lines of code, no n8n required."
+```
+Ctrl+C in the watcher's terminal.
+```
 
-## Step 6: Stop it cleanly (1 min)
+> "The pipeline stops listening. Nothing else changes. The reports stay in outputs/."
 
-Tell them how to stop the watcher:
+## Step 7: See it in the frontend (4 min)
 
-> "When you're done playing, hit `Ctrl+C` in the watcher's terminal to stop it. The agent stops listening; nothing else changes."
-
-## Step 7: See it in the frontend (3 min)
-
-Open `frontend/index.html` in their browser (if it's not already), and have them click the **Stage 2 tab** at the top:
+Open `frontend/index.html` (if not already open) and click the **Stage 2 tab**:
 
 ```bash
 open frontend/index.html
 ```
 
-Walk them through:
+Walk them through the Stage 2 view:
 
-> "Look at this layout. Same shape as Stage 1, but two things changed:
+> "Look at the layout. The workflow is a container — it shows the full pipeline: File drop → Parse → Chat Assistant → Format → Save.
 >
-> - The input on the left is no longer 'A transcript' — it's now '**File drop**.' That's the chokidar watcher you just built.
-> - The output on the right is no longer 'A report' (printed) — it's now '**Saved file**.' That's the markdown file in `outputs/`.
+> See the Chat Assistant node inside the workflow box? That's the Stage 1 building block, nested inside Stage 2. The same assistant you built and ran in Module 3 — now it's a step in a pipeline.
 >
-> The agent in the middle is **identical** to Stage 1. Same Analyst, same code, same system prompt. *Only the trigger and the destination changed.*"
+> Click the Chat Assistant node inside the workflow. The inspect panel shows the same system prompt from Stage 1. Same file, same function, just used differently."
 
-Have them click the **File drop** node — show them the inspect panel: it describes the watcher, lists recent files, points to the connection. Then hit **Run Agent** to watch the Stage 2 animation play.
-
-> "That's the visual proof: same agent in the middle, automated trigger on the input, persistent destination on the output."
+Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights up in sequence.
 
 ## Step 8: The big idea (2 min)
 
-Pause and zoom out:
-
-> "Notice the shape of what you built:
+> "The shape of what you built:
 >
->     Trigger        →    Agent (same as Stage 1)    →    Destination
->     [file lands]        [API call]                      [save markdown]
+>     Event fires       →    Chat Assistant    →    Saved file
+>     [file appears]         [ask() step]           [outputs/*.md]
 >
-> The agent in the middle is unchanged. We swapped the trigger from 'user runs the script' to 'file appears.' We swapped the destination from 'print to terminal' to 'save to file.'
+> The chat assistant is *unchanged*. We didn't touch it. We just called it from a new context — a pipeline that has its own trigger and its own output step.
 >
-> Once you see this pattern, you can swap *any* trigger and *any* destination. A scheduled cron. An incoming email. A Slack message. A webhook from your CRM. The agent doesn't care. **The trigger and destination are pluggable.**"
+> Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A webhook from your CRM. The pipeline doesn't care. **The trigger and the output step are pluggable.**"
 
 ## Step 9: Wrap and commit (2 min)
 
-1. Have them clean up the test files if they want:
+1. Clean up test files if desired:
    ```bash
    rm transcripts/test-run-*.txt transcripts/tiny.txt
    ```
 2. **Update `CLAUDE.md`**: change `- [ ] Module 4:` to `- [x] Module 4:`
 3. **Commit:**
    ```bash
-   git add -A && git commit -m "Complete Module 4: Automate the Trigger"
+   git add -A && git commit -m "Complete Module 4: Build the Workflow"
    ```
 4. Hand off:
 
-> "Beautiful. You have an agent that runs without you. In Module 5 we'll make the *destination* more interesting — your reports can land in a markdown file, sure, but also a database, a Slack message, or anywhere else you want them. Type `module-5` when you're ready."
+> "Stage 2 done. You have a workflow that runs without you. In Module 5 we'll extend it — add more steps to the pipeline so reports land exactly where you need them. Type `module-5` when you're ready."

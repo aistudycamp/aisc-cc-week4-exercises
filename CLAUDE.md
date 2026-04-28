@@ -4,7 +4,15 @@
 
 ## What This Repo Is
 
-Week 4 of the AI Study Camp Vibe Coding course. Students build a real working **multi-agent system** in JavaScript over 3 stages (8 modules + an intro). The use case is the same the whole way through: turn a meeting transcript into a structured insights report. The arc is the lesson — going from one chat assistant → an automated workflow → a multi-agent system with an orchestrator and 2 sub-agents.
+Week 4 of the AI Study Camp Vibe Coding course. Students build a real working **agentic system** in JavaScript over 3 stages (8 modules + an intro). The use case is the same the whole way through: turn a meeting transcript into a structured insights report. The arc is the lesson — building a chat assistant, then a workflow that uses the chat assistant as a building block, then an agentic system that uses both as tools:
+
+```
+Agentic System (Stage 3)
+└── imports → Workflow (Stage 2)
+               └── imports → Chat Assistant (Stage 1)
+```
+
+Each stage is genuinely different — not just a wrapper around the same API call.
 
 By the end, each student will have:
 - A working multi-agent system they call from the terminal
@@ -74,10 +82,10 @@ After Stage 1 Intro, the student's working folder will be `student-output/` (cre
 | `stage-1-intro` | Setup | Orientation, API key, project scaffold | `what-is-an-api.md` |
 | `module-1` | 1 | Systems-thinking tour (no code) | `what-is-an-agent.md`, `systems-thinking.md` |
 | `module-2` | 1 | First raw API call (demystify JSON) | `what-is-an-api.md` |
-| `module-3` | 1 | Chat assistant + system prompt | `what-is-a-system-prompt.md` |
-| `module-4` | 2 | Folder-watcher automation | — |
-| `module-5` | 2 | Output destinations | — |
-| `module-6` | 3 | Orchestrator + sub-agents | `what-is-an-orchestrator.md` |
+| `module-3` | 1 | Build the chat assistant (interactive loop, exports `ask()`) | `what-is-a-system-prompt.md` |
+| `module-4` | 2 | Build the workflow (pipeline importing `ask()` from Stage 1) | `what-is-a-workflow.md` |
+| `module-5` | 2 | Extend the workflow (add pipeline steps) | — |
+| `module-6` | 3 | The agentic system (planner + dispatch over Stages 1+2) | `what-is-an-orchestrator.md` |
 | `module-7` | 3 | Frontend visualization | — |
 | `module-8` | 3 | Make it yours (personalize) | `agent-archetypes.md` |
 
@@ -99,9 +107,9 @@ The 3 system prompts in `student-output/prompts/`:
 - `action_extractor.md` — sub-agent #2 (returns actions JSON)
 
 The Node.js code:
-- `stage-1/chat.js` — single-shot chat assistant
-- `stage-2/watcher.js` — chokidar watcher → agent → save
-- `stage-3/orchestrator.js` — orchestrator + 2 sub-agents + synthesizer
+- `stage-1/chat.js` — interactive chat assistant; exports `ask()` for Stages 2+3 to import
+- `stage-2/workflow.js` — multi-step pipeline; imports `ask()` from Stage 1; exports `runWorkflow()` for Stage 3
+- `stage-3/orchestrator.js` — planner + dispatch; imports `ask()` and `runWorkflow()` from Stages 1+2
 
 ## When students hit errors
 
@@ -111,6 +119,7 @@ Common failure modes:
 - **`401 Unauthorized` from Anthropic** → API key is invalid or hasn't activated yet (try a new one)
 - **`SyntaxError: Unexpected token` from sub-agent JSON** → the sub-agent prompt got edited in a way that breaks JSON output. Restore from `templates/transcripts-to-insights/prompts/`.
 - **Watcher doesn't fire** → confirm `npm run stage-2` is still running in another terminal; chokidar's `ignoreInitial` means existing files don't trigger, only new ones
+- **`import { ask }` hangs** → check that `stage-1/chat.js` has the `if (import.meta.url === ...)` guard around its interactive loop; without it, importing the file starts a readline prompt and hangs
 
 If they ever just want to start a stage from scratch:
 ```bash

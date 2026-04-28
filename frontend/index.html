@@ -818,9 +818,9 @@
       </div>
 
       <!-- Stage banners -->
-      <div class="stage-banner" data-stages="1">— Stage 1 · <em>One agent, one job</em> —</div>
-      <div class="stage-banner" data-stages="2">— Stage 2 · <em>Same agent, automatic trigger</em> —</div>
-      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Orchestrator + sub-agents</em> —</div>
+      <div class="stage-banner" data-stages="1">— Stage 1 · <em>Chat assistant — one call, one conversation</em> —</div>
+      <div class="stage-banner" data-stages="2">— Stage 2 · <em>Workflow — pipeline using the Stage 1 building block</em> —</div>
+      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Agentic system — planner + dynamic tool dispatch</em> —</div>
 
       <div class="sub-label" data-stages="3">— Orchestrator's <em>sub-agents</em> —</div>
 
@@ -892,16 +892,16 @@
         <div class="ag-header">
           <div class="ag-icon">a</div>
           <div class="ag-info">
-            <div class="ag-tag">Chat assistant</div>
+            <div class="ag-tag">Workflow · step 2 of 4</div>
             <div class="ag-name">The <em>Analyst</em></div>
           </div>
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc">Same agent as Stage 1. The only thing that changed is who's pressing "go" — now a folder watcher instead of you.</div>
+          <div class="ag-desc">The Stage 1 chat assistant, used as one step in the workflow pipeline. Imported directly: <code style="font-family:var(--mono);font-size:11px;background:#F0EDE6;padding:1px 5px;border-radius:3px">import { ask } from '../stage-1/chat.js'</code></div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
-            <div><div class="k">trigger</div><div class="v">automatic</div></div>
+            <div><div class="k">trigger</div><div class="v">pipeline step</div></div>
           </div>
         </div>
         <div class="ag-foot">
@@ -940,16 +940,16 @@
         <div class="ag-header">
           <div class="ag-icon">o</div>
           <div class="ag-info">
-            <div class="ag-tag">Orchestrator</div>
+            <div class="ag-tag">Orchestrator · planner + dispatch</div>
             <div class="ag-name">The <em>Conductor</em></div>
           </div>
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc">No longer one agent. Now a conductor that dispatches to specialists, then synthesizes the final report.</div>
+          <div class="ag-desc">First calls a planner LLM to decide which tools to use. Then dispatches to the Stage 1 chat assistant, Stage 2 workflow, or specialists — based on the plan.</div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
-            <div><div class="k">helpers</div><div class="v">2 sub-agents</div></div>
+            <div><div class="k">tools</div><div class="v">4 available</div></div>
           </div>
         </div>
         <div class="ag-foot">
@@ -1200,18 +1200,18 @@ Return ONLY a JSON object:
       ]
     },
     's2-agent': {
-      eyebrow: "Inspecting · Chat assistant",
+      eyebrow: "Inspecting · Workflow step",
       title: "The <em>Analyst</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `<em>The same agent from Stage 1.</em> Same code, same system prompt. The only thing that changed is who pressed "go" — now a folder watcher instead of you.` },
+          content: `<em>The Stage 1 chat assistant, used as step 2 in the workflow pipeline.</em> The workflow imports it directly — <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink)">import { ask } from '../stage-1/chat.js'</code> — and calls it with a fixed prompt. Same code, same system prompt, different caller.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 a final report" } },
+          content: { in: "📝 a transcript", out: "📊 report text" } },
         { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
         { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "File drop", note: "triggered automatically" },
-            { arrow: "→", target: "Saved file", note: "writes the report" }
+            { arrow: "←", target: "Read file (step 1)", note: "receives the transcript" },
+            { arrow: "→", target: "Format markdown (step 3)", note: "returns report text" }
           ] }
       ]
     },
@@ -1251,16 +1251,16 @@ Return ONLY a JSON object:
       title: "The <em>Conductor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The brain. <em>It doesn't read the transcript itself — it dispatches to its sub-agents, waits for their answers, then writes the final report.</em>` },
+          content: `The orchestrator. First it calls a <em>planner</em> — a dedicated LLM call that reads the transcript and decides which tools to invoke. Then it dispatches to those tools. It imports the chat assistant and workflow from Stages 1 and 2: <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink)">import { ask } from '../stage-1/chat.js'; import { runWorkflow } from '../stage-2/workflow.js'</code>` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 a final report" } },
+          content: { in: "📝 a transcript", out: "📊 synthesized report" } },
         { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
         { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "The transcript", note: "reads input" },
-            { arrow: "↓", target: "The Summarizer", note: "asks for themes" },
-            { arrow: "↓", target: "The Extractor", note: "asks for actions" },
-            { arrow: "→", target: "The report", note: "writes final" }
+            { arrow: "←", target: "The transcript", note: "receives input" },
+            { arrow: "↓", target: "The Summarizer", note: "specialist for themes (if plan includes it)" },
+            { arrow: "↓", target: "The Extractor", note: "specialist for actions (if plan includes it)" },
+            { arrow: "→", target: "The report", note: "synthesizes and outputs" }
           ] }
       ]
     },
@@ -1321,29 +1321,30 @@ Return ONLY a JSON object:
       { t: 2900, src: 'output',srcLabel: 'A report',     msg: 'Printed to terminal. <em>Stage 1 done.</em>', node: 's1-output', state: 'active', report: true, complete: 's1-output' }
     ],
     2: [
-      { t: 0,    src: 'input', srcLabel: 'File drop',    msg: 'New file <code>sample-transcript.txt</code> landed in <code>transcripts/</code>.', node: 's2-input', state: 'active' },
-      { t: 350,  src: 'input', srcLabel: 'File drop',    msg: 'Watcher fired <span class="arrow">→</span> sending to The Analyst.', particle: 's2-input>s2-agent', complete: 's2-input' },
-      { t: 800,  src: 'orch',  srcLabel: 'The Analyst',  msg: 'Got it. Same agent as Stage 1, same prompt.', node: 's2-agent', state: 'active' },
-      { t: 1500, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Reading the transcript and writing the report.' },
-      { t: 2400, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Done. <span class="arrow">→</span> Saving to a file.', particle: 's2-agent>s2-output', complete: 's2-agent' },
-      { t: 2900, src: 'output',srcLabel: 'Saved file',   msg: 'Wrote <code>outputs/2026-04-27-1042.md</code>. <em>Pipeline complete.</em>', node: 's2-output', state: 'active', report: true, complete: 's2-output' }
+      { t: 0,    src: 'input', srcLabel: 'File drop',    msg: 'Step 1 — File detected: <code>sample-transcript.txt</code> in <code>transcripts/</code>.', node: 's2-input', state: 'active' },
+      { t: 350,  src: 'input', srcLabel: 'File drop',    msg: 'Step 2 — Calling the Stage 1 chat assistant: <code>ask(prompt, transcript)</code>.', particle: 's2-input>s2-agent', complete: 's2-input' },
+      { t: 800,  src: 'orch',  srcLabel: 'The Analyst',  msg: 'Got it. <em>Same ask() function from Stage 1, called with a fixed prompt.</em>', node: 's2-agent', state: 'active' },
+      { t: 1500, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Reading transcript, finding themes and actions, writing the report.' },
+      { t: 2400, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Done. Step 3 — Formatting as markdown. Step 4 — Saving.', particle: 's2-agent>s2-output', complete: 's2-agent' },
+      { t: 2900, src: 'output',srcLabel: 'Saved file',   msg: 'Wrote <code>outputs/2026-04-27-1042.md</code>. <em>4-step pipeline complete.</em>', node: 's2-output', state: 'active', report: true, complete: 's2-output' }
     ],
     3: [
       { t: 0,    src: 'input', srcLabel: 'A transcript', msg: 'New file <code>sample-transcript.txt</code> · 442 words.', node: 's3-input', state: 'active' },
       { t: 350,  src: 'input', srcLabel: 'A transcript', msg: 'Sending <span class="arrow">→</span> The Conductor.', particle: 's3-input>s3-agent', complete: 's3-input' },
-      { t: 750,  src: 'orch',  srcLabel: 'The Conductor', msg: 'Got it. Reading the transcript…', node: 's3-agent', state: 'active' },
-      { t: 1200, src: 'orch',  srcLabel: 'The Conductor', msg: 'I need themes <em>and</em> action items. I\'ll ask both helpers.' },
-      { t: 1700, src: 'orch',  srcLabel: 'The Conductor', msg: 'Calling <code>The Summarizer</code>…', particle: 's3-agent>s3-summ' },
-      { t: 2100, src: 'sub',   srcLabel: 'The Summarizer', msg: 'On it. Reading the transcript.', node: 's3-summ', state: 'active' },
-      { t: 2600, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Found 3 themes. Handing back.' },
-      { t: 3100, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Returning <span class="arrow">↑</span> to The Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
-      { t: 3500, src: 'orch',  srcLabel: 'The Conductor', msg: 'Got the themes. Now calling <code>The Extractor</code>…', particle: 's3-agent>s3-extr' },
-      { t: 3900, src: 'extr',  srcLabel: 'The Extractor',  msg: 'On it. Looking for action items.', node: 's3-extr', state: 'active' },
-      { t: 4500, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Found 5 actions with owners.' },
-      { t: 5000, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Sending <span class="arrow">↑</span> to The Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
-      { t: 5400, src: 'orch',  srcLabel: 'The Conductor', msg: 'Both helpers done. Writing the final report.' },
-      { t: 6100, src: 'orch',  srcLabel: 'The Conductor', msg: 'Report ready. Sending <span class="arrow">→</span> Output.', particle: 's3-agent>s3-output', complete: 's3-agent' },
-      { t: 6500, src: 'output',srcLabel: 'A report',     msg: 'Saved as <code>2026-04-27-1042.md</code>. <em>All done.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
+      { t: 750,  src: 'orch',  srcLabel: 'The Conductor', msg: 'Got it. First: calling the <em>planner</em> — a dedicated LLM call to decide which tools to use.', node: 's3-agent', state: 'active' },
+      { t: 1400, src: 'orch',  srcLabel: 'The Conductor', msg: 'Planner returned: <code>{ tools: ["summarize", "extract"] }</code>' },
+      { t: 1900, src: 'orch',  srcLabel: 'The Conductor', msg: 'Plan set. Dispatching to tools.' },
+      { t: 2200, src: 'orch',  srcLabel: 'The Conductor', msg: 'Calling <code>The Summarizer</code>…', particle: 's3-agent>s3-summ' },
+      { t: 2600, src: 'sub',   srcLabel: 'The Summarizer', msg: 'On it. Reading the transcript.', node: 's3-summ', state: 'active' },
+      { t: 3100, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Found 3 themes. Handing back.' },
+      { t: 3600, src: 'sub',   srcLabel: 'The Summarizer', msg: 'Returning <span class="arrow">↑</span> to The Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
+      { t: 4000, src: 'orch',  srcLabel: 'The Conductor', msg: 'Got the themes. Now calling <code>The Extractor</code>…', particle: 's3-agent>s3-extr' },
+      { t: 4400, src: 'extr',  srcLabel: 'The Extractor',  msg: 'On it. Looking for action items.', node: 's3-extr', state: 'active' },
+      { t: 5000, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Found 5 actions with owners.' },
+      { t: 5500, src: 'extr',  srcLabel: 'The Extractor',  msg: 'Sending <span class="arrow">↑</span> to The Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
+      { t: 5900, src: 'orch',  srcLabel: 'The Conductor', msg: 'Both helpers done. Synthesizing final report.' },
+      { t: 6600, src: 'orch',  srcLabel: 'The Conductor', msg: 'Report ready. Sending <span class="arrow">→</span> Output.', particle: 's3-agent>s3-output', complete: 's3-agent' },
+      { t: 7000, src: 'output',srcLabel: 'A report',     msg: 'Saved as <code>2026-04-27-1042.md</code>. <em>Planner → Dispatch → Synthesize → Done.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
     ]
   };
 

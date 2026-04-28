@@ -1,185 +1,162 @@
 ---
 name: module-5
-description: Output Destinations — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student picks one additional destination (Slack, Notion, console-with-color, JSON file, etc.) and extends watcher.js to send the report there as well as the markdown file. Reinforces the "trigger + agent + destination" pattern.
+description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student adds additional steps to the workflow pipeline (Slack, JSON log, console, etc.), reinforcing that workflows are composed of steps and that the pipeline is the thing they control.
 ---
 
-# Module 5: Output Destinations
+# Module 5: Extend the Workflow
 
-**Time:** ~25 minutes
-**You'll produce:** an extended `watcher.js` that sends the report to one *additional* destination beyond the markdown file — Slack, a JSON log, a copy in your clipboard, anywhere you'd like the report to actually show up.
+**Time:** ~20 minutes
+**You'll produce:** an extended workflow with one additional step — the report lands somewhere new in addition to the markdown file.
 
 ## Coach Instructions
 
-This is an open-ended module. Don't prescribe one answer. Help the student pick a destination that's *useful for them*. The point is the pattern — once they've added one extra destination, they can add five.
+This module reinforces that a workflow is *a sequence of steps you control*. Each addition is a new step in `runWorkflow()` — not a separate "integration." Keep the focus on the code shape: step 1, step 2, step 3. The student can pick whichever new step appeals to them.
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Module 4 saved your reports to a markdown file. That's fine, but in real life, your report doesn't always want to live in a folder. Maybe you want it in Slack, so the team can see it. Maybe you want it in Notion, attached to your meeting page. Maybe you want a JSON log so you can analyze it later.
+> "Stage 2 is done — but the pipeline only has one output step: save a markdown file. In real life, your report probably needs to go somewhere else too. To a Slack channel so the team sees it. To a JSON log so you can analyze trends. To a database row.
 >
-> The cool thing: **the destination is a separate concern from the agent.** The agent does its job, returns a string. Where you send that string is your call. Today you'll add one more destination."
+> Here's the key insight: **the output step is just another step in the pipeline**. We add it inside `runWorkflow()`. The chat assistant doesn't change. The trigger doesn't change. We just extend the sequence."
 
-## Step 2: Pick a destination (4 min)
+## Step 2: Open workflow.js and locate the extension point (2 min)
 
-Show them the menu:
-
-```
-  1. Console with color/formatting
-     - easiest. Just makes the terminal output prettier.
-     - good warmup if you've never touched output formatting.
-
-  2. JSON log file
-     - writes outputs/log.jsonl with timestamp + report.
-     - useful if you want to feed reports into a spreadsheet or dashboard later.
-
-  3. Slack webhook
-     - posts the report to a Slack channel.
-     - feels real — a teammate could see it land.
-     - needs a Slack incoming webhook URL (5 min setup).
-
-  4. Local notification
-     - macOS notification when a report lands.
-     - tiny dopamine hit when the agent finishes.
-     - Mac only.
-
-  5. Notion (advanced)
-     - creates a Notion page with the report as content.
-     - needs a Notion integration token + database.
-     - skip if you've never touched the Notion API before.
-```
-
-Ask: **"Which one feels useful or fun? Pick one and we'll wire it up."**
-
-## Step 3: Wire it up (10–15 min)
-
-Below are the additions for each option. Pick the one they chose and walk them through.
-
-### Option 1: Console with color/formatting
-
-Install one tiny dependency:
-
-```bash
-npm install picocolors
-```
-
-Then edit `stage-2/watcher.js`. Add at the top:
+Open `student-output/stage-2/workflow.js`. Find the end of `runWorkflow()`:
 
 ```js
-import pc from "picocolors";
+  // Step 4: save to outputs/
+  fs.writeFileSync(outPath, body, 'utf-8');
+
+  // Step 5: return saved path
+  return outPath;
 ```
 
-Right after the `saveReport(...)` line in the `add` handler, add:
+> "Step 5 is where we add more steps. After the file is saved, we can do anything else we want with `reportText` or `outPath`. Let's pick one."
+
+## Step 3: Pick a new step (3 min)
+
+Show them the options:
+
+```
+  1. Console print — format the report in the terminal with a visual separator.
+     Easiest. Good warmup.
+
+  2. JSON log — append { timestamp, source, report } to outputs/log.jsonl.
+     Useful for analysis or building a dashboard later.
+
+  3. Slack webhook — post the report to a Slack channel.
+     Feels real. Team can see it land.
+
+  4. macOS notification — show a banner when the pipeline finishes.
+     Tiny, satisfying signal.
+```
+
+Ask: **"Which feels useful or fun? Pick one."**
+
+## Step 4: Add the step (8–10 min)
+
+### Option 1: Console print
+
+Add after the save step inside `runWorkflow()`:
 
 ```js
-// console destination
-console.log("\n" + pc.cyan("─".repeat(60)));
-console.log(pc.bold(pc.cyan("📊 INSIGHTS REPORT")));
-console.log(pc.cyan("─".repeat(60)));
-console.log(report);
-console.log(pc.cyan("─".repeat(60)) + "\n");
+// Step 5: print to console
+console.log("\n" + "─".repeat(60));
+console.log("📊 INSIGHTS REPORT");
+console.log("─".repeat(60));
+console.log(reportText);
+console.log("─".repeat(60) + "\n");
 ```
 
-Save, restart the watcher, drop a test file. They'll see the report printed in the terminal with a colored frame.
+No new dependencies needed.
 
-### Option 2: JSON log file
+### Option 2: JSON log
 
-No extra deps. Add at the top of `stage-2/watcher.js`:
+Add at the top of the file:
 
 ```js
 const LOG_FILE = path.join(OUTPUTS_DIR, "log.jsonl");
 ```
 
-Add inside the `add` handler, right after `saveReport(...)`:
+Add inside `runWorkflow()` after the save step:
 
 ```js
-// json log destination
-const logEntry = {
-  timestamp: new Date().toISOString(),
-  source: filename,
-  report,
-};
-fs.appendFileSync(LOG_FILE, JSON.stringify(logEntry) + "\n", "utf-8");
-console.log(`✓ Logged to ${path.relative(ROOT, LOG_FILE)}`);
+// Step 5: append to JSON log
+const entry = { timestamp: new Date().toISOString(), source: sourceFilename, report: reportText };
+fs.appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", "utf-8");
 ```
 
-Save, restart, test. They can `cat outputs/log.jsonl` to see the log accumulate.
+Test with `cat outputs/log.jsonl` — one line per transcript processed.
 
 ### Option 3: Slack webhook
 
-Slack setup (3 min):
-1. Go to <https://api.slack.com/apps>, create a new app from scratch (workspace dev mode).
-2. Add the **Incoming Webhooks** feature, enable it, create one for a test channel.
-3. Copy the webhook URL.
+First, set up a Slack incoming webhook:
+1. Go to `api.slack.com/apps` → create a new app → Incoming Webhooks → activate → add to a test channel → copy the URL.
+2. Add to `.env`:
+   ```
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+   ```
 
-Add the URL to `.env`:
-
-```
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-```
-
-Edit `stage-2/watcher.js`, add inside the `add` handler after `saveReport(...)`:
+Add inside `runWorkflow()` after the save step:
 
 ```js
-// slack destination
+// Step 5: post to Slack
 if (process.env.SLACK_WEBHOOK_URL) {
   await fetch(process.env.SLACK_WEBHOOK_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      text: `📊 *New insights report from \`${filename}\`*\n\`\`\`${report}\`\`\``,
+      text: `📊 *Report from \`${sourceFilename}\`*\n\`\`\`${reportText.slice(0, 2000)}\`\`\``,
     }),
   });
-  console.log("✓ Posted to Slack");
 }
 ```
 
-Save, restart, test. They'll see the report land in Slack.
-
 ### Option 4: macOS notification
 
-Add inside the `add` handler:
+Add inside `runWorkflow()` after the save step:
 
 ```js
-// macOS notification destination
+// Step 5: macOS notification
 import { exec } from "node:child_process";
-exec(`osascript -e 'display notification "Saved report from ${filename}" with title "Agent done"'`);
+exec(`osascript -e 'display notification "Report saved from ${sourceFilename}" with title "Pipeline done"'`);
 ```
 
-Save, restart, test. Mac shows a notification banner.
+## Step 5: Test it (3 min)
 
-### Option 5: Notion (advanced)
-
-Skip the walkthrough — it's its own can of worms (database setup, integration token, schema). If they really want this, point them to the Notion API docs and have them follow along after the sprint.
-
-## Step 4: Test it (3 min)
-
-Whatever destination they picked, have them run the watcher and drop a fresh file:
+Start the watcher and drop a file:
 
 ```bash
-cp transcripts/sample-transcript.txt transcripts/destination-test.txt
+npm run stage-2
+# in second terminal:
+cp transcripts/sample-transcript.txt transcripts/step-test.txt
 ```
 
-Confirm they see *both* the markdown file *and* the new destination fire.
+Confirm both the markdown file *and* the new step fire.
 
-## Step 5: The big idea, restated (2 min)
+## Step 6: The big idea (2 min)
 
-> "You now have an agent that:
+> "Look at the shape of `runWorkflow()` now:
 >
->     Trigger        →    Agent             →    Destinations (plural!)
->     [file lands]        [API call]              [markdown + your-thing]
+>     Step 1 (caller): read file
+>     Step 2: call ask()   ← the Stage 1 chat assistant
+>     Step 3: format
+>     Step 4: save markdown
+>     Step 5: [your new step]
 >
-> Stage 2 is officially done. Take a moment to appreciate this — most people who 'use AI' have never built something this real. You have an automation that runs without you, processes input, and lands the output where you actually use it.
+> Each step is a few lines. Each step has a clear input and output. The pipeline is just functions in a sequence.
 >
-> One more stage. In Stage 3 we'll level up the agent itself — split it into an orchestrator with sub-agents."
+> Workflows aren't magic. They're **composed of steps**. Once you see that, you can add as many steps as you need — database, analytics, email, whatever. The chat assistant in step 2 never changes."
 
-## Step 6: Wrap and commit (1 min)
+## Step 7: Wrap and commit (1 min)
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
-2. **Commit:**
+1. Clean up test file: `rm transcripts/step-test.txt`
+2. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
+3. **Commit:**
    ```bash
-   git add -A && git commit -m "Complete Module 5: Output Destinations"
+   git add -A && git commit -m "Complete Module 5: Extend the Workflow"
    ```
-3. Hand off:
+4. Hand off:
 
-> "Stage 2 done. Next up — the big one. Stage 3 is where you build a multi-agent system. The orchestrator pattern. Type `module-6` when you're ready."
+> "Stage 2 extended. Your pipeline now produces multiple outputs. One more stage — the biggest one. Stage 3 is where we go beyond a fixed pipeline and build something that *decides what to do*. Type `module-6` when you're ready."
