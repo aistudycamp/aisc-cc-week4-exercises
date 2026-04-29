@@ -20,7 +20,7 @@ Say:
 
 ## Step 2: Read the concept doc (3 min)
 
-Open `concepts/what-is-a-workflow.md` — actually, skip ahead. Open `concepts/what-is-an-agent.md` and read the **"three-level hierarchy"** section together. Land one idea:
+Open `concepts/what-is-an-agent.md` and read the **"three-level hierarchy"** section together. Land one idea:
 
 > "Stage 1 is the foundation. Stages 2 and 3 *import and reuse it*. This isn't marketing — it's literally what the code does. Let's look."
 

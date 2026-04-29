@@ -101,7 +101,7 @@ student-output/
 ├── transcripts/              ← drop input files here
 │   └── sample-transcript.txt
 ├── stage-1/chat.js           ← Stage 1 code
-├── stage-2/watcher.js        ← Stage 2 code
+├── stage-2/workflow.js       ← Stage 2 code
 ├── stage-3/orchestrator.js   ← Stage 3 code
 ├── package.json              ← lists dependencies
 └── .env.example              ← template for your API key

@@ -156,7 +156,9 @@ Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights 
 >
 > The chat assistant is *unchanged*. We didn't touch it. We just called it from a new context — a pipeline that has its own trigger and its own output step.
 >
-> Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A webhook from your CRM. The pipeline doesn't care. **The trigger and the output step are pluggable.**"
+> Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A webhook from your CRM. The pipeline doesn't care. **The trigger and the output step are pluggable.**
+>
+> And here's the thing to hold onto: every product you've seen called 'AI automation' is this exact shape. Upload a contract, get a summary. Paste a Slack thread, get action items. Send a customer email, get a draft reply. They're all a file-drop — or a webhook — pointing at an LLM. You just built the whole thing from scratch."
 
 ## Step 9: Wrap and commit (2 min)
 

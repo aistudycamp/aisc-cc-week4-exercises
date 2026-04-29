@@ -52,6 +52,8 @@ If they pick "Custom," ask:
 
 Open `student-output/prompts/system.md`.
 
+One heads-up before you edit: `system.md` is used in two places — by `ask()` in Stage 1 (the chat assistant) and by the synthesizer in Stage 3. The edits you make here affect both. For most use cases that's exactly what you want; just know it's one file doing double duty.
+
 Walk them through editing it for their use case. Two things change:
 
 ### A) The role

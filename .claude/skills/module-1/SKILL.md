@@ -44,7 +44,9 @@ Then explain:
 
 > "Read this left-to-right. The transcript comes in. The orchestrator reads it. It dispatches to two specialists — the Summarizer (which finds themes) and the Extractor (which finds action items). Both come back to the orchestrator with their answers. The orchestrator synthesizes everything into a final report and saves it.
 >
-> That's the whole shape of every agentic system you'll ever build. Different inputs, different outputs, different specialists — but always: **input → orchestrator → specialists → orchestrator → output.**"
+> This is the Stage 3 architecture — what you'll have at the end of Module 6. It's also the shape that every serious agentic system follows: **input → orchestrator → specialists → orchestrator → output.**
+>
+> You won't build this today. You'll build the bottom-left corner first — the chat assistant — and by Module 6, you'll have built every single piece in this picture. The staircase, not the whole building at once."
 
 ## Step 3: Walk through the example (5 min)
 
@@ -82,7 +84,7 @@ Print the staircase:
        Stage 1                Stage 2                 Stage 3
        ───────                ───────                 ───────
 
-       chat.js           →    watcher.js        →    orchestrator.js
+       chat.js           →    workflow.js       →    orchestrator.js
        1 function             1 function +           4 functions
                               file trigger           (orch + 2 subs + synth)
 
