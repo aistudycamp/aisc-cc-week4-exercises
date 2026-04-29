@@ -99,7 +99,24 @@ Print the staircase:
 >
 > One agent at a time."
 
-## Step 6: Reflection (1 min)
+## Step 6: Find the orchestrator (2 min)
+
+Let's make this concrete. Open the example file:
+
+```bash
+open examples/example-transcripts-insights.md
+# or: code examples/example-transcripts-insights.md
+```
+
+Say:
+
+> "Find the section in this file that shows the orchestrator function. How many lines is it?"
+
+Wait for them to look. The orchestrator function is short — roughly 10–15 lines. That's the point:
+
+> "Notice how thin the orchestrator is. It doesn't do any of the actual analysis — it just calls its specialists and combines the answers. The intelligence is in the specialists and their system prompts. The orchestrator is just the traffic controller."
+
+## Step 7: Reflection (1 min)
 
 Ask:
 
@@ -111,7 +128,7 @@ Ask:
 >
 > Three questions. The whole pattern."
 
-## Step 7: Wrap and commit (1 min)
+## Step 8: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:`
 2. **Commit:**
@@ -124,7 +141,15 @@ Ask:
 
 ## Optional deeper reading
 
-If they're curious:
-- `concepts/what-is-an-agent.md`
-- `concepts/what-is-an-orchestrator.md`
-- `concepts/systems-thinking.md`
+If they're curious — these are all optional here, but a heads up: `what-is-an-agent.md` will be opened together in Module 3. Reading it now gives a head start; skipping it is fine since Module 3 covers the key ideas inline.
+
+- `concepts/what-is-an-agent.md` — the three-level hierarchy (chat assistant → workflow → agentic system) in detail
+- `concepts/what-is-an-orchestrator.md` — deeper on the planner pattern and when orchestrators shine
+- `concepts/systems-thinking.md` — systems-thinking vocabulary for talking about agents
+
+## Coach Guardrails
+
+- **This module is intentionally code-free** — don't open any files in `student-output/`. The mental model comes first.
+- **Wait for the student's answer** to "Why would we architect it that way?" in Step 3 before giving the answer. Their attempt matters more than getting it right.
+- **Print the ASCII diagrams** — don't describe them, show them. The visual anchor is the whole point.
+- **`what-is-an-agent.md` is optional here, required in Module 3** — if the student reads it now, great. If they skip it, Module 3 teaches the hierarchy inline. Don't pressure them.

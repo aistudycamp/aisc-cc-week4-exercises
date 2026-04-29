@@ -79,7 +79,11 @@ Walk them through:
 
 ## Step 4: Scaffold the project (3 min)
 
-Now create the student's working folder by copying the template:
+Now scaffold the working folder. First, confirm they're ready:
+
+> "Ready to set up your project folder? This copies the starter template into `student-output/` — that'll be your working directory for the whole sprint."
+
+Wait for them to confirm (a "yes" or "yep" or "go for it"). Then run:
 
 ```bash
 cp -R templates/transcripts-to-insights student-output/
@@ -161,3 +165,15 @@ Wrap and update progress:
 3. Say:
 
 > "You're set up. Project scaffolded, API key in place, dependencies installed. When you're ready, type `module-1` and we'll do the systems-thinking tour."
+
+## Coach Guardrails
+
+- **Ask before scaffolding** — confirm the student is ready before running `cp -R` in Step 4. Never copy files ahead of them without asking.
+- **Wait for real API key** — confirm `grep ANTHROPIC_API_KEY .env` shows their actual key (not the `sk-ant-api03-...` placeholder) before moving on. A student with a placeholder key will hit a `401` in Module 2.
+- **Never ask the student to paste their API key in chat** — always tell them to open `.env` directly.
+- **If Node isn't installed, stop and wait** — don't continue until `node --version` succeeds with v20+.
+- **`.env` is in `.gitignore`** — if the student asks whether to commit it, say no.
+
+## Optional deeper reading
+
+- `concepts/what-is-an-api.md` — the doorbell metaphor and a deeper explanation of what APIs are

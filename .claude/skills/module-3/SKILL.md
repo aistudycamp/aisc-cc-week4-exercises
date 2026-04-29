@@ -6,7 +6,7 @@ description: Build the Chat Assistant — Module 3 of the AISC Agent Sprint. Tri
 # Module 3: Build the Chat Assistant
 
 **Time:** ~25 minutes
-**You'll produce:** a working interactive chat assistant — a multi-turn conversation where you paste a transcript as the first message, then ask follow-up questions. You'll also edit the system prompt and watch the output change.
+**You'll produce:** a working multi-turn conversation with the chat assistant, and a first-hand feel for how the system prompt controls everything about the output. You'll run it, talk to it, break it, restore it.
 
 ## Coach Instructions
 
@@ -135,15 +135,27 @@ Save, re-run. Different shape entirely.
 
 > "Same code. Same Claude. New format. The system prompt is the product spec — every word of output is shaped by it."
 
-### Restore
+### Step 5c: Restore the original prompt ⚠️ (required)
 
-After they see the change, restore the original:
+Don't skip this — Module 4's workflow depends on the original `system.md` being intact.
 
 ```bash
 cp ../templates/transcripts-to-insights/prompts/system.md prompts/system.md
 ```
 
-Run once more to confirm the original behavior is back. We need it intact for the workflow in Module 4.
+Run once more to confirm the original output is back before moving on:
+
+```bash
+npm run stage-1
+# paste the sample transcript — output should match the original format
+```
+
+If they want to keep their custom prompt, save it first:
+```bash
+cp prompts/system.md prompts/system-custom.md
+```
+
+Then restore. The original stays in `templates/` and is always recoverable.
 
 ## Step 6: See it in the frontend (2 min)
 
@@ -169,3 +181,16 @@ Click the **Chat Assistant** node. Show them the inspect panel — system prompt
 3. Hand off:
 
 > "Stage 1 done. You have a working chat assistant — an interactive multi-turn conversation and a reusable `ask()` function. Next: Stage 2. We wrap that function in a pipeline so it runs *automatically* every time a file appears. Type `module-4` when you're ready."
+
+## Coach Guardrails
+
+- **The restore step is mandatory** — confirm the student ran it and that `npm run stage-1` produces the original output format before committing. Module 4's workflow reads `system.md` directly. A broken or customized prompt here causes confusing failures later.
+- **Don't build the assistant for them** — they're running and editing an existing scaffold, not writing from scratch. The learning is in the interaction and the prompt edits.
+- **Don't skip the system prompt edits** — Edit A (changing the role) and Edit B (changing the output format) are the core exercises. Seeing the output change from one word of prompt change is the whole lesson.
+- **If they want to keep a custom prompt**, save it as `prompts/system-custom.md` before restoring the original.
+- **The `ask()` export and import guard** — these are the "this is why we'll do this again in Stage 2 and 3" moments. Don't rush past them.
+
+## Optional deeper reading
+
+- `concepts/what-is-an-agent.md` — the three-level hierarchy you just read, with additional context on how agents compose
+- `concepts/what-is-a-system-prompt.md` — deeper reference on how system prompts control model behavior

@@ -115,13 +115,20 @@ if (process.env.SLACK_WEBHOOK_URL) {
 
 ### Option 4: macOS notification
 
-Add inside `runWorkflow()` after the save step:
+Add at the **top of the file**, with the other imports:
+
+```js
+import { exec } from "node:child_process"; // add this line at the top, not inside runWorkflow
+```
+
+Then add inside `runWorkflow()` after the save step:
 
 ```js
 // Step 5: macOS notification
-import { exec } from "node:child_process";
 exec(`osascript -e 'display notification "Report saved from ${sourceFilename}" with title "Pipeline done"'`);
 ```
+
+Note: ES module `import` statements must be at the top level of the file. Putting one inside a function causes a SyntaxError.
 
 ## Step 5: Test it (3 min)
 
@@ -159,4 +166,15 @@ Confirm both the markdown file *and* the new step fire.
    ```
 4. Hand off:
 
-> "Stage 2 extended. Your pipeline now produces multiple outputs. One more stage — the biggest one. Stage 3 is where we go beyond a fixed pipeline and build something that *decides what to do*. Type `module-6` when you're ready."
+> "Stage 2 done. You now have a pipeline that runs without you and produces exactly the outputs you want. Here's what changes in Stage 3: instead of a fixed sequence of steps, the system reads the input first and *decides* what to run. It looks at the transcript and asks: what analysis does this actually need? That decision-making is what makes it an agentic system. Type `module-6` when you're ready."
+
+## Coach Guardrails
+
+- **Let them pick their option** — don't steer them toward the easiest one unless they're stuck. Their choice is their investment.
+- **For Option 3 (Slack)** — warn them upfront that it requires creating a Slack app and incoming webhook before writing a line of code. If they're not sure they want to do that, suggest Option 1 or 2 instead.
+- **Imports go at the top of the file** — if the student puts `import { exec }` inside `runWorkflow()`, stop them. ES module imports must be top-level declarations. This causes a `SyntaxError` at parse time.
+- **Test before committing** — confirm the new step actually fires when a file is dropped before running the commit. Don't commit broken code.
+
+## Optional deeper reading
+
+- `concepts/what-is-a-workflow.md` — deeper reference on workflow patterns, trigger types, and when to use a workflow vs. an agentic system

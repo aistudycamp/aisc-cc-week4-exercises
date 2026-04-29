@@ -25,7 +25,7 @@ Say:
 Give them the menu, then nudge them to pick fast:
 
 ```
-  1. Customer interviews          →  JTBD themes + verbatim quotes
+  1. Customer interviews          →  JTBD (Jobs to Be Done) themes + verbatim quotes
   2. Earnings calls               →  Risk flags + analyst questions
   3. Lecture / podcast notes      →  Study guide + flashcards
   4. 1:1 notes                    →  Their actions + your actions
@@ -68,7 +68,7 @@ Replace the `KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP` block with whate
 
 Example for customer interviews:
 ```
-**JTBD THEMES**
+**JTBD THEMES** (Jobs to Be Done — what the user is fundamentally trying to accomplish)
 - [What user was trying to do]: [evidence from interview]
 
 **VERBATIM QUOTES**
@@ -90,10 +90,10 @@ For customer interviews, the summarizer might find "JTBD themes" and the extract
 
 `prompts/summarizer.md`:
 ```
-You are a JTBD theme finder.
+You are a JTBD (Jobs to Be Done) theme finder.
 
 Given a customer interview, identify the 3 most prominent
-"jobs to be done" the customer was trying to get done.
+"jobs to be done" — the underlying tasks or goals the customer is trying to accomplish.
 
 Return ONLY a JSON object:
 
@@ -147,12 +147,6 @@ Anything ~300+ words works.
 npm run stage-3 -- transcripts/real-input.txt
 ```
 
-Or if Stage 3 only takes the sample by default, edit the run command:
-
-```bash
-node stage-3/orchestrator.js transcripts/real-input.txt
-```
-
 Watch the trace. Read the output together.
 
 > "How is it? Useful? Surprising? Wrong about something?"
@@ -204,3 +198,15 @@ Listen. Reflect back. The point is to plant the seed: this pattern is portable. 
 > - **Three questions for any new agent**: What's the input? What's the output? What sub-agents fit between them?
 >
 > Go build something."
+
+## Coach Guardrails
+
+- **Use only `npm run stage-3 -- transcripts/real-input.txt`** as the run command. Don't offer alternative invocation patterns — consistency matters at the sprint's most important moment.
+- **Use-case selection cap: 3 minutes** — if the student hasn't picked after 3 minutes, nudge them to the option that matches a document they have on their laptop right now.
+- **Warn about JSON field names before Step 4** — when editing the sub-agent prompts, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator code expects them. A student who renames these fields will get a confusing runtime error.
+- **JTBD = Jobs to Be Done** — if the student doesn't recognize the term, explain it: "Jobs to Be Done — what the user is fundamentally trying to accomplish, not just what they're doing on the surface."
+- **If the output is bad, iterate** — bad first output is expected and pedagogically useful. Tune one prompt, re-run, compare. That process is the craft.
+
+## Optional deeper reading
+
+- `concepts/agent-archetypes.md` — patterns for how to think about any new agent you build next

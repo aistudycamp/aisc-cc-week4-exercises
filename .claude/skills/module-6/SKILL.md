@@ -43,6 +43,12 @@ import { runWorkflow } from '../stage-2/workflow.js'; // ← Stage 2 building bl
 >
 > This is why we designed Stages 1 and 2 the way we did — with `export` statements, with the import guards. It was all so Stage 3 could do exactly this."
 
+Before moving to Step 4, pause and ask:
+
+> "Before we look at the planner — you've seen the two imports. The orchestrator now has `ask()` from Stage 1 and `runWorkflow()` from Stage 2 available. What do you think happens when the planner returns `{ tools: ['summarize'] }` only — which of those functions gets called?"
+
+Wait for their answer. The correct answer: only the summarizer function runs (not `ask()` or `runWorkflow()` directly). The point is that the plan drives the dispatch — not all tools run every time.
+
 ## Step 4: Walk through the planner (4 min)
 
 Find `async function planner(transcript)`:
@@ -63,6 +69,8 @@ Open `prompts/router.md` and skim it together:
 
 ## Step 5: Walk through the dispatch logic (4 min)
 
+One word to define before we look at the code: **synthesize** means "combine the specialists' outputs into one final report." The `synthesize()` function takes everything the planner dispatched to — themes, action items, chat responses — and writes the final output from all of them together.
+
 Find the dispatch section inside `export async function orchestrator(transcript)`:
 
 ```js
@@ -73,7 +81,7 @@ if (plan.tools.includes("workflow"))  results.workflow = await runWorkflow(...);
 if (plan.tools.includes("summarize")) results.themes  = await summarize(...);
 if (plan.tools.includes("extract"))   results.actions = await extractActions(...);
 
-return await synthesize(results);          // step 3: combine
+return await synthesize(results);          // step 3: combine — merges all specialist outputs
 ```
 
 > "Each `if` is one tool in the toolkit. If the planner said 'use chat,' we call `ask()`. If the planner said 'use workflow,' we call `runWorkflow()`. The same functions from the files you already built.
@@ -153,8 +161,16 @@ Click into each nested box. Show the inspect panels — the system prompts, the 
 
 > "You just built a multi-agent agentic system. Take a moment — that's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system visually, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
 
+## Coach Guardrails
+
+- **Slow down at the import lines in Step 3** — "Stop here. These two lines are everything." means it. Don't move to Step 4 until the student has sat with the idea that the orchestrator's tools are the files they already built.
+- **Check in before the planner walkthrough** — the pause before Step 4 is not optional. Wait for the student to make a prediction before walking through the dispatch logic.
+- **"Orchestrator" means two things in this module** — when you say "the orchestrator *system*," you mean Stage 3 as a whole. When you say "the `orchestrator()` *function*," you mean the specific exported function inside `orchestrator.js`. Say which you mean.
+- **Define "synthesize" before showing the code** — it means "combine the specialists' outputs into one final report."
+- **Have them actually run Stage 1 in Step 7** — don't describe the comparison, do it. Side-by-side output makes the difference concrete.
+
 ## Optional deeper reading
 
-- `concepts/what-is-an-orchestrator.md`
-- `concepts/what-is-a-workflow.md`
-- `concepts/what-is-an-agent.md` — re-read the hierarchy section now that you've built it
+- `concepts/what-is-an-orchestrator.md` — goes deeper on the planner pattern and when to use dynamic dispatch
+- `concepts/what-is-a-workflow.md` — compare the workflow pattern to the agentic system you just built
+- `concepts/what-is-an-agent.md` — re-read the hierarchy section now that you've built all three levels

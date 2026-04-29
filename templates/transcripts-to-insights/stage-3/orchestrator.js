@@ -121,11 +121,7 @@ export async function orchestrator(transcript) {
 
 // ─── CLI entry point (only runs when invoked directly) ────────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const transcriptPath = process.argv[2];
-  if (!transcriptPath) {
-    console.error("Usage: node stage-3/orchestrator.js <path-to-transcript.txt>");
-    process.exit(1);
-  }
+  const transcriptPath = process.argv[2] || "transcripts/sample-transcript.txt";
 
   const transcript = fs.readFileSync(transcriptPath, "utf-8");
   console.log(`📄 Input: ${transcriptPath} (${transcript.split(/\s+/).length} words)\n`);

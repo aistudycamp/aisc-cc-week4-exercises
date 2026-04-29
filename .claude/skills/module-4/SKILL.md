@@ -67,6 +67,12 @@ Also note the export:
 
 > "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this, just like this file imports `ask()` from Stage 1."
 
+Pause and ask:
+
+> "Quick check before we start the watcher — `ask()` came from Stage 1 and got imported here. What do you think Stage 3 will import from THIS file?"
+
+Wait for their answer. The answer: `runWorkflow`. The point: the same export pattern they're looking at right now is what makes Stage 3 possible.
+
 ### The watcher gating
 
 Point to the `if (import.meta.url === ...)` block at the bottom:
@@ -93,7 +99,7 @@ They should see:
 
 ## Step 5: Trigger it (5 min)
 
-In a **second terminal window**, drop a file:
+Open a **second terminal window** (on Mac: `Cmd+T` for a new tab in the same window, or `Cmd+N` for a new window; on Windows/Linux: right-click your terminal title or open a new session). In that second terminal, navigate to your project and drop a file:
 
 ```bash
 cd student-output
@@ -121,15 +127,9 @@ cp transcripts/sample-transcript.txt transcripts/test-run-2.txt
 echo "Quick sync: Alex says launch delayed to next Friday." > transcripts/tiny.txt
 ```
 
-## Step 6: Stop the watcher cleanly (1 min)
+## Step 6: See it in the frontend (4 min)
 
-```
-Ctrl+C in the watcher's terminal.
-```
-
-> "The pipeline stops listening. Nothing else changes. The reports stay in outputs/."
-
-## Step 7: See it in the frontend (4 min)
+The watcher just fired. Before you stop it, let's see what you just triggered as a diagram. This is a comprehension check — you'll be able to map every node back to the code you read in Step 3.
 
 Open `frontend/index.html` (if not already open) and click the **Stage 2 tab**:
 
@@ -146,6 +146,14 @@ Walk them through the Stage 2 view:
 > Click the Chat Assistant node inside the workflow. The inspect panel shows the same system prompt from Stage 1. Same file, same function, just used differently."
 
 Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights up in sequence.
+
+## Step 7: Stop the watcher cleanly (1 min)
+
+```
+Ctrl+C in the watcher's terminal.
+```
+
+> "The pipeline stops listening. Nothing else changes. The reports stay in outputs/."
 
 ## Step 8: The big idea (2 min)
 
@@ -174,3 +182,15 @@ Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights 
 4. Hand off:
 
 > "Stage 2 done. You have a workflow that runs without you. In Module 5 we'll extend it — add more steps to the pipeline so reports land exactly where you need them. Type `module-5` when you're ready."
+
+## Coach Guardrails
+
+- **Don't rush past the import line in Step 3** — `import { ask } from '../stage-1/chat.js'` is the conceptual centerpiece of Module 4. Let the building-block connection land before moving to the pipeline walkthrough.
+- **Pause for the reflection question** — wait for the student to answer "What will Stage 3 import from this file?" before moving to Step 4. It's a 30-second check that pays off in Module 6.
+- **Second-terminal first-timers** — if the student has never split a terminal, show them how before they drop the file. Don't just say "second terminal" and leave them searching.
+- **Show the frontend after the watcher fires** — the visualization is most effective right after the student sees the pipeline output appear. Don't wait until the end.
+- **Don't skip the building-block callout** at the end of Step 3: "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this."
+
+## Optional deeper reading
+
+- `concepts/what-is-a-workflow.md` — full workflow reference, including trigger types and the comparison to chat assistants

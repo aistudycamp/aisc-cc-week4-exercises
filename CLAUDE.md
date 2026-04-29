@@ -71,23 +71,24 @@ After Stage 1 Intro, the student's working folder will be `student-output/` (cre
 - **Show the JSON.** When students hit Module 2 (the first API call), make sure they see the raw JSON request and response. Demystifying that is the whole point of Stage 1.
 - **Don't skip the hands-on bits.** Doing IS the learning. Don't run commands *for* the student when they should be running them themselves.
 - **Use ASCII diagrams.** Seeing the system helps cement it. Most modules already have one — print it.
+- **"Orchestrator" means two things — be explicit.** "The orchestrator *system*" or "Stage 3" means the full agentic system. "The `orchestrator()` *function*" means the specific exported function inside `stage-3/orchestrator.js`. When a student is confused, check which level you're discussing.
 - **Celebrate every module completion.** "You just called the API." "You just built an automation." "You just built a multi-agent system." These are real milestones — react like it.
 - **When directing students to a module, NEVER add a `/` prefix.** Say `module-3`, not `/module-3`.
 - **Most students have never written real code.** Be patient. If they get stuck on something basic (terminal navigation, opening a file, copying text), explain it once cleanly. Don't get exasperated.
 
 ## Module Reference
 
-| Command | Stage | Topic | Concept Doc(s) |
-|---------|-------|-------|----------------|
-| `stage-1-intro` | Setup | Orientation, API key, project scaffold | `what-is-an-api.md` |
-| `module-1` | 1 | Systems-thinking tour (no code) | `what-is-an-agent.md`, `systems-thinking.md` |
-| `module-2` | 1 | First raw API call (demystify JSON) | `what-is-an-api.md` |
-| `module-3` | 1 | Build the chat assistant (interactive loop, exports `ask()`) | `what-is-a-system-prompt.md` |
-| `module-4` | 2 | Build the workflow (pipeline importing `ask()` from Stage 1) | `what-is-a-workflow.md` |
-| `module-5` | 2 | Extend the workflow (add pipeline steps) | — |
-| `module-6` | 3 | The agentic system (planner + dispatch over Stages 1+2) | `what-is-an-orchestrator.md` |
-| `module-7` | 3 | Frontend visualization | — |
-| `module-8` | 3 | Make it yours (personalize) | `agent-archetypes.md` |
+| Command | Stage | Time | Topic | Artifact | Concept Doc(s) |
+|---------|-------|------|-------|----------|----------------|
+| `stage-1-intro` | Setup | ~10–15 min | Orientation, API key, project scaffold | Working `student-output/` folder with API key and dependencies | `what-is-an-api.md` |
+| `module-1` | 1 | ~15 min | Systems-thinking tour (no code) | Mental model: orchestrator, sub-agents, system prompts, data flow | `what-is-an-agent.md`, `systems-thinking.md` |
+| `module-2` | 1 | ~20 min | First raw API call (demystify JSON) | First API call run; raw JSON request/response seen | `what-is-an-api.md` |
+| `module-3` | 1 | ~25 min | Run + edit the chat assistant (interactive loop, exports `ask()`) | Multi-turn conversation run; system prompt edited and restored | `what-is-a-system-prompt.md` |
+| `module-4` | 2 | ~25 min | Build the workflow (pipeline importing `ask()` from Stage 1) | Working folder-watching pipeline; reports in `outputs/` | `what-is-a-workflow.md` |
+| `module-5` | 2 | ~20 min | Extend the workflow (add pipeline steps) | Workflow with one additional output step | — |
+| `module-6` | 3 | ~30 min | The agentic system (planner + dispatch over Stages 1+2) | Working orchestrator; all three stages running | `what-is-an-orchestrator.md` |
+| `module-7` | 3 | ~20 min | Frontend visualization | Screenshot of the running agentic system visualization | — |
+| `module-8` | 3 | ~25 min | Make it yours (personalize) | `student-output/personalized/` with prompts + real input/output | `agent-archetypes.md` |
 
 ## Key Files
 
@@ -101,10 +102,11 @@ After Stage 1 Intro, the student's working folder will be `student-output/` (cre
 
 Every student builds an agent that turns a meeting transcript into a structured insights report (key themes, action items, recommended next step). Same scaffold for everyone through Module 7. They personalize the prompts in Module 8 for their own use case.
 
-The 3 system prompts in `student-output/prompts/`:
+The 4 system prompts in `student-output/prompts/`:
 - `system.md` — orchestrator + synthesizer's instructions
 - `summarizer.md` — sub-agent #1 (returns themes JSON)
 - `action_extractor.md` — sub-agent #2 (returns actions JSON)
+- `router.md` — planner's routing instructions (used by Stage 3 to decide which tools to invoke)
 
 The Node.js code:
 - `stage-1/chat.js` — interactive chat assistant; exports `ask()` for Stages 2+3 to import

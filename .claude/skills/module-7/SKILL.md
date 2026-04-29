@@ -6,7 +6,7 @@ description: See the System — Module 7 of the AISC Agent Sprint. Triggered whe
 # Module 7: See the System
 
 **Time:** ~20 minutes
-**You'll produce:** a screenshot of your working agentic system as a visualization, with a real understanding of what every piece of the diagram represents.
+**You'll produce:** a screenshot of your running agentic system visualization, and the ability to point to every node in the diagram and name the file or function behind it.
 
 ## Coach Instructions
 
@@ -82,7 +82,7 @@ Watch the 9-message animated flow play out:
 6. Conductor → synthesizes
 7. Final report appears in the right panel
 
-> "That animation isn't fake — it's the actual sequence of API calls your `orchestrator.js` runs. The order matches. The output panel shows what your real agent produced for the sample transcript."
+> "That animation matches the actual sequence of API calls in your `orchestrator.js` — planner first, then specialists, then synthesis. The output panel shows what your real agent produced for the sample transcript."
 
 ## Step 6: Screenshot moment (2 min)
 
@@ -102,3 +102,10 @@ Have them save the screenshot somewhere accessible (Desktop, screenshots folder)
 3. Hand off:
 
 > "One module to go. The agent works on meeting transcripts — but what if it worked on *your* thing? Module 8 is where you make it yours. Type `module-8` when you're ready."
+
+## Coach Guardrails
+
+- **This is a celebration module** — don't rush toward Module 8. Let the student take a moment with what they built.
+- **The animation is scripted timing, not a live wire** — it plays even when the orchestrator isn't running. Don't claim it's live. Say it "matches the sequence of API calls in `orchestrator.js`."
+- **Encourage the screenshot** — it's a real, shareable artifact. Treat Step 6 as a genuine milestone, not a formality.
+- **Learning objective check before wrap** — before committing, ask the student to point to one node and say what file or function it represents. If they can't, walk through Step 4 again for that node.

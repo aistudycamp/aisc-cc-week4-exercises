@@ -60,6 +60,8 @@ Have them look at the object inside `messages.create()`. Print it out yourself, 
 > - `system` — the system prompt (the personality + rules)
 > - `messages` — the actual conversation
 >
+> Remember the orchestrator diagram from Module 1 — the 'AI thinking' step? This JSON request is what goes over the wire for that step. One call. One JSON object.
+>
 > When you open Claude.ai or ChatGPT, your browser is sending JSON exactly like this. No more, no less."
 
 ## Step 4: Run it (3 min)
@@ -136,3 +138,10 @@ Stop and say:
 
 - `concepts/what-is-an-api.md` — the doorbell metaphor in full
 - `concepts/what-is-a-system-prompt.md` — preview for Module 3
+
+## Coach Guardrails
+
+- **Don't run the API call for them on the first try** — have the student type `npm run stage-1`. The act of running it themselves is the lesson.
+- **Don't skip the JSON walkthrough** — Steps 2 and 3 (reading the file and showing the request object) are the point of this module. Don't jump straight to running it.
+- **Diagnose errors before moving on** — if the student gets a `401`, `Cannot find module`, or `ANTHROPIC_API_KEY undefined`, fix it here. A broken setup will block every module from here forward.
+- **The "full JSON response" step is optional** — follow the student's curiosity. If they want to see the full response object, great. If not, move on without guilt.
