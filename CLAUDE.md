@@ -42,7 +42,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 ## Student Progress
 
 ### Stage 0 — Setup
-- [ ] Stage 1 Intro: Setup + API Key
+- [x] Stage 1 Intro: Setup + API Key
 
 ### Stage 1 — Chat Assistant
 - [ ] Module 1: Tour the System
