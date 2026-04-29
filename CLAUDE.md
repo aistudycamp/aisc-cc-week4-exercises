@@ -47,7 +47,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 ### Stage 1 — Chat Assistant
 - [x] Module 1: Tour the System
 - [x] Module 2: Your First API Call
-- [ ] Module 3: Chat Assistant + System Prompt
+- [x] Module 3: Chat Assistant + System Prompt
 
 ### Stage 2 — Workflow
 - [ ] Module 4: Automate the Trigger
