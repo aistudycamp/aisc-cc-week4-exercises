@@ -358,13 +358,16 @@
     background: var(--panel-soft);
   }
   .ag-desc {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-2);
-    line-height: 1.4;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.6;
     margin-bottom: 12px;
   }
+  .ag-desc ul { list-style: none; padding: 0; margin: 0; }
+  .ag-desc ul li { padding: 2px 0 2px 14px; position: relative; }
+  .ag-desc ul li::before { content: ""; position: absolute; left: 0; top: 10px; width: 6px; height: 1px; background: var(--orch); }
+  .ag-desc em { font-style: italic; color: var(--ink-2); }
   .ag-meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -443,12 +446,12 @@
 
   .sa-body {
     padding: 10px 14px;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-2);
-    line-height: 1.4;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink);
+    line-height: 1.6;
   }
+  .sa-body em { font-style: italic; color: var(--ink-2); }
 
   .sa-foot {
     padding: 7px 14px;
@@ -468,18 +471,21 @@
   body[data-stage="1"] #s1-agent  { left: 50%;        top: 50%; transform: translate(-50%, -50%); }
   body[data-stage="1"] #s1-output { right: 80px;      top: 50%; transform: translateY(-50%); }
 
-  /* POSITIONS — Stage 2 (4 horizontal nodes — pipeline) */
-  body[data-stage="2"] #s2-input  { left: 40px;       top: 50%; transform: translateY(-50%); }
-  body[data-stage="2"] #s2-agent  { left: 30%;        top: 50%; transform: translateY(-50%); }
-  body[data-stage="2"] #s2-output { right: 30%;       top: 50%; transform: translateY(-50%); }
-  body[data-stage="2"] #s2-notify { right: 40px;      top: 50%; transform: translateY(-50%); }
+  /* POSITIONS — Stage 2 (branching pipeline) */
+  body[data-stage="2"] #s2-input    { left: 30px;     top: 50%; transform: translateY(-50%); }
+  body[data-stage="2"] #s2-agent    { left: 22%;      top: 50%; transform: translateY(-50%); }
+  body[data-stage="2"] #s2-standup  { left: 50%;      top: 15%; }
+  body[data-stage="2"] #s2-client   { left: 50%;      top: 50%; transform: translateY(-50%); }
+  body[data-stage="2"] #s2-planning { left: 50%;      top: 77%; }
+  body[data-stage="2"] #s2-notify   { right: 30px;    top: 50%; transform: translateY(-50%); }
 
-  /* POSITIONS — Stage 3 (5 nodes, existing layout) */
-  body[data-stage="3"] #s3-input  { left: 32px;       top: 32%; }
-  body[data-stage="3"] #s3-agent  { left: 50%;        top: 22%; transform: translateX(-50%); }
-  body[data-stage="3"] #s3-output { right: 32px;      top: 32%; }
-  body[data-stage="3"] #s3-summ   { left: 26%;        top: 70%; }
-  body[data-stage="3"] #s3-extr   { right: 26%;       top: 70%; }
+  /* POSITIONS — Stage 3 (6 nodes — orchestrator + 3 specialists) */
+  body[data-stage="3"] #s3-input  { left: 32px;       top: 36%; }
+  body[data-stage="3"] #s3-agent  { left: 50%;        top: 18%; transform: translateX(-50%); }
+  body[data-stage="3"] #s3-output { right: 32px;      top: 36%; }
+  body[data-stage="3"] #s3-summ   { left: 10%;        top: 68%; }
+  body[data-stage="3"] #s3-extr   { left: 50%;        top: 68%; transform: translateX(-50%); }
+  body[data-stage="3"] #s3-route  { right: 10%;       top: 68%; }
 
   /* PARTICLES */
   .particle {
@@ -851,7 +857,7 @@
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc">A single agent. Reads the transcript, finds themes, finds actions, writes the report — all in one API call.</div>
+          <div class="ag-desc"><ul><li>Reads the transcript</li><li>Finds themes and action items</li><li>Writes the full report</li><li><em>All in one API call — one job, one agent</em></li></ul></div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
             <div><div class="k">runs</div><div class="v">once per call</div></div>
@@ -899,7 +905,7 @@
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc">Reads the transcript and decides: team-standup, client-call, or planning-session. Returns JSON with the type and a suggested filename.</div>
+          <div class="ag-desc"><ul><li>Reads the transcript</li><li>Decides: team-standup, client-call, or planning-session</li><li>Returns the decision — pipeline routes accordingly</li></ul></div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
             <div><div class="k">prompt</div><div class="v">classifier.md</div></div>
@@ -911,28 +917,52 @@
         </div>
       </div>
 
-      <div class="node node-io output" id="s2-output" data-stages="2" data-node="s2-output">
+      <div class="node node-io output" id="s2-standup" data-stages="2" data-node="s2-standup">
         <div class="io-header">
-          <div class="io-icon">⇣</div>
+          <div class="io-icon">📁</div>
           <div class="io-text">
-            <div class="io-tag">Routed file</div>
+            <div class="io-tag">Path A</div>
             <div class="io-name"><em>team-standup/</em></div>
           </div>
           <div class="io-status-dot"></div>
         </div>
-        <div class="io-foot">saved to typed folder</div>
+        <div class="io-foot">daily standups go here</div>
+      </div>
+
+      <div class="node node-io output" id="s2-client" data-stages="2" data-node="s2-client">
+        <div class="io-header">
+          <div class="io-icon">📁</div>
+          <div class="io-text">
+            <div class="io-tag">Path B</div>
+            <div class="io-name"><em>client-call/</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">client calls go here</div>
+      </div>
+
+      <div class="node node-io output" id="s2-planning" data-stages="2" data-node="s2-planning">
+        <div class="io-header">
+          <div class="io-icon">📁</div>
+          <div class="io-text">
+            <div class="io-tag">Path C</div>
+            <div class="io-name"><em>planning-session/</em></div>
+          </div>
+          <div class="io-status-dot"></div>
+        </div>
+        <div class="io-foot">planning sessions go here</div>
       </div>
 
       <div class="node node-io output" id="s2-notify" data-stages="2" data-node="s2-notify">
         <div class="io-header">
-          <div class="io-icon">🔔</div>
+          <div class="io-icon">📄</div>
           <div class="io-text">
-            <div class="io-tag">Notification</div>
-            <div class="io-name">macOS <em>banner</em></div>
+            <div class="io-tag">Saved + Notified</div>
+            <div class="io-name"><em>Document</em> + banner</div>
           </div>
           <div class="io-status-dot"></div>
         </div>
-        <div class="io-foot">"Routed to: team-standup"</div>
+        <div class="io-foot">file written, macOS banner fired</div>
       </div>
 
       <!-- =============== STAGE 3 NODES =============== -->
@@ -959,7 +989,7 @@
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc">Runs three specialists in sequence — each one finishes and returns before the next starts. Imports ask() from Stage 1 and runWorkflow() from Stage 2.</div>
+          <div class="ag-desc"><ul><li>Dispatches Summarizer + Extractor <em>in parallel</em> — both run at once</li><li>Waits for both to return, then sends everything to the Router</li><li>Router classifies, merges, routes, saves, and notifies</li><li>Conductor assembles the final report</li></ul></div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
             <div><div class="k">steps</div><div class="v">3 + synthesize</div></div>
@@ -988,12 +1018,12 @@
         <div class="sa-header">
           <div class="sa-icon">s</div>
           <div class="sa-info">
-            <div class="sa-tag">Stage 2 building block</div>
+            <div class="sa-tag">Specialist 1</div>
             <div class="sa-name">The <em>Summarizer</em></div>
           </div>
           <div class="sa-dot"></div>
         </div>
-        <div class="sa-body">Finds 3 key themes in the transcript.</div>
+        <div class="sa-body">Reads the transcript. Finds the 3 key themes — <em>the same job the Stage 1 Analyst did, but focused only on themes.</em></div>
         <div class="sa-foot">
           <span id="s3-summState">idle</span>
           <span id="s3-summTime">—</span>
@@ -1004,15 +1034,31 @@
         <div class="sa-header">
           <div class="sa-icon">e</div>
           <div class="sa-info">
-            <div class="sa-tag">Synthesizer</div>
+            <div class="sa-tag">Specialist 2</div>
             <div class="sa-name">The <em>Extractor</em></div>
           </div>
           <div class="sa-dot"></div>
         </div>
-        <div class="sa-body">Pulls out who-said-what and action items.</div>
+        <div class="sa-body">Reads the transcript. Pulls out who said what and every commitment made — <em>the same job the Stage 1 Analyst did, but focused only on actions.</em></div>
         <div class="sa-foot">
           <span id="s3-extrState">idle</span>
           <span id="s3-extrTime">—</span>
+        </div>
+      </div>
+
+      <div class="node node-sub-agent extr" id="s3-route" data-stages="3" data-node="s3-route">
+        <div class="sa-header">
+          <div class="sa-icon">r</div>
+          <div class="sa-info">
+            <div class="sa-tag">Specialist 3</div>
+            <div class="sa-name">The <em>Router</em></div>
+          </div>
+          <div class="sa-dot"></div>
+        </div>
+        <div class="sa-body">Gets the transcript, summary, and actions. Classifies the meeting type, merges everything into one document, routes the file, and fires the notification.</div>
+        <div class="sa-foot">
+          <span id="s3-routeState">idle</span>
+          <span id="s3-routeTime">—</span>
         </div>
       </div>
 
@@ -1240,23 +1286,48 @@ Return ONLY a JSON object:
           ] }
       ]
     },
-    's2-output': {
-      eyebrow: "Inspecting · Output",
+    's2-standup': {
+      eyebrow: "Inspecting · Path A",
       title: "<em>team-standup/</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The routed transcript. Based on the Classifier's decision, the file is copied to one of three folders: <code style="font-family:var(--mono);font-size:12px;background:#EBE5DE;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/team-standup/</code>, <code style="font-family:var(--mono);font-size:12px;background:#EBE5DE;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/client-call/</code>, or <code style="font-family:var(--mono);font-size:12px;background:#EBE5DE;padding:1px 6px;border-radius:3px;color:var(--ink);">transcripts/planning-session/</code>.` },
+          content: `One of three possible destinations. If the Classifier decides it's a team standup, the file lands here. <em>The Classifier picks the path — the pipeline just follows the decision.</em>` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 original transcript", out: "📁 file in typed folder" } },
-        { label: "Recent files routed", type: "files",
-          content: [
-            { name: "team-standup/2026-04-29-team-standup.txt", meta: "just now" },
-            { name: "client-call/2026-04-28-client-call.txt", meta: "yesterday" }
-          ] },
+          content: { in: "📝 the transcript", out: "📁 file saved here" } },
         { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "The Classifier", note: "gets type + filename" },
-            { arrow: "→", target: "Notification", note: "then sends banner" }
+            { arrow: "←", target: "The Classifier", note: "chosen if type = team-standup" },
+            { arrow: "→", target: "Notification", note: "then fires macOS banner" }
+          ] }
+      ]
+    },
+    's2-client': {
+      eyebrow: "Inspecting · Path B",
+      title: "<em>client-call/</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `One of three possible destinations. If the Classifier decides it's a client call, the file lands here instead.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 the transcript", out: "📁 file saved here" } },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "The Classifier", note: "chosen if type = client-call" },
+            { arrow: "→", target: "Notification", note: "then fires macOS banner" }
+          ] }
+      ]
+    },
+    's2-planning': {
+      eyebrow: "Inspecting · Path C",
+      title: "<em>planning-session/</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `One of three possible destinations. If the Classifier decides it's a planning session, the file lands here instead.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 the transcript", out: "📁 file saved here" } },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "The Classifier", note: "chosen if type = planning-session" },
+            { arrow: "→", target: "Notification", note: "then fires macOS banner" }
           ] }
       ]
     },
@@ -1291,17 +1362,17 @@ Return ONLY a JSON object:
       title: "The <em>Conductor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The orchestrator. Runs three steps in sequence — each specialist finishes and returns before the next starts. It imports the building blocks you built: <code style="font-family:var(--mono);font-size:12px;background:#EBE5DE;padding:1px 6px;border-radius:3px;color:var(--ink)">import { ask } from '../stage-1/chat.js'</code> and <code style="font-family:var(--mono);font-size:12px;background:#EBE5DE;padding:1px 6px;border-radius:3px;color:var(--ink)">import { runWorkflow } from '../stage-2/workflow.js'</code>` },
+          content: `The coordinator. In Stage 1, one Analyst did all of this alone. Here, the Conductor splits the work across three specialists:<br><br>• Summarizer + Extractor run <em>at the same time</em> (parallel)<br>• Router takes their combined outputs, merges everything into one document, classifies, routes, and notifies<br>• Conductor assembles the final report` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 a transcript", out: "📊 synthesized report" } },
         { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
         { label: "Connects to", type: "connections",
           content: [
             { arrow: "←", target: "The transcript", note: "receives input" },
-            { arrow: "↓", target: "ask() — Stage 1", note: "step 1: executive summary" },
-            { arrow: "↓", target: "ask() — Stage 1", note: "step 2: action items" },
-            { arrow: "↓", target: "runWorkflow() — Stage 2", note: "step 3: classify, route, notify" },
-            { arrow: "→", target: "The report", note: "step 4: synthesize + output" }
+            { arrow: "↓", target: "The Summarizer", note: "step 1: finds key themes" },
+            { arrow: "↓", target: "The Extractor", note: "step 2: pulls action items" },
+            { arrow: "↓", target: "The Router", note: "step 3: classifies, merges, saves, notifies" },
+            { arrow: "→", target: "Saved report", note: "step 4: final output" }
           ] }
       ]
     },
@@ -1323,11 +1394,11 @@ Return ONLY a JSON object:
       ]
     },
     's3-summ': {
-      eyebrow: "Inspecting · Sub-agent",
+      eyebrow: "Inspecting · Specialist 1",
       title: "The <em>Summarizer</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `A <em>helper</em> the orchestrator calls when it needs themes pulled from a transcript. It does one thing well: reads, finds 3 patterns, returns them.` },
+          content: `One half of what the Stage 1 Analyst did alone — but as a dedicated specialist. Runs in parallel with the Extractor. Does one thing: reads the transcript, finds 3 key themes, returns them.` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 a transcript", out: "🏷️ 3 themes" } },
         { label: "Its instructions (system prompt)", type: "prompt", content: promptSummarizer },
@@ -1336,16 +1407,29 @@ Return ONLY a JSON object:
       ]
     },
     's3-extr': {
-      eyebrow: "Inspecting · Sub-agent",
+      eyebrow: "Inspecting · Specialist 2",
       title: "The <em>Extractor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `Another <em>helper</em>. The orchestrator calls this one to pull out specific action items — who's doing what, by when.` },
+          content: `The other half of what the Stage 1 Analyst did alone — but as a dedicated specialist. Runs in parallel with the Summarizer. Does one thing: reads the transcript, pulls out every action item with owner and deadline.` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 a transcript", out: "✅ a list of actions" } },
         { label: "Its instructions (system prompt)", type: "prompt", content: promptExtractor },
         { label: "Connects to", type: "connections",
           content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns to" }] }
+      ]
+    },
+    's3-route': {
+      eyebrow: "Inspecting · Sub-agent",
+      title: "The <em>Router</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `Specialist 3. Gets the transcript, summary, and action items from the first two specialists. Classifies the meeting type, merges everything into one document, routes it to the right folder, and fires the macOS notification.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📝 transcript + themes + actions", out: "📄 saved merged report + 🔔 notification" } },
+        { label: "Its instructions (system prompt)", type: "prompt", content: promptClassifier },
+        { label: "Connects to", type: "connections",
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns saved file path" }] }
       ]
     }
   };
@@ -1362,28 +1446,29 @@ Return ONLY a JSON object:
       { t: 4200, src: 'output',srcLabel: 'A report',     msg: 'Printed to terminal. <em>Stage 1 done.</em>', node: 's1-output', state: 'active', report: true, complete: 's1-output' }
     ],
     2: [
-      { t: 0,    src: 'input', srcLabel: 'incoming/',     msg: 'Step 1 — File detected: <code>test-1746000000.txt</code> drops into <code>transcripts/incoming/</code>.', node: 's2-input', state: 'active' },
-      { t: 600,  src: 'input', srcLabel: 'incoming/',     msg: 'Step 2 — Reading transcript, sending to Classifier.', particle: 's2-input>s2-agent', complete: 's2-input' },
-      { t: 1200, src: 'orch',  srcLabel: 'The Classifier', msg: 'Got it. Reading the transcript to determine meeting type.', node: 's2-agent', state: 'active' },
-      { t: 2200, src: 'orch',  srcLabel: 'The Classifier', msg: 'Decision: <code>{ type: "team-standup", suggested_filename: "2026-04-29-team-standup.txt" }</code>' },
-      { t: 3200, src: 'orch',  srcLabel: 'The Classifier', msg: 'Step 3 — Routing file to <code>transcripts/team-standup/</code>.', particle: 's2-agent>s2-output', complete: 's2-agent' },
-      { t: 4000, src: 'output',srcLabel: 'Routed file',   msg: 'Saved as <code>transcripts/team-standup/2026-04-29-team-standup.txt</code>. Step 4 — Sending notification.', node: 's2-output', state: 'active', complete: 's2-output', particle: 's2-output>s2-notify' },
-      { t: 5000, src: 'output',srcLabel: 'Notification',  msg: 'macOS banner fired: "Routed to: team-standup". <em>Pipeline complete.</em>', node: 's2-notify', state: 'active', report: true, complete: 's2-notify' }
+      { t: 0,    src: 'input', srcLabel: 'incoming/',      msg: 'File detected: <code>meeting-notes.txt</code> dropped into the watch folder.', node: 's2-input', state: 'active' },
+      { t: 700,  src: 'input', srcLabel: 'incoming/',      msg: 'Transcript read. Sending to the Classifier to identify the meeting type.', particle: 's2-input>s2-agent', complete: 's2-input' },
+      { t: 1400, src: 'orch',  srcLabel: 'The Classifier', msg: 'Got it. Reading the transcript…', node: 's2-agent', state: 'active' },
+      { t: 2600, src: 'orch',  srcLabel: 'The Classifier', msg: 'This is a team standup. Three possible paths — routing to <em>team-standup/</em>.', complete: 's2-agent', particle: 's2-agent>s2-standup' },
+      { t: 3500, src: 'output',srcLabel: 'team-standup/',  msg: 'Path chosen: team-standup. Writing document as <code>2026-04-29-team-standup.txt</code>.', node: 's2-standup', state: 'active', complete: 's2-standup', particle: 's2-standup>s2-notify' },
+      { t: 4500, src: 'output',srcLabel: 'Saved + Notified', msg: 'Document written to <code>transcripts/team-standup/</code>. macOS banner fired: "Routed to: team-standup". <em>Pipeline complete.</em>', node: 's2-notify', state: 'active', report: true, complete: 's2-notify' }
     ],
     3: [
-      { t: 0,    src: 'input', srcLabel: 'A transcript', msg: 'New file <code>sample-transcript.txt</code> · 442 words.', node: 's3-input', state: 'active' },
-      { t: 700,  src: 'input', srcLabel: 'A transcript', msg: 'Sending <span class="arrow">→</span> The Conductor.', particle: 's3-input>s3-agent', complete: 's3-input' },
-      { t: 1400, src: 'orch',  srcLabel: 'The Conductor', msg: 'Step 1: Calling <code>ask()</code> — getting executive summary from Stage 1 building block.', node: 's3-agent', state: 'active' },
-      { t: 2600, src: 'orch',  srcLabel: 'The Conductor', msg: 'Summary complete. Step 2: Calling <code>ask()</code> again — extracting action items.' },
-      { t: 3800, src: 'orch',  srcLabel: 'The Conductor', msg: 'Actions extracted. Step 3: Calling <code>runWorkflow()</code> — Stage 2 building block.', particle: 's3-agent>s3-summ' },
-      { t: 4500, src: 'sub',   srcLabel: 'The Workflow',  msg: 'Got it. Classifying transcript…', node: 's3-summ', state: 'active' },
-      { t: 5400, src: 'sub',   srcLabel: 'The Workflow',  msg: 'Classified as: team-standup. Routing file, sending notification.' },
-      { t: 6200, src: 'sub',   srcLabel: 'The Workflow',  msg: 'Done. Returning <span class="arrow">↑</span> to The Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
-      { t: 7000, src: 'orch',  srcLabel: 'The Conductor', msg: 'All three steps complete. Step 4: Synthesizing final report.', particle: 's3-agent>s3-extr' },
-      { t: 7600, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Combining: summary + actions + classification into final report.', node: 's3-extr', state: 'active' },
-      { t: 8600, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Report ready. Sending <span class="arrow">↑</span> to The Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
-      { t: 9400, src: 'orch',  srcLabel: 'The Conductor', msg: 'Final report synthesized. Sending <span class="arrow">→</span> Output.', particle: 's3-agent>s3-output', complete: 's3-agent' },
-      { t: 10000, src: 'output',srcLabel: 'A report',    msg: 'Saved as <code>2026-04-29-1042.md</code>. <em>ask() → ask() → runWorkflow() → synthesize → Done.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
+      { t: 0,    src: 'input', srcLabel: 'A transcript',    msg: 'Transcript received. Sending to the Conductor.', node: 's3-input', state: 'active' },
+      { t: 800,  src: 'input', srcLabel: 'A transcript',    msg: 'On its way.', particle: 's3-input>s3-agent', complete: 's3-input' },
+      { t: 1500, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Got it. Dispatching Summarizer and Extractor at the same time — both run in parallel.', node: 's3-agent', state: 'active' },
+      { t: 2100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Summarizer: find the key themes. Extractor: pull out every action item. Both working now.', particle: 's3-agent>s3-summ' },
+      { t: 2200, src: 'orch',  srcLabel: 'The Conductor',   msg: '', particle: 's3-agent>s3-extr' },
+      { t: 2500, src: 'sub',   srcLabel: 'The Summarizer',  msg: 'Reading the transcript. Finding key themes…', node: 's3-summ', state: 'active' },
+      { t: 2600, src: 'extr',  srcLabel: 'The Extractor',   msg: 'Reading the transcript. Pulling out who said what and every commitment made.', node: 's3-extr', state: 'active' },
+      { t: 3800, src: 'sub',   srcLabel: 'The Summarizer',  msg: '3 themes found. Returning to Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
+      { t: 4300, src: 'extr',  srcLabel: 'The Extractor',   msg: '4 action items with owners and deadlines. Returning to Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
+      { t: 5100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Both back. Sending themes + actions + full transcript to the Router.', particle: 's3-agent>s3-route' },
+      { t: 5900, src: 'extr',  srcLabel: 'The Router',      msg: 'Got the transcript, 3 themes, 4 action items. Classifying meeting type…', node: 's3-route', state: 'active' },
+      { t: 7000, src: 'extr',  srcLabel: 'The Router',      msg: 'Team standup. Merging themes + actions + transcript into one document. Routing to team-standup/. Notification sent.' },
+      { t: 7900, src: 'extr',  srcLabel: 'The Router',      msg: 'Document written. Returning to Conductor.', particle: 's3-route>s3-agent', complete: 's3-route' },
+      { t: 8600, src: 'orch',  srcLabel: 'The Conductor',   msg: 'All three done. Assembling final report.', particle: 's3-agent>s3-output', complete: 's3-agent' },
+      { t: 9300, src: 'output',srcLabel: 'Saved report',    msg: 'Merged document saved: <code>team-standup/2026-04-29-insights.md</code>. <em>Two specialists in parallel, one Router, one report.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
     ]
   };
 
@@ -1414,25 +1499,38 @@ Return ONLY a JSON object:
       ];
       anchors.push(inputRight, agentLeft, agentRight, outputLeft);
     } else if (stage === '2') {
-      const inR = rect('s2-input'), agR = rect('s2-agent'), outR = rect('s2-output'), notR = rect('s2-notify');
-      const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), outputLeft = ptL(outR), outputRight = ptR(outR), notifyLeft = ptL(notR);
+      const inR = rect('s2-input'), agR = rect('s2-agent');
+      const stdR = rect('s2-standup'), cliR = rect('s2-client'), plnR = rect('s2-planning');
+      const notR = rect('s2-notify');
+      const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR);
+      const standupLeft = ptL(stdR), standupRight = ptR(stdR);
+      const clientLeft = ptL(cliR), clientRight = ptR(cliR);
+      const planningLeft = ptL(plnR), planningRight = ptR(plnR);
+      const notifyLeft = ptL(notR);
+      function bez(a, b, off) { return `M ${a.x} ${a.y} C ${a.x + off} ${a.y}, ${b.x - off} ${b.y}, ${b.x} ${b.y}`; }
       paths = [
-        { id: 's2-input>s2-agent',   d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 60} ${inputRight.y}, ${agentLeft.x - 60} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
-        { id: 's2-agent>s2-output',  d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 60} ${agentRight.y}, ${outputLeft.x - 60} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
-        { id: 's2-output>s2-notify', d: `M ${outputRight.x} ${outputRight.y} C ${outputRight.x + 60} ${outputRight.y}, ${notifyLeft.x - 60} ${notifyLeft.y}, ${notifyLeft.x} ${notifyLeft.y}`, cls: 'main' }
+        { id: 's2-input>s2-agent',    d: bez(inputRight,   agentLeft,    60),  cls: 'main' },
+        { id: 's2-agent>s2-standup',  d: bez(agentRight,   standupLeft,  50),  cls: 'main' },
+        { id: 's2-agent>s2-client',   d: bez(agentRight,   clientLeft,   50),  cls: 'dashed' },
+        { id: 's2-agent>s2-planning', d: bez(agentRight,   planningLeft, 50),  cls: 'dashed' },
+        { id: 's2-standup>s2-notify', d: bez(standupRight, notifyLeft,   50),  cls: 'main' },
+        { id: 's2-client>s2-notify',  d: bez(clientRight,  notifyLeft,   50),  cls: 'dashed' },
+        { id: 's2-planning>s2-notify',d: bez(planningRight,notifyLeft,   50),  cls: 'dashed' }
       ];
-      anchors.push(inputRight, agentLeft, agentRight, outputLeft, outputRight, notifyLeft);
+      anchors.push(inputRight, agentLeft, agentRight, standupLeft, standupRight, clientLeft, clientRight, planningLeft, planningRight, notifyLeft);
     } else if (stage === '3') {
-      const inR = rect('s3-input'), agR = rect('s3-agent'), outR = rect('s3-output'), summR = rect('s3-summ'), extrR = rect('s3-extr');
+      const inR = rect('s3-input'), agR = rect('s3-agent'), outR = rect('s3-output');
+      const summR = rect('s3-summ'), extrR = rect('s3-extr'), routeR = rect('s3-route');
       const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), agentBot = ptB(agR), outputLeft = ptL(outR);
-      const summTop = ptT(summR), extrTop = ptT(extrR);
+      const summTop = ptT(summR), extrTop = ptT(extrR), routeTop = ptT(routeR);
       paths = [
         { id: 's3-input>s3-agent',  d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-output', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
-        { id: 's3-agent>s3-summ',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 30}, ${summTop.x} ${summTop.y - 30}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
-        { id: 's3-agent>s3-extr',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 30}, ${extrTop.x} ${extrTop.y - 30}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' }
+        { id: 's3-agent>s3-summ',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${summTop.x} ${summTop.y - 40}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
+        { id: 's3-agent>s3-extr',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${extrTop.x} ${extrTop.y - 40}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' },
+        { id: 's3-agent>s3-route',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routeTop.x} ${routeTop.y - 40}, ${routeTop.x} ${routeTop.y}`, cls: 'dashed' }
       ];
-      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop);
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop);
     }
 
     paths.forEach(p => {
@@ -1542,7 +1640,7 @@ Return ONLY a JSON object:
     });
     const labels = { '1': '1 · chat assistant', '2': '2 · workflow pipeline', '3': '3 · agentic system' };
     const titles = { '1': 'What\'s <em>happening?</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
-    const nodeCounts = { '1': '3', '2': '4', '3': '5' };
+    const nodeCounts = { '1': '3', '2': '6', '3': '6' };
     $('metaStage').textContent = labels[currentStage];
     $('metaNodes').textContent = nodeCounts[currentStage];
     $('rhTitle').innerHTML = titles[currentStage];
@@ -1661,6 +1759,8 @@ Return ONLY a JSON object:
     if (fromNodeId.includes('input')) return 'p1';
     if (fromNodeId.includes('summ')) return 'p3';
     if (fromNodeId.includes('extr')) return 'p5';
+    if (fromNodeId.includes('route')) return 'p4';
+    if (fromNodeId.includes('standup') || fromNodeId.includes('client') || fromNodeId.includes('planning')) return 'p6';
     if (fromNodeId.includes('output')) return 'p6';
     return 'p2'; // default: orch color
   }
