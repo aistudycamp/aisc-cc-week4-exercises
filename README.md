@@ -1,104 +1,82 @@
 # AI Study Camp — Agent Sprint
 
-This is **Week 4** of the Vibe Coding course — the week you build a real, working multi-agent system from scratch. By the end, you'll understand how every AI product on Earth is actually built.
-
-## The 3-stage arc
-
-Each stage is a genuinely different type of system — and each one **uses the previous as a building block**:
-
-| Stage | What you build | Time | Key trait |
-|-------|---------------|------|-----------|
-| **Stage 1** | A **chat assistant** — interactive multi-turn conversation | ~1 hr | You ask, it answers. Exports `ask()` for reuse. |
-| **Stage 2** | A **workflow** — fixed pipeline triggered by a file drop | ~45 min | Event-driven. Imports `ask()` from Stage 1 as one pipeline step. |
-| **Stage 3** | An **agentic system** — planner + dynamic tool dispatch | ~1 hr | Decides what to run. Imports both Stage 1 and Stage 2 as tools. |
-
-```
-Agentic System (Stage 3)
-└── uses → Workflow (Stage 2)
-             └── uses → Chat Assistant (Stage 1)
-```
-
-**Total: ~3 hours** of guided work, plus an optional Module 8 where you personalize the agent for your own use case.
+Welcome to Week 4 of the Vibe Coding course! This week you'll build a real, working multi-agent system from scratch — the same architecture behind every serious AI product. By the end, you'll know exactly how it works because you'll have built every piece of it yourself.
 
 ## Prerequisites
 
-- **Node.js v20+** ([download here](https://nodejs.org/)) — `node --version` should print `v20.x.x` or higher
+- **Claude Code** installed on your computer ([install guide](https://docs.anthropic.com/en/docs/claude-code/overview))
+- **Node.js v20+** installed ([download here](https://nodejs.org/)) — run `node --version` to check
 - An **Anthropic API key** ([get one here](https://console.anthropic.com)) — set a $5 spending cap on the billing page
-- Basic comfort with the terminal (`cd`, `ls`, running commands)
-- **Claude Code** installed ([install guide](https://docs.anthropic.com/en/docs/claude-code/overview)) — Claude is your coach for the whole sprint
+- Basic comfort with opening a terminal
 
-You don't need to be a JavaScript expert. The code is short, plain, and heavily commented.
+You don't need to know JavaScript. Claude writes the code — you describe what you want.
 
-## Getting started
+## Getting Started
 
-```bash
-git clone https://github.com/aistudycamp/aisc-cc-week4-exercises.git
-cd aisc-cc-week4-exercises
-claude
-```
+1. **Clone this repo**
+   ```
+   git clone https://github.com/aistudycamp/aisc-cc-week4-exercises.git
+   ```
 
-Just say hi. Claude will greet you and guide you from there. No need to memorize anything — the next move is always the next module command.
+2. **Open the folder in your terminal**
+   ```
+   cd aisc-cc-week4-exercises
+   ```
 
-## What you'll build
+3. **Start Claude Code**
+   ```
+   claude
+   ```
 
-| Command | Module | Topic | Time |
-|---------|--------|-------|------|
-| `stage-1-intro` | — | Set up Node, get an API key, scaffold project | ~10 min |
-| `module-1` | 1 | Tour the System (mental model, no code) | ~15 min |
-| `module-2` | 2 | Your First API Call (the demystify moment) | ~20 min |
-| `module-3` | 3 | Build the Chat Assistant (interactive loop + system prompt) | ~25 min |
-| `module-4` | 4 | Build the Workflow (pipeline using Stage 1 as a building block) | ~25 min |
-| `module-5` | 5 | Extend the Workflow (add more pipeline steps) | ~20 min |
-| `module-6` | 6 | The Agentic System (planner + dynamic dispatch over Stages 1+2) | ~30 min |
-| `module-7` | 7 | See the System (frontend visualization) | ~20 min |
-| `module-8` | 8 | Make It Yours (personalize for your work) | ~25 min |
+4. **Say hello!**
+   Claude will greet you and guide you from there. No need to memorize anything — the next move is always the next module command.
 
-## Pausing and resuming
+## The 3-Stage Arc
 
-Each module ends with a git commit. **Natural stopping points are between modules.** If you need a break, finish the current module first.
+Each stage is a different type of AI system — and each one uses the previous as a building block:
 
-When you come back, run `claude` in this folder again — Claude reads the progress checklist and picks up where you left off.
+| Stage | What you build | Key idea |
+|-------|---------------|----------|
+| **Stage 1** | A **chat assistant** — interactive, back-and-forth conversation | You ask, it answers |
+| **Stage 2** | A **workflow** — automated pipeline triggered by a file drop | Runs without you |
+| **Stage 3** | An **agentic system** — orchestrator that coordinates multiple specialists | Decides what to run |
 
-**Pro tip:** `claude --resume` restores your exact previous conversation, so you don't have to re-explain anything.
+By the end of Stage 3, you'll have built every box in the diagram — and you'll import each one into the next.
 
-## What you walk away with
+## Pausing and Resuming
 
-- A working multi-agent system you can keep using on your own meeting transcripts (or whatever document you point it at)
-- A personalized version configured for *your* use case (Module 8)
-- A pre-built visual frontend that shows the system architecture, with the actual system prompts visible inline
-- Real understanding — not "I copied a tutorial," but "I know what every line does and could rebuild it from scratch"
-- The skeleton pattern for any future agent: **input → orchestrator → specialists → synthesis → output**
+Each module ends with a git commit that saves your progress — the checklist in `CLAUDE.md` tracks which modules you've completed. **Natural stopping points are between modules**, so if you need a break, try to wrap up the current module first.
 
-## Repository layout
+If you need to stop mid-module, just close your terminal. When you come back, run `claude` in this folder again — it will read your checklist and guide you to pick up where you left off.
 
-```
-aisc-cc-agent-sprint/
-├── README.md                      ← you are here
-├── CLAUDE.md                      ← Claude's coaching instructions
-├── concepts/                      ← read-anytime conceptual docs
-│   ├── what-is-an-api.md
-│   ├── what-is-a-system-prompt.md
-│   ├── what-is-an-agent.md          ← includes the 3-level hierarchy
-│   ├── what-is-a-workflow.md        ← new: explains workflow vs. chat assistant
-│   ├── what-is-an-orchestrator.md   ← includes planner + tool-picking
-│   ├── systems-thinking.md
-│   └── agent-archetypes.md
-├── examples/                      ← worked example for reference
-│   └── example-transcripts-insights.md
-├── templates/                     ← starter scaffold (Module 0 copies this)
-│   └── transcripts-to-insights/
-│       ├── prompts/               ← 4 system prompts (system, summarizer, extractor, router)
-│       ├── transcripts/           ← input goes here
-│       ├── stage-1/chat.js        ← Chat assistant — exports ask() for reuse
-│       ├── stage-2/workflow.js    ← Workflow pipeline — imports ask() from Stage 1
-│       └── stage-3/orchestrator.js ← Agentic system — imports from both Stages 1+2
-├── frontend/
-│   └── index.html                 ← the visual viewer
-└── student-output/                ← your working folder (created in stage-1-intro)
-```
+**Pro tip:** `claude --resume` restores your exact previous conversation so you don't have to re-explain anything.
 
-## Need help?
+## What You'll Learn
 
-- During a module, just ask Claude. That's what it's here for.
-- If something's broken: paste the error into Claude and let it diagnose.
-- If you're stuck on the bigger picture: open `concepts/what-is-an-agent.md` or `concepts/what-is-an-orchestrator.md` for a refresher.
+| Module | Topic | Time | You'll Produce |
+|--------|-------|------|----------------|
+| `stage-1-intro` | Setup — Node, API key, scaffold your project | ~10 min | A working project folder with your API key wired in |
+| `module-1` | Tour the System — the mental model before any code | ~15 min | *(no artifact — a clear picture of what you're building)* |
+| `module-2` | Your First API Call — demystify what the API actually is | ~20 min | A successful API call that prints Claude's response |
+| `module-3` | Build the Chat Assistant — interactive loop and system prompt | ~25 min | A working chat assistant you can have a conversation with |
+| `module-4` | Build the Workflow — pipeline that runs automatically on a file drop | ~25 min | A workflow that classifies and routes transcripts without you |
+| `module-5` | Extend the Workflow — add a new step by describing what you want | ~20 min | A workflow with one more output step you added without writing code |
+| `module-6` | The Agentic System — orchestrator that coordinates three specialists | ~30 min | A working multi-agent system: Summarizer + Extractor + Router |
+| `module-7` | See the System — visual frontend showing the full architecture | ~20 min | A screenshot of your running system's architecture |
+| `module-8` | Make It Yours — point the system at a real use case from your life | ~25 min | A personalized version running on a real document you brought |
+
+**Total: ~3 hours.** Most students spread it across 2–3 sessions.
+
+## What You'll Walk Away With
+
+By the end, you will have:
+
+- A working multi-agent system you can keep running on your own meeting transcripts — or any long document you point it at
+- A personalized version configured for your specific use case (Module 8)
+- A visual frontend showing the system architecture, with each component inspectable
+- Real understanding of the pattern behind every serious AI product: **input → orchestrator → specialists → synthesis → output**
+- The skill to build the next one in a fraction of the time
+
+## Need Help?
+
+If you get stuck at any point, just ask Claude. That's what it's here for.
