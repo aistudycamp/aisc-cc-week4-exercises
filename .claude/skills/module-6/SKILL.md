@@ -1,36 +1,36 @@
 ---
 name: module-6
-description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student opens stage-3/orchestrator.js, sees imports from both Stage 1 (ask) and Stage 2 (runWorkflow), walks through the planner step, runs the orchestrator, and experiences the moment the hierarchy clicks — they built every box the orchestrator dispatches to.
+description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student opens stage-3/orchestrator.js, sees imports from both Stage 1 (ask) and Stage 2 (runWorkflow), walks through the sequential dispatch, runs the orchestrator end-to-end, and experiences the moment the hierarchy clicks — they built every step the orchestrator coordinates.
 ---
 
 # Module 6: The Agentic System
 
 **Time:** ~30 minutes
-**You'll produce:** a working agentic system — an orchestrator that uses a planner to decide which tools to invoke, then dispatches to those tools (including the chat assistant and workflow you already built), and synthesizes the results.
+**You'll produce:** a working agentic system — an orchestrator that runs three specialists in sequence, synthesizes all their results, and produces a final report.
 
 ## Coach Instructions
 
-This is the conceptual peak. The single biggest moment: the student realizes the orchestrator imports *their own work from Stages 1 and 2*. They didn't just learn about building blocks — they built the blocks and they're watching them get composed. Take it slow. Let that land.
+This is the conceptual peak. The single biggest moment: the student realizes the orchestrator imports *their own work from Stages 1 and 2*. They didn't just learn about building blocks — they built the blocks and they're watching them get coordinated. Take it slow. Let that land.
 
 ## Step 1: Set the frame (3 min)
 
 Say:
 
-> "Welcome to Stage 3. We've built two things: a chat assistant that answers questions, and a workflow that runs a fixed pipeline when a file drops.
+> "Welcome to Stage 3. We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files automatically.
 >
-> Stage 3 is a third thing — an **agentic system**. It's not a chat assistant, because it doesn't wait for you to type. It's not a workflow, because it doesn't follow a fixed sequence. Instead, it does something new: **it looks at the input and decides which tools to use**.
+> Stage 3 is a third thing — an **agentic system**. It's not a chat assistant, because it doesn't wait for you to type. It's not just a workflow, because it does more than classify. Instead, an orchestrator coordinates three specialists in sequence — each one does its job, hands back to the orchestrator, and the next one starts.
 >
-> And here's the payoff: the tools it picks from are the chat assistant and workflow you already built. You're not starting over. You're composing what you have."
+> And here's the payoff: two of those three specialists are the things you already built. You're not starting over. You're composing what you have."
 
-## Step 2: Read the concept doc (3 min)
+Ask before we open anything:
 
-Open `concepts/what-is-an-orchestrator.md`. Read the **"The planner"** section together.
+> "Before we look at the code — how many total LLM calls do you think Stage 3 makes? One? Three? More?"
 
-Land one key idea:
+Wait for their answer. Then:
 
-> "The orchestrator doesn't decide which tools to use — the *planner* does. The planner is a separate LLM call whose only job is routing. The orchestrator just dispatches based on what the planner says. Separation of concerns."
+> "The answer: at least three. One for the executive summary, one for action items, one for the final synthesis. And the workflow also calls the classifier. So four or more total API calls — each one focused on a different job. Compare that to Stage 1: one call doing everything."
 
-## Step 3: Open orchestrator.js — start at the imports (5 min)
+## Step 2: Open orchestrator.js — start at the imports (5 min)
 
 Open `student-output/stage-3/orchestrator.js`. Start at the top:
 
@@ -39,102 +39,96 @@ import { ask }         from '../stage-1/chat.js';    // ← Stage 1 building blo
 import { runWorkflow } from '../stage-2/workflow.js'; // ← Stage 2 building block
 ```
 
-> "Stop here. These two lines are everything. The orchestrator imports the chat assistant from Stage 1 and the workflow from Stage 2. The building blocks you built are now tools the orchestrator can dispatch to.
+> "Stop here. These two lines are everything. The orchestrator imports the chat assistant from Stage 1 and the workflow from Stage 2. The building blocks you built — those exact files — are now the tools this orchestrator calls.
 >
 > This is why we designed Stages 1 and 2 the way we did — with `export` statements, with the import guards. It was all so Stage 3 could do exactly this."
 
-Before moving to Step 4, pause and ask:
+Now ask:
 
-> "Before we look at the planner — you've seen the two imports. The orchestrator now has `ask()` from Stage 1 and `runWorkflow()` from Stage 2 available. What do you think happens when the planner returns `{ tools: ['summarize'] }` only — which of those functions gets called?"
+> "You've seen the two imports. What do you think happens when the orchestrator runs? Which one gets called first — `ask()` or `runWorkflow()`?"
 
-Wait for their answer. The correct answer: only the summarizer function runs (not `ask()` or `runWorkflow()` directly). The point is that the plan drives the dispatch — not all tools run every time.
+Wait for their answer. The answer: `ask()` first — for the executive summary. Then `ask()` again for action items. Then `runWorkflow()` to classify, route, and notify. The point: each step hands back to the orchestrator before the next one starts.
 
-## Step 4: Walk through the planner (4 min)
+## Step 3: Walk through the sequential dispatch (4 min)
 
-Find `async function planner(transcript)`:
+One word to define before we look at the code: **synthesize** means "combine all the specialists' outputs into one final report." The `synthesize()` function takes everything — the summary, the actions, the classification — and writes the complete final output.
+
+Find the `orchestrator()` function:
 
 ```js
-async function planner(transcript) {
-  const response = await client.messages.create({
-    system: promptRouter,    // reads prompts/router.md
-    messages: [{ role: "user", content: transcript.slice(0, 800) }],
-  });
-  return JSON.parse(response.content[0].text); // e.g. { tools: ["summarize", "extract"] }
+export async function orchestrator(transcript, sourceFilename) {
+  // Step 1: ask() — get executive summary  [Stage 1 building block]
+  results.summary = await ask("Give me a one-paragraph executive summary...", transcript);
+
+  // Step 2: ask() — extract action items  [Stage 1 building block]
+  results.actions = await ask("List every action item...", transcript);
+
+  // Step 3: runWorkflow() — classify, route, notify  [Stage 2 building block]
+  const { classification } = await runWorkflow(transcript, sourceFilename);
+  results.classification = classification;
+
+  // Step 4: synthesize — combine all results into the final report
+  return await synthesize(results);
 }
 ```
 
-Open `prompts/router.md` and skim it together:
-
-> "The planner gets the beginning of the transcript and returns a JSON object: `{ tools: ['summarize', 'extract'] }`. That's the routing decision. The orchestrator receives it and dispatches accordingly."
-
-## Step 5: Walk through the dispatch logic (4 min)
-
-One word to define before we look at the code: **synthesize** means "combine the specialists' outputs into one final report." The `synthesize()` function takes everything the planner dispatched to — themes, action items, chat responses — and writes the final output from all of them together.
-
-Find the dispatch section inside `export async function orchestrator(transcript)`:
-
-```js
-const plan = await planner(transcript);    // step 1: decide
-
-if (plan.tools.includes("chat"))      results.chat    = await ask(...);
-if (plan.tools.includes("workflow"))  results.workflow = await runWorkflow(...);
-if (plan.tools.includes("summarize")) results.themes  = await summarize(...);
-if (plan.tools.includes("extract"))   results.actions = await extractActions(...);
-
-return await synthesize(results);          // step 3: combine — merges all specialist outputs
-```
-
-> "Each `if` is one tool in the toolkit. If the planner said 'use chat,' we call `ask()`. If the planner said 'use workflow,' we call `runWorkflow()`. The same functions from the files you already built.
+> "Read this top to bottom. Step 1 uses `ask()` — the exact function you built in Stage 1. Step 2 uses `ask()` again with a different question. Step 3 calls `runWorkflow()` — the exact function you built in Stage 2. Step 4 synthesizes all three results into a final report.
 >
-> If the planner picked a different set of tools for a different transcript, the code path through these `if` blocks would be different. That's what makes it agentic — the path through the system isn't fixed."
+> Each step finishes before the next one starts. The orchestrator is the coordinator — it calls each specialist in turn and keeps their results. That's what makes it an *orchestrator*: not doing the work itself, but sequencing the specialists that do."
 
-## Step 6: Run it (5 min)
+## Step 4: Run it (5 min)
 
 Have them run:
 
 ```bash
-npm run stage-3
+npm run stage-3 -- transcripts/sample-transcript.txt
 ```
 
 The terminal shows the live trace:
 
 ```
 📄 Input: transcripts/sample-transcript.txt (312 words)
+🤖 Orchestrator starting — 3 specialists, then synthesis.
 
-🗺️  Planner: deciding which tools to invoke...
-  ✓ Plan: summarize, extract
-  📋 Summarizer: reading transcript...
-  ✅ Extractor: scanning for action items...
-  ✓ Summarizer returned 3 themes
-  ✓ Extractor returned 5 actions
+  💬 Step 1: Chat assistant — getting executive summary...
+  ✓ Summary complete.
+  💬 Step 2: Chat assistant — extracting action items...
+  ✓ Action items extracted.
+  ⚙️  Step 3: Workflow — classifying and routing transcript...
+    🔍 Classifying meeting type...
+    ✓ Classified as: team-standup
+    ✓ Routed → transcripts/team-standup/2026-04-29-team-standup.txt
+  ✓ Workflow complete.
   🧠 Synthesizing final report...
 ✓ Orchestration complete.
+
 ────────────────────────────────────────────────────────────
-[final report]
+[final report here]
 ```
 
 Walk them through the output:
 
-> "The planner ran first — one API call just to decide. Then the specialists ran. Then synthesis. That's three separate LLM calls, each with a focused job. Compare this to Stage 1: one call doing everything. The specialization produces better output for complex tasks."
+> "See the sequence? Step 1, 2, 3, then synthesis. Each one logged, each one returning to the orchestrator. Stage 1 was one call. Stage 2 was two calls (file watch + classifier). Stage 3 is four or more — and you can see each one labeled as it happens."
 
-## Step 7: Compare all three stages (4 min)
+Also: a macOS notification should fire during Step 3 (from the workflow running).
 
-Run Stage 1 again:
+## Step 5: Compare all three stages (4 min)
+
+Run Stage 1 for comparison:
 
 ```bash
-npm run stage-1
-# paste the transcript, ask for the insights report
+npm run stage-1 -- transcripts/sample-transcript.txt
 ```
 
-Compare the two outputs side by side.
+Ask one question at the prompt, then exit.
 
-> "Stage 1: one call, good output, interactive. Stage 3: multiple calls, better-structured output for a detailed task, automated. Different tools for different situations.
+> "Stage 1: one call, one output, interactive. Stage 3: four calls, structured output across every dimension, fully automated.
 >
 > When would you use Stage 1? Quick Q&A, exploration, when you want to ask follow-ups.
-> When would you use Stage 2? Automated processing, file-based triggers, saves to disk.
-> When would you use Stage 3? Complex tasks where you want a system to *decide* what analysis to run, or where you need specialists."
+> When would you use Stage 2? Automated classification and routing — when you want a file to land in the right place without lifting a finger.
+> When would you use Stage 3? When you need all of the above — summary, actions, routing, and notification — all from one trigger."
 
-## Step 8: See the full hierarchy in the frontend (3 min)
+## Step 6: See the full hierarchy in the frontend (3 min)
 
 Open `frontend/index.html` and click the **Stage 3 tab**:
 
@@ -142,15 +136,15 @@ Open `frontend/index.html` and click the **Stage 3 tab**:
 open frontend/index.html
 ```
 
-> "Look at this. The orchestrator branches out to all the tools it can dispatch to. You can see the chat assistant box — that's Stage 1. You can see the workflow box — that's Stage 2. You can see the specialists — those are new to Stage 3.
+> "Look at this. The orchestrator coordinates three specialists. You can see the ask() calls — those are Stage 1. You can see the workflow box — that's Stage 2. You built every one of those boxes.
 >
-> You built every one of those boxes. The orchestrator is just the thing that picks between them."
+> The orchestrator is just the thing that sequences them."
 
-Click into each nested box. Show the inspect panels — the system prompts, the code, the connections.
+Click into each node. Show the inspect panels.
 
-> "This is the hierarchy: chat assistant ⊂ workflow ⊂ agentic system. Each level contains the previous one. You didn't just learn about this — you *built* it."
+> "You didn't just learn about agentic systems — you built one. Every node in this diagram is code you ran."
 
-## Step 9: Wrap and commit (2 min)
+## Step 7: Wrap and commit (2 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 6:` to `- [x] Module 6:`
 2. **Commit:**
@@ -159,18 +153,19 @@ Click into each nested box. Show the inspect panels — the system prompts, the 
    ```
 3. Hand off:
 
-> "You just built a multi-agent agentic system. Take a moment — that's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system visually, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
+> "You just built a multi-agent agentic system. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system visually, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
 
 ## Coach Guardrails
 
-- **Slow down at the import lines in Step 3** — "Stop here. These two lines are everything." means it. Don't move to Step 4 until the student has sat with the idea that the orchestrator's tools are the files they already built.
-- **Check in before the planner walkthrough** — the pause before Step 4 is not optional. Wait for the student to make a prediction before walking through the dispatch logic.
-- **"Orchestrator" means two things in this module** — when you say "the orchestrator *system*," you mean Stage 3 as a whole. When you say "the `orchestrator()` *function*," you mean the specific exported function inside `orchestrator.js`. Say which you mean.
+- **Slow down at the import lines in Step 2** — "Stop here. These two lines are everything." means it. Don't move to Step 3 until the student has sat with the idea that the orchestrator's tools are the files they already built.
+- **Check in before the dispatch walkthrough** — the question "which gets called first, `ask()` or `runWorkflow()`?" in Step 2 is not optional. Wait for the student to make a prediction before walking through the code.
+- **"Orchestrator" means two things in this module** — "the orchestrator *system*" means Stage 3 as a whole. "The `orchestrator()` *function*" means the specific exported function in `orchestrator.js`. Say which you mean.
 - **Define "synthesize" before showing the code** — it means "combine the specialists' outputs into one final report."
-- **Have them actually run Stage 1 in Step 7** — don't describe the comparison, do it. Side-by-side output makes the difference concrete.
+- **There is no planner** — the orchestrator always runs all three steps. Don't describe it as "deciding" which steps to run — it runs them sequentially every time. The intelligence is in *what* each step does, not in choosing whether to do it.
+- **Have them actually run Stage 1 in Step 5** — don't describe the comparison, do it. Side-by-side output makes the difference concrete.
 
 ## Optional deeper reading
 
-- `concepts/what-is-an-orchestrator.md` — goes deeper on the planner pattern and when to use dynamic dispatch
+- `concepts/what-is-an-orchestrator.md` — goes deeper on orchestration patterns and sequential vs. parallel dispatch
 - `concepts/what-is-a-workflow.md` — compare the workflow pattern to the agentic system you just built
 - `concepts/what-is-an-agent.md` — re-read the hierarchy section now that you've built all three levels

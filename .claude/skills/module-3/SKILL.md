@@ -1,91 +1,54 @@
 ---
 name: module-3
-description: Build the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student opens stage-1/chat.js, runs it as an interactive multi-turn chat, asks follow-up questions, edits the system prompt to see personality change, then opens the frontend Stage 1 tab.
+description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student runs stage-1/chat.js interactively with a pre-loaded transcript, asks follow-up questions, edits the system prompt to see personality change, then restores it. No manual code editing — all edits go through Claude.
 ---
 
-# Module 3: Build the Chat Assistant
+# Module 3: Run the Chat Assistant
 
 **Time:** ~25 minutes
 **You'll produce:** a working multi-turn conversation with the chat assistant, and a first-hand feel for how the system prompt controls everything about the output. You'll run it, talk to it, break it, restore it.
 
 ## Coach Instructions
 
-In Module 2 they ran the agent once. This module is deeper: they experience an actual back-and-forth conversation, and they feel the leverage of the system prompt. End state: they understand what "building a chat assistant" means — not a UI, but a loop with a messages array.
+This module is about the *experience* of the chat assistant — not building it. Students run an existing scaffold, feel the leverage of the system prompt, and restore the original for Module 4. The key exercise is the system prompt edits. Don't rush past them.
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "You built a basic agent in Module 2. Today we look closely at Stage 1 — the **chat assistant**. It's more than one API call. It's an *ongoing conversation* where the agent remembers what you said before. You paste a transcript in, then you can ask follow-ups: 'What are the action items? Who looks blocked? What should I bring to next standup?' The agent knows the full conversation so far."
+> "You ran the agent once in Module 2. Today we go deeper — you'll have an actual back-and-forth conversation, and you'll feel exactly how much power is in one file: the system prompt. Everything Claude says is shaped by it."
 
-## Step 2: Read the concept doc (3 min)
+## Step 2: Three roles — system, user, assistant (3 min)
 
-Open `concepts/what-is-an-agent.md` and read the **"three-level hierarchy"** section together. Land one idea:
+Before we run anything, name the three roles in every AI conversation:
 
-> "Stage 1 is the foundation. Stages 2 and 3 *import and reuse it*. This isn't marketing — it's literally what the code does. Let's look."
+> "Every API call has three roles. Here's how to think about them:
+>
+> - **System** — the standing instructions Claude always reads first. It's set by you, the builder, before the conversation starts. The file `prompts/system.md` IS the system prompt. It defines the persona, the output format, the rules.
+> - **User** — what you say in the conversation. When you paste a transcript, that's a user message. When you ask a follow-up, that's another user message.
+> - **Assistant** — what Claude says back. Every response is an assistant message.
+>
+> Three roles. The system prompt is what makes this a *meeting analyst* instead of a generic AI. Change the system prompt and you change everything."
 
-## Step 3: Open chat.js and read it top to bottom (5 min)
+## Step 3: Run it with a transcript (8 min)
 
-Open `student-output/stage-1/chat.js`. Walk through the code together.
-
-Three things to highlight:
-
-### The `ask()` export
-
-```js
-export async function ask(question, context) {
-  const content = context ? `${question}\n\n${context}` : question;
-  const response = await client.messages.create({ ... });
-  return response.content[0].text;
-}
-```
-
-> "This is a stateless one-shot function. Ask it a question, get an answer. It has no memory. Stage 2 and Stage 3 will import this exact function — `import { ask } from '../stage-1/chat.js'`. The building-block reuse is *in the code*."
-
-### The `messages[]` array
-
-```js
-const messages = [];
-messages.push({ role: 'user', content: line });
-// ... API call ...
-messages.push({ role: 'assistant', content: reply });
-```
-
-> "This is how multi-turn conversation works. Every message gets appended. When you send the next message, Claude sees the whole array — it knows everything that was said. This is what 'context window' means in practice: one long array of messages."
-
-### The import guard
-
-```js
-if (import.meta.url === `file://${process.argv[1]}`) {
-  // interactive loop — only runs when you type `node stage-1/chat.js`
-  // NOT when Stage 2 does: import { ask } from '../stage-1/chat.js'
-}
-```
-
-> "This is how the same file works two ways. When you run it directly, you get the interactive loop. When Stage 2 imports it, only the `ask()` function loads — the loop never fires. Smart modular design."
-
-## Step 4: Run it and have an actual conversation (8 min)
-
-Have them run:
+Run with the sample transcript pre-loaded:
 
 ```bash
-npm run stage-1
+npm run stage-1 -- transcripts/sample-transcript.txt
 ```
 
 They'll see:
 
 ```
 💬 Chat Assistant — Meeting Analyst
-   Paste a transcript as your first message,
-   then ask follow-up questions.
-   Type "exit" to quit.
+   Transcript loaded from: transcripts/sample-transcript.txt
+   Ask your first question.
 
 >
 ```
 
-Have them paste the sample transcript as their first message (copy/paste from `transcripts/sample-transcript.txt`).
-
-Get the first report back. Then push them to ask follow-ups — at least 4:
+The transcript is already in the conversation. Have them ask follow-up questions — at least 4:
 
 ```
 > What are the top 3 action items?
@@ -94,68 +57,73 @@ Get the first report back. Then push them to ask follow-ups — at least 4:
 > Write a one-sentence summary I can put in Slack.
 ```
 
-> "See how each answer knows what was said before? The agent remembers the transcript and your questions. That's the `messages[]` array growing. That's all it is."
+> "See how each answer knows the transcript? It's all in memory. The `messages[]` array grows with every exchange — that's what 'context window' means in practice."
 
-When they're done:
+When done:
 
 ```
 > exit
 ```
 
+## Step 4: Open and read the system prompt (3 min)
+
+Have Claude open `prompts/system.md`:
+
+> "Tell Claude: 'Show me the contents of prompts/system.md'"
+
+Read it together. Land:
+
+> "This is what makes every output look the way it does. KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined here. Change this file and the output format changes entirely. That's the leverage."
+
 ## Step 5: Edit the system prompt (5 min)
 
-Open `student-output/prompts/system.md`. Read it together. Then make two quick edits:
+Two quick edits. **Tell Claude to make each one** — the student should not touch the file directly.
 
 ### Edit A: Change the role
 
-Replace the first line with:
+Have the student say to Claude:
 
-```
-You are a sarcastic meeting analyst who has seen too many standups.
+> "Tell Claude: 'Update prompts/system.md — change the first line to: You are a sarcastic meeting analyst who has seen too many standups.'"
+
+After Claude edits it, re-run:
+
+```bash
+npm run stage-1 -- transcripts/sample-transcript.txt
 ```
 
-Save, re-run `npm run stage-1`, paste the transcript again, ask one question. Watch the voice change — same structure, different personality.
+Ask one question. Watch the voice change — same structure, different personality.
 
 ### Edit B: Change the output format
 
-Replace the `KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP` block with:
+Have the student say to Claude:
 
-```
-**TLDR**
-[One sentence — what happened?]
+> "Tell Claude: 'Update prompts/system.md — replace the KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format with: **TLDR** (one sentence), **WHO OWES WHAT** (bullet list of person + task), **SHOULD I CARE?** (Yes/No and why)'"
 
-**WHO OWES WHAT**
-- [Person]: [task]
+Re-run. Different shape entirely.
 
-**SHOULD I CARE?**
-[Yes/No, and why.]
-```
-
-Save, re-run. Different shape entirely.
-
-> "Same code. Same Claude. New format. The system prompt is the product spec — every word of output is shaped by it."
+> "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output is shaped by it."
 
 ### Step 5c: Restore the original prompt ⚠️ (required)
 
-Don't skip this — Module 4's workflow depends on the original `system.md` being intact.
+Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
 
 ```bash
-cp ../templates/transcripts-to-insights/prompts/system.md prompts/system.md
+cp prompts/system-original.md prompts/system.md
 ```
 
-Run once more to confirm the original output is back before moving on:
+Run once more to confirm the original output is back:
 
 ```bash
-npm run stage-1
-# paste the sample transcript — output should match the original format
+npm run stage-1 -- transcripts/sample-transcript.txt
 ```
 
-If they want to keep their custom prompt, save it first:
+The output should have the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format. If they want to keep their custom prompt, save it first:
+
 ```bash
 cp prompts/system.md prompts/system-custom.md
 ```
 
-Then restore. The original stays in `templates/` and is always recoverable.
+Then restore.
 
 ## Step 6: See it in the frontend (2 min)
 
@@ -165,32 +133,32 @@ Open `frontend/index.html`:
 open frontend/index.html
 ```
 
-The Stage 1 tab is the default. Three nodes: `[A transcript] → [Chat Assistant] → [A report]`. That's exactly what they just built.
+Click the **Stage 1 tab**. Three nodes: `[A transcript] → [Chat Assistant] → [A report]`. That's exactly what they just ran.
 
 Click the **Chat Assistant** node. Show them the inspect panel — system prompt, description, connections. Hit **Run Agent** to watch the animation.
 
-> "That's your Stage 1 assistant visualized. One API call. One building block. In Module 4 you'll see it appear *inside* a larger box — the workflow — as one step in a pipeline."
+> "That's your Stage 1 assistant visualized. One specialist. One system prompt. In Module 4 you'll see it become *one step* in a larger automated pipeline."
 
 ## Step 7: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:`
 2. **Commit:**
    ```bash
-   git add -A && git commit -m "Complete Module 3: Build the Chat Assistant"
+   git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
    ```
 3. Hand off:
 
-> "Stage 1 done. You have a working chat assistant — an interactive multi-turn conversation and a reusable `ask()` function. Next: Stage 2. We wrap that function in a pipeline so it runs *automatically* every time a file appears. Type `module-4` when you're ready."
+> "Stage 1 done. You have a working chat assistant — interactive, back-and-forth, and driven entirely by a system prompt you can change anytime. Next: Stage 2. We build something that runs *automatically* every time a file appears — no typing required. Type `module-4` when you're ready."
 
 ## Coach Guardrails
 
-- **The restore step is mandatory** — confirm the student ran it and that `npm run stage-1` produces the original output format before committing. Module 4's workflow reads `system.md` directly. A broken or customized prompt here causes confusing failures later.
-- **Don't build the assistant for them** — they're running and editing an existing scaffold, not writing from scratch. The learning is in the interaction and the prompt edits.
-- **Don't skip the system prompt edits** — Edit A (changing the role) and Edit B (changing the output format) are the core exercises. Seeing the output change from one word of prompt change is the whole lesson.
+- **The restore step is mandatory** — confirm the student ran it and that `npm run stage-1 -- transcripts/sample-transcript.txt` produces the original output format before committing. Module 4's workflow reads `system.md` directly. A broken prompt here causes confusing failures in Module 4.
+- **Never ask the student to edit code or files directly** — all edits go through "Tell Claude: [what you want]". The student describes the change; Claude writes it.
+- **Don't skip the system prompt edits** — Edit A and Edit B are the core exercises. The visceral "I changed one file and the whole output changed" moment is the whole lesson.
 - **If they want to keep a custom prompt**, save it as `prompts/system-custom.md` before restoring the original.
-- **The `ask()` export and import guard** — these are the "this is why we'll do this again in Stage 2 and 3" moments. Don't rush past them.
+- **The three roles** (system/user/assistant) should land before the edits, not after. If the student seems confused about why the prompt is in a file, revisit this explanation.
 
 ## Optional deeper reading
 
-- `concepts/what-is-an-agent.md` — the three-level hierarchy you just read, with additional context on how agents compose
+- `concepts/what-is-an-agent.md` — the three-level hierarchy, with additional context on how agents compose
 - `concepts/what-is-a-system-prompt.md` — deeper reference on how system prompts control model behavior

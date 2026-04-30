@@ -6,7 +6,7 @@ description: See the System — Module 7 of the AISC Agent Sprint. Triggered whe
 # Module 7: See the System
 
 **Time:** ~20 minutes
-**You'll produce:** a screenshot of your running agentic system visualization, and the ability to point to every node in the diagram and name the file or function behind it.
+**You'll produce:** the ability to point to every node in the diagram and name the file or function behind it, plus a screenshot of the running visualization to share.
 
 ## Coach Instructions
 
@@ -73,16 +73,14 @@ This is the killer move. Click each node and walk through what's inside.
 
 Have them hit the **"Run Agent"** button.
 
-Watch the 9-message animated flow play out:
+Watch the animated flow play out — each specialist fires in sequence:
 1. Transcript arrives → Conductor activates
-2. Conductor → dispatches to Summarizer (particle flies)
-3. Summarizer → returns to Conductor
-4. Conductor → dispatches to Extractor (particle flies)
-5. Extractor → returns to Conductor
-6. Conductor → synthesizes
-7. Final report appears in the right panel
+2. Step 1: ask() for executive summary → returns to Conductor
+3. Step 2: ask() for action items → returns to Conductor
+4. Step 3: runWorkflow() → classify, route, notify → returns to Conductor
+5. Step 4: Synthesizer combines results → final report appears
 
-> "That animation matches the actual sequence of API calls in your `orchestrator.js` — planner first, then specialists, then synthesis. The output panel shows what your real agent produced for the sample transcript."
+> "That animation matches the sequence of API calls in your `orchestrator.js` — three specialists in order, then synthesis. The output panel shows what your real agent produced for the sample transcript."
 
 ## Step 6: Screenshot moment (2 min)
 

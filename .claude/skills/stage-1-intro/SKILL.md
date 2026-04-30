@@ -27,16 +27,17 @@ Print this:
    ─────────                  ─────────                  ─────────
    CHAT ASSISTANT      →      WORKFLOW            →      AGENTIC SYSTEM
 
-   You paste a                You drop a file,           An orchestrator
-   transcript, get            agent runs                 dispatches 2
-   insights back.             automatically,             sub-agents in
-                              output saves to            parallel, then
-                              a folder.                  synthesizes.
+   You paste a                A file drops into a        An orchestrator
+   transcript, ask            folder. AI classifies      calls three
+   questions, get             the meeting, routes        specialists in
+   answers back.              the file, sends a          sequence, then
+                              notification.              synthesizes a
+                                                         final report.
 
    ~1 hour                    ~45 min                    ~1 hour
 ```
 
-> "Same use case the whole way through — turning meeting transcripts into clean insight reports. The arc is the lesson. Each stage adds one new idea on top of the last.
+> "Same use case the whole way through — turning meeting transcripts into clean insight reports. Each stage adds one new idea on top of the last. You won't write code yourself — you'll describe what you want and let Claude build it.
 >
 > **Second — what AI products actually are.** Spoiler: they're not magic. By the end of Module 2, you'll have called the Claude API yourself and seen the JSON come back. Once you've seen that, AI stops being a black box and becomes 'JSON in, JSON out, with a clever system prompt in the middle.' That moment is the whole point of Stage 1."
 
@@ -73,20 +74,20 @@ Walk them through:
 1. **Sign up / log in** at <https://console.anthropic.com>
 2. **Add a payment method.** *(Yes, this part is annoying. The good news: every API call in this sprint costs less than a penny. Total spend across all modules is under $0.50. Promise.)*
 3. **Set a spending limit.** Go to billing → set a $5 monthly cap. Even if something goes wrong, your blast radius is $5.
-4. **Generate an API key.** API Keys → Create Key. Copy it. It starts with `sk-ant-api03-...`.
+4. **Generate an API key.** API Keys → Create Key. Copy it. It starts with `sk-ant-`.
 
-> "Got your key copied? Don't paste it in chat — we'll put it in a file in a second."
+> "Got your key copied? Keep it ready — we'll put it in a file in a second. Don't paste it in chat."
 
 ## Step 4: Scaffold the project (3 min)
 
-Now scaffold the working folder. First, confirm they're ready:
+Now scaffold the working folder. Confirm they're ready:
 
 > "Ready to set up your project folder? This copies the starter template into `student-output/` — that'll be your working directory for the whole sprint."
 
 Wait for them to confirm (a "yes" or "yep" or "go for it"). Then run:
 
 ```bash
-cp -R templates/transcripts-to-insights student-output/
+command cp -R templates/transcripts-to-insights/. student-output/
 cd student-output
 ```
 
@@ -99,11 +100,14 @@ Show them:
 ```
 student-output/
 ├── prompts/                  ← system prompts (we'll edit these!)
-│   ├── system.md
-│   ├── summarizer.md
-│   └── action_extractor.md
-├── transcripts/              ← drop input files here
-│   └── sample-transcript.txt
+│   ├── system.md             ← the meeting analyst's core instructions
+│   ├── classifier.md         ← tells AI how to classify meeting types
+│   └── system-original.md   ← backup (for restoring after edits)
+├── transcripts/
+│   ├── incoming/             ← drop files here to trigger the workflow
+│   ├── team-standup/         ← classified files land here...
+│   ├── client-call/          ← ...or here...
+│   └── planning-session/     ← ...or here
 ├── stage-1/chat.js           ← Stage 1 code
 ├── stage-2/workflow.js       ← Stage 2 code
 ├── stage-3/orchestrator.js   ← Stage 3 code
@@ -115,42 +119,34 @@ student-output/
 
 ## Step 5: Install dependencies + add API key (3 min)
 
-Two commands. Walk them through both:
+Two steps. Walk them through both:
 
 ```bash
-# Install the npm packages (Anthropic SDK, chokidar for watching files, dotenv for the key)
+# Install the packages (Anthropic SDK, chokidar for watching files, dotenv for the key)
 npm install
-
-# Copy the env template to a real .env file
-cp .env.example .env
 ```
 
-Then:
-
-> "Open `.env` in your editor. You'll see one line: `ANTHROPIC_API_KEY=sk-ant-api03-...`. Replace that placeholder with your real key. Save the file. **Important:** `.env` is in `.gitignore` — your key won't accidentally end up on GitHub."
-
-Wait for them to do it. Confirm with:
+Now add the API key. Run this command, replacing `sk-ant-your-key-here` with the real key they copied:
 
 ```bash
-# This should print "ANTHROPIC_API_KEY=sk-ant-api03-..." — your real key
-grep ANTHROPIC_API_KEY .env
+echo "ANTHROPIC_API_KEY=sk-ant-your-key-here" > .env
 ```
 
-If the value is still `sk-ant-api03-...` (the placeholder), nudge them:
+Verify it worked:
 
-> "That's still the placeholder. Open `.env` and paste your real key (the one you copied from console.anthropic.com)."
+```bash
+cat .env
+```
 
-## Step 6: Read the API concept doc (3 min)
+They should see `ANTHROPIC_API_KEY=sk-ant-...` with their real key. If it still shows the example value:
 
-Open `concepts/what-is-an-api.md` and read it together. Don't rush — let them ask questions.
+> "That's still a placeholder. Re-run the echo command with your actual key from console.anthropic.com."
 
-The two beats to land:
-1. **An API is just JSON in, JSON out.** No magic.
-2. **Every AI product they've used works the same way under the hood.**
+## Step 6: Read the API concept doc (2 min)
 
-After reading, say:
+Explain inline (don't make them open a file):
 
-> "Good. You don't need to memorize this — just hold onto the doorbell metaphor. In Module 2 you'll send your first API call and see exactly what goes over the wire."
+> "Before Module 2, one thing to know about APIs: they're just a doorbell. You ring it with a JSON message — 'here's my question, here's my system prompt' — and the server sends back a JSON answer. That's it. Every AI product you've ever used — ChatGPT, Claude, Gemini — is JSON in, JSON out with a clever system prompt in the middle. In Module 2 you'll see exactly what that looks like."
 
 ## Step 7: Handoff (1 min)
 
@@ -159,8 +155,7 @@ Wrap and update progress:
 1. **Update `CLAUDE.md`**: change `- [ ] Stage 1 Intro:` to `- [x] Stage 1 Intro:`
 2. **Commit:**
    ```bash
-   git add -A
-   git commit -m "Complete Stage 1 Intro: setup + API key"
+   git add -A && git commit -m "Complete Stage 1 Intro: setup + API key"
    ```
 3. Say:
 
@@ -168,9 +163,10 @@ Wrap and update progress:
 
 ## Coach Guardrails
 
-- **Ask before scaffolding** — confirm the student is ready before running `cp -R` in Step 4. Never copy files ahead of them without asking.
-- **Wait for real API key** — confirm `grep ANTHROPIC_API_KEY .env` shows their actual key (not the `sk-ant-api03-...` placeholder) before moving on. A student with a placeholder key will hit a `401` in Module 2.
-- **Never ask the student to paste their API key in chat** — always tell them to open `.env` directly.
+- **Ask before scaffolding** — confirm the student is ready before running the `command cp` in Step 4. Never copy files ahead of them without asking.
+- **Use `command cp`, not `cp`** — the `command` prefix bypasses any shell aliases. Plain `cp` may be aliased in the student's shell and silently fail.
+- **Wait for real API key** — confirm `cat .env` shows their actual key (not the placeholder) before moving on. A placeholder key hits a `401` in Module 2.
+- **Never ask the student to paste their API key in chat** — always use the `echo` command to write it directly to `.env`.
 - **If Node isn't installed, stop and wait** — don't continue until `node --version` succeeds with v20+.
 - **`.env` is in `.gitignore`** — if the student asks whether to commit it, say no.
 

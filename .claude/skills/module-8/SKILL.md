@@ -25,7 +25,8 @@ Say:
 Give them the menu, then nudge them to pick fast:
 
 ```
-  1. Customer interviews          →  JTBD (Jobs to Be Done) themes + verbatim quotes
+  1. Customer interviews          →  JTBD themes + verbatim quotes
+                                     (JTBD = Jobs to Be Done: what the user is fundamentally trying to accomplish)
   2. Earnings calls               →  Risk flags + analyst questions
   3. Lecture / podcast notes      →  Study guide + flashcards
   4. 1:1 notes                    →  Their actions + your actions
@@ -50,35 +51,13 @@ If they pick "Custom," ask:
 
 ## Step 3: Edit the orchestrator's prompt (5 min)
 
-Open `student-output/prompts/system.md`.
+Have the student describe what they want, then tell Claude to update the file:
 
-One heads-up before you edit: `system.md` is used in two places — by `ask()` in Stage 1 (the chat assistant) and by the synthesizer in Stage 3. The edits you make here affect both. For most use cases that's exactly what you want; just know it's one file doing double duty.
+For customer interviews, the student would say to Claude:
 
-Walk them through editing it for their use case. Two things change:
+> "Tell Claude: 'Update prompts/system.md to be a customer interview analyst. Change the role to: You are a customer interview analyst. Change the output format to: **JTBD THEMES** (what the user is fundamentally trying to accomplish), **VERBATIM QUOTES** (exact quotes from the interview), **WHAT TO DO ABOUT IT** (one sentence on the implication for the product).'"
 
-### A) The role
-```diff
-- You are a meeting analyst.
-+ You are a customer interview analyst. ← (or whatever fits)
-```
-
-### B) The output format
-
-Replace the `KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP` block with whatever shape makes sense for their use case.
-
-Example for customer interviews:
-```
-**JTBD THEMES** (Jobs to Be Done — what the user is fundamentally trying to accomplish)
-- [What user was trying to do]: [evidence from interview]
-
-**VERBATIM QUOTES**
-- "[exact quote]" — [speaker]
-
-**WHAT TO DO ABOUT IT**
-[One sentence — the implication for the product.]
-```
-
-Save.
+Coach: help them phrase this for their specific use case. The pattern is always: "Tell Claude: 'Update prompts/system.md to be a [role]. Change the output format to: [their desired sections].'"
 
 ## Step 4: Edit the sub-agent prompts (5 min)
 

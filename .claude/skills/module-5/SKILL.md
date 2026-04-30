@@ -1,179 +1,140 @@
 ---
 name: module-5
-description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student adds additional steps to the workflow pipeline (Slack, JSON log, console, etc.), reinforcing that workflows are composed of steps and that the pipeline is the thing they control.
+description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student extends the workflow by telling Claude what to add — no manual code editing. They describe a new output step in plain English, Claude writes it, they run drop-test to confirm it fires.
 ---
 
 # Module 5: Extend the Workflow
 
 **Time:** ~20 minutes
-**You'll produce:** an extended workflow with one additional step — the report lands somewhere new in addition to the markdown file.
+**You'll produce:** an extended workflow with one additional step — added by telling Claude what you want, not by editing code yourself.
 
 ## Coach Instructions
 
-This module reinforces that a workflow is *a sequence of steps you control*. Each addition is a new step in `runWorkflow()` — not a separate "integration." Keep the focus on the code shape: step 1, step 2, step 3. The student can pick whichever new step appeals to them.
+This module is about the vibe-coding pattern: describe what you want → Claude writes it → you run it → you see it work. No student should touch a line of code directly. The learning is "I extended a running system by describing what I wanted."
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Stage 2 is done — but the pipeline only has one output step: save a markdown file. In real life, your report probably needs to go somewhere else too. To a Slack channel so the team sees it. To a JSON log so you can analyze trends. To a database row.
+> "Your workflow classifies and routes files automatically. That's already useful. But what if you wanted it to do more? Save a summary alongside the transcript? Post to Slack? Send an email?
 >
-> Here's the key insight: **the output step is just another step in the pipeline**. We add it inside `runWorkflow()`. The chat assistant doesn't change. The trigger doesn't change. We just extend the sequence."
+> Here's the key insight: **the pipeline is just a sequence of steps**. Adding a new step doesn't mean rewriting anything — it means describing what you want at the end of the sequence. And here's how we'll do it: you tell Claude what you want in plain English. Claude writes the code. You run it and see it work.
+>
+> That's vibe coding. You're the director. Claude is the developer."
 
-## Step 2: Open workflow.js and locate the extension point (2 min)
-
-Open `student-output/stage-2/workflow.js`. Find the end of `runWorkflow()`:
-
-```js
-  // Step 4: save to outputs/
-  fs.writeFileSync(outPath, body, 'utf-8');
-
-  // Step 5: return saved path
-  return outPath;
-```
-
-> "Step 5 is where we add more steps. After the file is saved, we can do anything else we want with `reportText` or `outPath`. Let's pick one."
-
-## Step 3: Pick a new step (3 min)
+## Step 2: Pick a new step (3 min)
 
 Show them the options:
 
 ```
-  1. Console print — format the report in the terminal with a visual separator.
-     Easiest. Good warmup.
+  1. Save a summary  — after routing, also save a one-paragraph AI summary
+     alongside the transcript file. Both land in the same folder.
+     Good first choice. Shows the pipeline can call AI AND save multiple files.
 
-  2. JSON log — append { timestamp, source, report } to outputs/log.jsonl.
-     Useful for analysis or building a dashboard later.
+  2. Slack notification — post the meeting type and a summary to a Slack channel.
+     Feels real. Team can see it land in real time.
 
-  3. Slack webhook — post the report to a Slack channel.
-     Feels real. Team can see it land.
-
-  4. macOS notification — show a banner when the pipeline finishes.
-     Tiny, satisfying signal.
+  3. JSON log — append { timestamp, classification, filename } to a log file.
+     Useful if you want to analyze trends across many transcripts.
 ```
 
-Ask: **"Which feels useful or fun? Pick one."**
+Ask: **"Which feels most useful or fun to you? Pick one."**
 
-## Step 4: Add the step (8–10 min)
+## Step 3: Tell Claude to add it (8–10 min)
 
-### Option 1: Console print
+They don't edit `workflow.js` themselves. They describe what they want.
 
-Add after the save step inside `runWorkflow()`:
+### Option 1: Save a summary
 
-```js
-// Step 5: print to console
-console.log("\n" + "─".repeat(60));
-console.log("📊 INSIGHTS REPORT");
-console.log("─".repeat(60));
-console.log(reportText);
-console.log("─".repeat(60) + "\n");
-```
+Have the student say to Claude:
 
-No new dependencies needed.
+> "Tell Claude: 'Update workflow.js to also call the Anthropic API and generate a one-paragraph summary of the transcript, then save it as [original-filename]-summary.txt in the same folder as the routed transcript.'"
 
-### Option 2: JSON log
-
-Add at the top of the file:
-
-```js
-const LOG_FILE = path.join(OUTPUTS_DIR, "log.jsonl");
-```
-
-Add inside `runWorkflow()` after the save step:
-
-```js
-// Step 5: append to JSON log
-const entry = { timestamp: new Date().toISOString(), source: sourceFilename, report: reportText };
-fs.appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", "utf-8");
-```
-
-Test with `cat outputs/log.jsonl` — one line per transcript processed.
-
-### Option 3: Slack webhook
-
-First, set up a Slack incoming webhook:
-1. Go to `api.slack.com/apps` → create a new app → Incoming Webhooks → activate → add to a test channel → copy the URL.
-2. Add to `.env`:
-   ```
-   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-   ```
-
-Add inside `runWorkflow()` after the save step:
-
-```js
-// Step 5: post to Slack
-if (process.env.SLACK_WEBHOOK_URL) {
-  await fetch(process.env.SLACK_WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: `📊 *Report from \`${sourceFilename}\`*\n\`\`\`${reportText.slice(0, 2000)}\`\`\``,
-    }),
-  });
-}
-```
-
-### Option 4: macOS notification
-
-Add at the **top of the file**, with the other imports:
-
-```js
-import { exec } from "node:child_process"; // add this line at the top, not inside runWorkflow
-```
-
-Then add inside `runWorkflow()` after the save step:
-
-```js
-// Step 5: macOS notification
-exec(`osascript -e 'display notification "Report saved from ${sourceFilename}" with title "Pipeline done"'`);
-```
-
-Note: ES module `import` statements must be at the top level of the file. Putting one inside a function causes a SyntaxError.
-
-## Step 5: Test it (3 min)
-
-Start the watcher and drop a file:
+Watch Claude make the change. Then test it:
 
 ```bash
 npm run stage-2
 # in second terminal:
-cp transcripts/sample-transcript.txt transcripts/step-test.txt
+npm run drop-test
 ```
 
-Confirm both the markdown file *and* the new step fire.
+Check the folder:
+```bash
+ls transcripts/team-standup/
+```
 
-## Step 6: The big idea (2 min)
+Two files should appear: the original transcript and a `-summary.txt` alongside it.
 
-> "Look at the shape of `runWorkflow()` now:
+### Option 2: Slack notification
+
+First, set up a Slack incoming webhook:
+1. Go to `api.slack.com/apps` → create a new app → Incoming Webhooks → activate → add to a test channel → copy the URL.
+2. Have the student say to Claude: "Add `SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...` to my `.env` file (with the actual URL I'll give you)."
+
+Then have the student say to Claude:
+
+> "Tell Claude: 'Update workflow.js to also send a Slack message when a file is classified. The message should include the meeting type and the routed filename. Use the SLACK_WEBHOOK_URL from the environment.'"
+
+Watch Claude write it. Test with `npm run drop-test`. Check Slack.
+
+### Option 3: JSON log
+
+Have the student say to Claude:
+
+> "Tell Claude: 'Update workflow.js to append a JSON record to outputs/log.jsonl after each classification. The record should include: timestamp, original filename, meeting type, and the routed file path.'"
+
+Watch Claude write it. Test with `npm run drop-test`. Check the log:
+```bash
+cat outputs/log.jsonl
+```
+
+One line per transcript processed.
+
+## Step 4: Test it (3 min)
+
+Start the watcher if not running, drop a test file, confirm both the routing AND the new step fire:
+
+```bash
+npm run stage-2
+# second terminal:
+npm run drop-test
+```
+
+If the new step doesn't fire: tell Claude what went wrong. "The summary file isn't appearing — can you check workflow.js?" That's the vibe-coding feedback loop.
+
+## Step 5: The big idea (2 min)
+
+> "Look at what you just did. You extended a running automated system by describing what you wanted. No file paths. No syntax. No 'which line do I put this on?' You just said what you needed and Claude wrote it.
 >
->     Step 1 (caller): read file
->     Step 2: call ask()   ← the Stage 1 chat assistant
->     Step 3: format
->     Step 4: save markdown
->     Step 5: [your new step]
+> That's vibe coding. And that's how the rest of the sprint works too: you describe, Claude builds, you run it.
 >
-> Each step is a few lines. Each step has a clear input and output. The pipeline is just functions in a sequence.
+> Now look at the shape of the pipeline:
 >
-> Workflows aren't magic. They're **composed of steps**. Once you see that, you can add as many steps as you need — database, analytics, email, whatever. The chat assistant in step 2 never changes."
+>     File drops in → Classify → Route → [your new step]
+>
+> Each step adds capability. The trigger doesn't change. The classification doesn't change. The rest of the pipeline stays exactly the same. **You composed a new behavior without touching what was already working.**"
+
+## Step 6: The handoff (30 seconds)
+
+> "Stage 2 complete. You built a pipeline that fires without you, makes an AI decision, routes files, and outputs to multiple destinations.
+>
+> Stage 3 is a different scale. Instead of a fixed sequence of steps, the orchestrator runs *three specialists in sequence* — each one handing its result back before the next one starts. And here's the payoff you've been set up for: two of those three specialists are the things you already built. Type `module-6` when you're ready."
 
 ## Step 7: Wrap and commit (1 min)
 
-1. Clean up test file: `rm transcripts/step-test.txt`
-2. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
-3. **Commit:**
+1. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
+2. **Commit:**
    ```bash
    git add -A && git commit -m "Complete Module 5: Extend the Workflow"
    ```
-4. Hand off:
-
-> "Stage 2 done. You now have a pipeline that runs without you and produces exactly the outputs you want. Here's what changes in Stage 3: instead of a fixed sequence of steps, the system reads the input first and *decides* what to run. It looks at the transcript and asks: what analysis does this actually need? That decision-making is what makes it an agentic system. Type `module-6` when you're ready."
 
 ## Coach Guardrails
 
+- **Never ask the student to edit code directly** — all changes go through "Tell Claude: [plain English description]." If a student reaches for a file to edit it, redirect: "Describe what you want and let Claude write it."
 - **Let them pick their option** — don't steer them toward the easiest one unless they're stuck. Their choice is their investment.
-- **For Option 3 (Slack)** — warn them upfront that it requires creating a Slack app and incoming webhook before writing a line of code. If they're not sure they want to do that, suggest Option 1 or 2 instead.
-- **Imports go at the top of the file** — if the student puts `import { exec }` inside `runWorkflow()`, stop them. ES module imports must be top-level declarations. This causes a `SyntaxError` at parse time.
-- **Test before committing** — confirm the new step actually fires when a file is dropped before running the commit. Don't commit broken code.
+- **For Option 2 (Slack)** — warn them upfront it requires creating a Slack app and incoming webhook before writing any code. If they're not sure they want to do that, suggest Option 1 instead.
+- **Test before committing** — confirm the new step fires when a file drops before running the commit. Don't commit code that hasn't been verified running.
+- **If Claude's code doesn't work**: have the student describe the failure to Claude. "The summary file isn't showing up" is enough for Claude to diagnose. This is the whole vibe-coding pattern — they describe, Claude fixes.
 
 ## Optional deeper reading
 

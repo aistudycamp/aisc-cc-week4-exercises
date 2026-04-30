@@ -1,85 +1,85 @@
 ---
 name: module-4
-description: Build the Workflow — Module 4 of the AISC Agent Sprint. Triggered when a student types "module-4". Student opens stage-2/workflow.js, sees how it imports ask() from Stage 1, walks through the 5-step pipeline, runs the folder watcher, drops files, sees the pipeline fire. End: opens frontend Stage 2 tab to see the chat assistant nested inside the workflow box.
+description: Build the Workflow — Module 4 of the AISC Agent Sprint. Triggered when a student types "module-4". Student starts the folder watcher, drops a test file via npm run drop-test, watches the AI classify the meeting type and route the file to the correct subfolder, and sees a macOS notification fire. Opens the frontend Stage 2 tab to see the pipeline visualization.
 ---
 
 # Module 4: Build the Workflow
 
 **Time:** ~25 minutes
-**You'll produce:** a working workflow pipeline. Drop any `.txt` file into `transcripts/` and the pipeline fires automatically — reading the file, calling the chat assistant, formatting the output, and saving a report to `outputs/`.
+**You'll produce:** a working automated workflow. Drop a transcript into the `incoming/` folder and the pipeline fires automatically — reading the file, classifying the meeting type, routing it to the right folder, and sending you a notification. No typing required.
 
 ## Coach Instructions
 
-The magic moment here is *two things at once*: the file drop triggering the pipeline, and the student seeing the `import { ask }` line that reuses Stage 1. Don't rush past either. The conceptual point is that a workflow is genuinely different from a chat assistant — it's not just a wrapper.
+The magic moment is *seeing what a workflow actually does*: a file drops, AI makes a decision, the file moves, a notification fires. That's fundamentally different from a chat assistant. Students should leave this module knowing exactly why you'd use a workflow instead of a chat.
 
 ## Step 1: Set the frame (3 min)
 
 Say:
 
-> "In Stage 1 you built a chat assistant. It's interactive — you type, it responds, you type more. Today we build something structurally different: a **workflow**.
+> "In Stage 1 you built a chat assistant. You paste something in, it responds, you paste more. It's interactive.
 >
-> A workflow doesn't wait for you to type. An *event* triggers it. A file appears in a folder. A webhook fires. A cron job ticks. The pipeline runs automatically, through a fixed sequence of steps, and produces a persistent result.
+> Stage 2 is different. It's a **workflow** — and a workflow doesn't wait for you. An event triggers it. In our case: a file drops into a folder. The pipeline wakes up automatically, the AI makes a decision, the file gets routed to the right place, you get a notification. You never typed anything.
 >
-> Here's the key question: is the chat assistant inside the workflow? Or is the workflow inside the chat assistant?
->
-> **The chat assistant is one step inside the workflow.** We import it."
+> Here's the real question: what can a workflow do that a chat assistant can't?"
 
-## Step 2: Open what-is-a-workflow.md (2 min)
+Wait for their answer. If stuck:
 
-Open `concepts/what-is-a-workflow.md` together. Read the "The short version" and the comparison table at the bottom. Land:
+> "A chat assistant is reactive — it waits for you. A workflow is **automatic** — it fires when something happens. It can also make decisions: look at a transcript, classify what kind of meeting it was, and route it to the right folder. That's not a conversation. That's a pipeline."
 
-> "A workflow trades interactivity for automation. You configure it once; it runs forever."
+## Step 2: What this workflow does (2 min)
 
-## Step 3: Open workflow.js and read the import (4 min)
+Print the pipeline:
+
+```
+transcripts/incoming/[you drop a file here]
+         ↓
+    Read the transcript
+         ↓
+    AI classifies meeting type
+    → "team-standup" / "client-call" / "planning-session"
+         ↓
+    Route to transcripts/[type]/[new-filename]
+         ↓
+    Send macOS notification: "Routed to: team-standup"
+```
+
+> "Four steps. The AI does step 2 (classification). The workflow does everything else — reading, routing, notifying. The AI is one smart step inside a larger automated sequence. That's what a workflow is."
+
+Ask before walking through the code:
+
+> "Before we look at how this works — what do you think the AI had to figure out to route the file correctly?"
+
+Wait for their answer. The answer: it read the transcript and decided what kind of meeting it was. Point:
+
+> "Exactly. That's the AI decision step. It reads the beginning of the transcript and returns a JSON answer: the meeting type and a suggested filename. The rest of the pipeline just follows that decision."
+
+## Step 3: Open workflow.js and see the import (4 min)
 
 Open `student-output/stage-2/workflow.js`. The very first thing to point to:
 
 ```js
-import { ask } from '../stage-1/chat.js'; // ← Stage 1 is one step in this pipeline
+import { ask } from '../stage-1/chat.js'; // ← not here — this imports Stage 1 for use later
 ```
 
-> "There it is. This isn't a copy-paste of Stage 1's code. It's a *literal import*. The workflow calls `ask()` — the function we just built — as step 2 of its pipeline. Stage 1 is a building block. Stage 2 uses it."
-
-Now walk through the full pipeline inside `runWorkflow()`:
+Wait, that import is not in this new workflow — instead, it uses the Anthropic client directly for classification. Show what IS there:
 
 ```js
-export async function runWorkflow(transcript, sourceFilename) {
-  // Step 2: call the chat assistant
-  const reportText = await ask(
-    'Generate the standard insights report for this transcript.',
-    transcript
-  );
-
-  // Step 3: format as markdown
-  const body = `# Insights Report\n\n${reportText}`;
-
-  // Step 4: save to outputs/
-  fs.writeFileSync(outPath, body, 'utf-8');
-
-  // Step 5: return saved path
-  return outPath;
-}
+import { runWorkflow } from '../stage-2/workflow.js'; // this is what Stage 3 will import
 ```
 
-> "Five steps. Read → Call ask() → Format → Save → Return. The LLM does step 2. The workflow does everything else. That's the distinction: the agent is one step; the pipeline is the whole thing."
+Point to the export at the bottom:
 
-Also note the export:
+```js
+export async function runWorkflow(transcript, sourceFilename)
+```
 
-> "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this, just like this file imports `ask()` from Stage 1."
-
-Pause and ask:
-
-> "Quick check before we start the watcher — `ask()` came from Stage 1 and got imported here. What do you think Stage 3 will import from THIS file?"
+> "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this, just like a workflow could import `ask()` from Stage 1.
+>
+> What do you think Stage 3 will import from THIS file?"
 
 Wait for their answer. The answer: `runWorkflow`. The point: the same export pattern they're looking at right now is what makes Stage 3 possible.
 
-### The watcher gating
-
-Point to the `if (import.meta.url === ...)` block at the bottom:
-
-> "Same pattern as Stage 1. When you run `npm run stage-2` directly, the folder watcher starts. When Stage 3 imports this file, only `runWorkflow()` loads — the watcher never fires. Clean separation."
-
-## Step 4: Start the workflow (3 min)
+## Step 4: Start the workflow (2 min)
 
 Have them run:
 
@@ -91,45 +91,47 @@ They should see:
 
 ```
 ⚙️  Workflow — Transcript Pipeline
-👀 Watching .../transcripts for new .txt files...
-    Drop a transcript into that folder to run the pipeline.
+👀 Watching transcripts/incoming/ for new files...
+    Run 'npm run drop-test' in another terminal to trigger it.
 ```
 
-> "It's running. Quietly watching. Nothing happens until a file appears."
+> "It's running. Watching the `incoming/` folder. Nothing happens until a file appears."
 
-## Step 5: Trigger it (5 min)
+## Step 5: Trigger it (6 min)
 
-Open a **second terminal window** (on Mac: `Cmd+T` for a new tab in the same window, or `Cmd+N` for a new window; on Windows/Linux: right-click your terminal title or open a new session). In that second terminal, navigate to your project and drop a file:
+Open a **second terminal tab** — on Mac: `Cmd+T` opens a new tab in the same window. In that second terminal, navigate to your project:
 
 ```bash
 cd student-output
-cp transcripts/sample-transcript.txt transcripts/test-run-1.txt
+npm run drop-test
 ```
 
-Watch the watcher terminal:
+This copies the sample transcript into `incoming/` automatically. Watch the watcher terminal:
 
 ```
-📄 New file detected: test-run-1.txt
+📄 New file: test-1234567890.txt
 ⚡️ Running pipeline...
-✓ Workflow complete → outputs/2026-04-28-1042-test-run-1.md
+
+  🔍 Classifying meeting type...
+  ✓ Classified as: team-standup
+  ✓ Routed → transcripts/team-standup/2026-04-29-team-standup.txt
+
+✓ Pipeline complete.
+  Type:    team-standup
+  Saved:   transcripts/team-standup/2026-04-29-team-standup.txt
 ```
 
-> "The pipeline fired. You didn't type anything. You dropped a file. The workflow woke up, called the chat assistant, formatted the output, saved it. Open outputs/ and look."
+A macOS notification should also appear in the top-right corner: **"Routed to: team-standup"**
+
+> "The pipeline fired. You didn't type anything. You dropped a file. The AI classified it, routed it, and notified you — all automatically. Check the folder:"
 
 ```bash
-cat outputs/*.md
+ls transcripts/team-standup/
 ```
 
-Drop a few more files to show the pattern repeating:
-
-```bash
-cp transcripts/sample-transcript.txt transcripts/test-run-2.txt
-echo "Quick sync: Alex says launch delayed to next Friday." > transcripts/tiny.txt
-```
+There's the routed transcript. Drop a few more via `npm run drop-test` to show the pattern repeating.
 
 ## Step 6: See it in the frontend (4 min)
-
-The watcher just fired. Before you stop it, let's see what you just triggered as a diagram. This is a comprehension check — you'll be able to map every node back to the code you read in Step 3.
 
 Open `frontend/index.html` (if not already open) and click the **Stage 2 tab**:
 
@@ -137,15 +139,13 @@ Open `frontend/index.html` (if not already open) and click the **Stage 2 tab**:
 open frontend/index.html
 ```
 
-Walk them through the Stage 2 view:
-
-> "Look at the layout. The workflow is a container — it shows the full pipeline: File drop → Parse → Chat Assistant → Format → Save.
+> "Look at the Stage 2 visualization. You can see the pipeline as nodes: incoming folder → Classifier → team-standup / client-call / planning-session → Notification.
 >
-> See the Chat Assistant node inside the workflow box? That's the Stage 1 building block, nested inside Stage 2. The same assistant you built and ran in Module 3 — now it's a step in a pipeline.
->
-> Click the Chat Assistant node inside the workflow. The inspect panel shows the same system prompt from Stage 1. Same file, same function, just used differently."
+> This is a sequence — not a conversation. Each node does one thing and passes results to the next. That's what makes it a workflow."
 
-Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights up in sequence.
+Click each node. Show the inspect panels — what each step does.
+
+Hit **Run Agent** and watch the Stage 2 animation step through the pipeline.
 
 ## Step 7: Stop the watcher cleanly (1 min)
 
@@ -153,43 +153,37 @@ Hit **Run Agent** and watch the Stage 2 animation — each pipeline step lights 
 Ctrl+C in the watcher's terminal.
 ```
 
-> "The pipeline stops listening. Nothing else changes. The reports stay in outputs/."
+> "The pipeline stops listening. Nothing else changes. The classified transcripts stay in their folders."
 
 ## Step 8: The big idea (2 min)
 
 > "The shape of what you built:
 >
->     Event fires       →    Chat Assistant    →    Saved file
->     [file appears]         [ask() step]           [outputs/*.md]
+>     File drops in   →   AI classifies   →   Routed file   +   Notification
+>     [incoming/]         [classifier.md]      [team-standup/]    [macOS banner]
 >
-> The chat assistant is *unchanged*. We didn't touch it. We just called it from a new context — a pipeline that has its own trigger and its own output step.
+> The AI made a decision — that's the intelligence. The pipeline handled the rest — that's the automation.
 >
-> Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A webhook from your CRM. The pipeline doesn't care. **The trigger and the output step are pluggable.**
->
-> And here's the thing to hold onto: every product you've seen called 'AI automation' is this exact shape. Upload a contract, get a summary. Paste a Slack thread, get action items. Send a customer email, get a draft reply. They're all a file-drop — or a webhook — pointing at an LLM. You just built the whole thing from scratch."
+> Chat assistants are great for back-and-forth. Workflows are great for automated, event-triggered processing. Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A file from Google Drive. The pipeline doesn't care. **The trigger and the output steps are pluggable.**"
 
 ## Step 9: Wrap and commit (2 min)
 
-1. Clean up test files if desired:
-   ```bash
-   rm transcripts/test-run-*.txt transcripts/tiny.txt
-   ```
-2. **Update `CLAUDE.md`**: change `- [ ] Module 4:` to `- [x] Module 4:`
-3. **Commit:**
+1. **Update `CLAUDE.md`**: change `- [ ] Module 4:` to `- [x] Module 4:`
+2. **Commit:**
    ```bash
    git add -A && git commit -m "Complete Module 4: Build the Workflow"
    ```
-4. Hand off:
+3. Hand off:
 
-> "Stage 2 done. You have a workflow that runs without you. In Module 5 we'll extend it — add more steps to the pipeline so reports land exactly where you need them. Type `module-5` when you're ready."
+> "Stage 2 running. In Module 5 we'll extend the pipeline — add a new step by telling Claude what you want, not by editing code. Type `module-5` when you're ready."
 
 ## Coach Guardrails
 
-- **Don't rush past the import line in Step 3** — `import { ask } from '../stage-1/chat.js'` is the conceptual centerpiece of Module 4. Let the building-block connection land before moving to the pipeline walkthrough.
-- **Pause for the reflection question** — wait for the student to answer "What will Stage 3 import from this file?" before moving to Step 4. It's a 30-second check that pays off in Module 6.
-- **Second-terminal first-timers** — if the student has never split a terminal, show them how before they drop the file. Don't just say "second terminal" and leave them searching.
-- **Show the frontend after the watcher fires** — the visualization is most effective right after the student sees the pipeline output appear. Don't wait until the end.
-- **Don't skip the building-block callout** at the end of Step 3: "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this."
+- **Use `npm run drop-test`, not `cp`** — the `cp` command may be aliased in the student's shell and silently fail. `npm run drop-test` uses Node to copy the file — no shell dependency.
+- **Second-terminal first-timers** — if the student has never opened a second terminal tab, show them `Cmd+T` on Mac before they try to drop the file. Don't just say "second terminal" and leave them searching.
+- **Pause for the reflection question in Step 2** — "what did the AI have to figure out to route correctly?" — wait for their answer before explaining. It's a 30-second check that makes the pipeline landing in Step 5 much more satisfying.
+- **Pause for the Stage 3 question in Step 3** — "what will Stage 3 import from this file?" — wait for their answer before explaining. It plants the payoff for Module 6.
+- **Show the frontend after the pipeline fires** — the visualization is most effective right after the student sees the routed file appear. Don't wait until the end.
 
 ## Optional deeper reading
 
