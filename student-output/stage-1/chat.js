@@ -85,16 +85,27 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
     messages.push({ role: "user", content: text });
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages,
-    });
+    try {
+      const response = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages,
+      });
 
-    const reply = response.content[0].text;
-    messages.push({ role: "assistant", content: reply });
-    console.log(`\nAssistant: ${reply}\n`);
+      const reply = response.content[0].text;
+      messages.push({ role: "assistant", content: reply });
+      console.log(`\nAssistant: ${reply}\n`);
+    } catch (err) {
+      messages.pop();
+      if (err.status === 429) {
+        console.log("\n⚠️  Too many connections right now — wait a moment and try again.\n");
+      } else if (err.status === 401) {
+        console.log("\n⚠️  API key issue — check that your .env has a valid ANTHROPIC_API_KEY.\n");
+      } else {
+        console.log(`\n⚠️  Something went wrong (${err.status ?? err.message}) — try again.\n`);
+      }
+    }
     showPrompt();
   };
 
