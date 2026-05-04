@@ -1,6 +1,6 @@
 ---
 name: module-5
-description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student extends the workflow by telling Claude what to add — no manual code editing. They describe a new output step in plain English, Claude writes it, they run drop-test to confirm it fires.
+description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student picks one of three pre-written extensions, tells Claude to add it to workflow.js, and runs it to confirm the new step fires. The vibe coding lesson — "I extended a running system by describing what I wanted" — with zero code-generation risk because the extension code is already written.
 ---
 
 # Module 5: Extend the Workflow
@@ -10,17 +10,24 @@ description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggere
 
 ## Coach Instructions
 
-This module is about the vibe-coding pattern: describe what you want → Claude writes it → you run it → you see it work. No student should touch a line of code directly. The learning is "I extended a running system by describing what I wanted."
+This module teaches the vibe-coding pattern: describe what you want → Claude applies it → you run it → you see it work. No student should touch a line of code directly.
+
+Three pre-written, tested extensions live in `stage-2/extensions/`:
+- `save-summary.js` — generates an AI summary and saves it alongside the transcript
+- `json-log.js` — appends a JSON record to a log file after each classification
+- `slack-notify.js` — posts a Slack message with the meeting type and filename
+
+When a student picks an option, read the matching extension file and integrate it into `workflow.js` — two changes: one import line at the top, one function call at the end of `runWorkflow()`. Do not generate extension code from scratch.
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Your workflow classifies and routes files automatically. That's already useful. But what if you wanted it to do more? Save a summary alongside the transcript? Post to Slack? Send an email?
+> "Your workflow classifies and routes files automatically. That's already useful. But what if you wanted it to do more? Save a summary alongside the transcript? Post to Slack? Keep a log?
 >
-> Here's the key insight: **the pipeline is just a sequence of steps**. Adding a new step doesn't mean rewriting anything — it means describing what you want at the end of the sequence. And here's how we'll do it: you tell Claude what you want in plain English. Claude writes the code. You run it and see it work.
+> Here's the key insight: **the pipeline is just a sequence of steps**. Adding a new step means describing what you want at the end of the sequence. You tell me what you want in plain English. I wire it in. You run it and see it work.
 >
-> That's vibe coding. You're the director. Claude is the developer."
+> That's vibe coding. You're the director. I'm the developer."
 
 ## Step 2: Pick a new step (3 min)
 
@@ -29,9 +36,8 @@ Show them the options:
 ```
   1. Save a summary  — after routing, also save a one-paragraph AI summary
      alongside the transcript file. Both land in the same folder.
-     Good first choice. Shows the pipeline can call AI AND save multiple files.
 
-  2. Slack notification — post the meeting type and a summary to a Slack channel.
+  2. Slack notification — post the meeting type and filename to a Slack channel.
      Feels real. Team can see it land in real time.
 
   3. JSON log — append { timestamp, classification, filename } to a log file.
@@ -40,59 +46,68 @@ Show them the options:
 
 Ask: **"Which feels most useful or fun to you? Pick one."**
 
-## Step 3: Tell Claude to add it (8–10 min)
+## Step 3: Tell Claude to add it (5 min)
 
-They don't edit `workflow.js` themselves. They describe what they want.
+The student describes what they want. You apply the matching pre-written extension.
 
 ### Option 1: Save a summary
 
-Have the student say to Claude:
+Have the student say:
 
-> "Tell Claude: 'Update workflow.js to also call the Anthropic API and generate a one-paragraph summary of the transcript, then save it as [original-filename]-summary.txt in the same folder as the routed transcript.'"
+> "Add the save-summary extension to my workflow."
 
-Watch Claude make the change. Then test it:
+Read `stage-2/extensions/save-summary.js`. Make two changes to `workflow.js`:
 
-```bash
-npm run stage-2
-# in second terminal:
-npm run drop-test
-```
-
-Check the folder:
-```bash
-ls transcripts/team-standup/
-```
-
-Two files should appear: the original transcript and a `-summary.txt` alongside it.
+1. Add at the top (with the other imports):
+   ```js
+   import { saveSummary } from './extensions/save-summary.js';
+   ```
+2. Add inside `runWorkflow()`, after the `notify()` call:
+   ```js
+   await saveSummary(transcript, outputPath);
+   ```
 
 ### Option 2: Slack notification
 
-First, set up a Slack incoming webhook:
-1. Go to `api.slack.com/apps` → create a new app → Incoming Webhooks → activate → add to a test channel → copy the URL.
-2. Have the student say to Claude: "Add `SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...` to my `.env` file (with the actual URL I'll give you)."
+First, the student needs a Slack webhook URL:
+1. Go to `api.slack.com/apps` → Create New App → Incoming Webhooks → Activate → Add to Workspace → pick a channel → copy the URL.
+2. Have the student say: "Add `SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...` to my `.env` file."
 
-Then have the student say to Claude:
+Then have the student say:
 
-> "Tell Claude: 'Update workflow.js to also send a Slack message when a file is classified. The message should include the meeting type and the routed filename. Use the SLACK_WEBHOOK_URL from the environment.'"
+> "Add the slack-notify extension to my workflow."
 
-Watch Claude write it. Test with `npm run drop-test`. Check Slack.
+Read `stage-2/extensions/slack-notify.js`. Make two changes to `workflow.js`:
+
+1. Add at the top:
+   ```js
+   import { slackNotify } from './extensions/slack-notify.js';
+   ```
+2. Add inside `runWorkflow()`, after the `notify()` call:
+   ```js
+   await slackNotify(result.type, outputPath);
+   ```
 
 ### Option 3: JSON log
 
-Have the student say to Claude:
+Have the student say:
 
-> "Tell Claude: 'Update workflow.js to append a JSON record to outputs/log.jsonl after each classification. The record should include: timestamp, original filename, meeting type, and the routed file path.'"
+> "Add the JSON log extension to my workflow."
 
-Watch Claude write it. Test with `npm run drop-test`. Check the log:
-```bash
-cat outputs/log.jsonl
-```
+Read `stage-2/extensions/json-log.js`. Make two changes to `workflow.js`:
 
-One line per transcript processed.
+1. Add at the top:
+   ```js
+   import { logToJson } from './extensions/json-log.js';
+   ```
+2. Add inside `runWorkflow()`, after the `notify()` call:
+   ```js
+   logToJson(result.type, sourceFilename, outputPath);
+   ```
 
 ## Step 4: Test it (3 min)
 
-Start the watcher if not running, drop a test file, confirm both the routing AND the new step fire:
+Start the watcher, drop a test file, confirm both the routing AND the new step fire:
 
 ```bash
 npm run stage-2
@@ -100,7 +115,21 @@ npm run stage-2
 npm run drop-test
 ```
 
-If the new step doesn't fire: tell Claude what went wrong. "The summary file isn't appearing — can you check workflow.js?" That's the vibe-coding feedback loop.
+**Option 1 — check the folder:**
+```bash
+ls transcripts/team-standup/
+```
+Two files should appear: the original transcript and a `-summary.txt` alongside it.
+
+**Option 2 — check Slack:** the message should appear in the channel within a few seconds.
+
+**Option 3 — check the log:**
+```bash
+cat outputs/log.jsonl
+```
+One JSON line per transcript processed.
+
+If the new step doesn't fire, check the error in the terminal and tell Claude what you see. "The summary file isn't appearing — the terminal shows [error]" gives Claude exactly what it needs to diagnose.
 
 ## Step 5: Verify it in the browser (2 min)
 
@@ -110,15 +139,11 @@ Now confirm the new step fires through the live interface. Switch to **http://lo
 
 > "You should see the same classification result you got in the terminal. The new step you added — does it also fire? Check the terminal logs while you click Run Workflow in the browser."
 
-If something's off, describe it to Claude. "The workflow ran but the summary file didn't appear" — Claude can diagnose from that.
-
-> "This is the full loop: describe → Claude writes → terminal confirms → browser confirms. You extended a running system and verified it without touching a line of code."
+> "This is the full loop: describe → applied → terminal confirms → browser confirms. You extended a running system and verified it without touching a line of code."
 
 ## Step 6: The big idea (2 min)
 
-> "Look at what you just did. You extended a running automated system by describing what you wanted. No file paths. No syntax. No 'which line do I put this on?' You just said what you needed and Claude wrote it.
->
-> That's vibe coding. And that's how the rest of the sprint works too: you describe, Claude builds, you run it.
+> "Look at what you just did. You extended a running automated system by describing what you wanted. No file paths. No syntax. No 'which line do I put this on?' You just said what you needed and it happened.
 >
 > Now look at the shape of the pipeline:
 >
@@ -142,11 +167,12 @@ If something's off, describe it to Claude. "The workflow ran but the summary fil
 
 ## Coach Guardrails
 
-- **Never ask the student to edit code directly** — all changes go through "Tell Claude: [plain English description]." If a student reaches for a file to edit it, redirect: "Describe what you want and let Claude write it."
-- **Let them pick their option** — don't steer them toward the easiest one unless they're stuck. Their choice is their investment.
-- **For Option 2 (Slack)** — warn them upfront it requires creating a Slack app and incoming webhook before writing any code. If they're not sure they want to do that, suggest Option 1 instead.
-- **Test before committing** — confirm the new step fires when a file drops before running the commit. Don't commit code that hasn't been verified running.
-- **If Claude's code doesn't work**: have the student describe the failure to Claude. "The summary file isn't showing up" is enough for Claude to diagnose. This is the whole vibe-coding pattern — they describe, Claude fixes.
+- **Use the pre-written extension files — never generate from scratch.** The three options in `stage-2/extensions/` are tested and ready. Read the matching file, make the two changes (import + call), and you're done. Generating new code introduces failure modes that have nothing to do with the lesson.
+- **The integration is always two lines.** One import at the top of `workflow.js`, one function call inside `runWorkflow()`. If you're making more than two changes, stop and re-read the extension file.
+- **Never ask the student to edit code directly** — all changes go through "tell Claude [what you want]." If a student reaches for a file to edit it, redirect: "Just describe what you want and I'll wire it in."
+- **For Option 2 (Slack)** — warn them upfront it requires creating a Slack app and webhook before anything else. If they're not sure they want to do that, suggest Option 1 instead.
+- **If the new step doesn't fire**, read the terminal error and diagnose from there. Common causes: server wasn't restarted (Step 5 fix), import path wrong, `.env` missing the webhook URL. Fix the specific issue — don't rewrite the extension.
+- **Test before committing** — confirm the new step fires before running the commit.
 
 ## Optional deeper reading
 
