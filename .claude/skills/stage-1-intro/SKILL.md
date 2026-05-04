@@ -172,4 +172,6 @@ Wrap and update progress:
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-an-api.md` — the doorbell metaphor and a deeper explanation of what APIs are

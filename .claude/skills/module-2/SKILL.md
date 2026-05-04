@@ -136,6 +136,8 @@ Stop and say:
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-an-api.md` — the doorbell metaphor in full
 - `concepts/what-is-a-system-prompt.md` — preview for Module 3
 

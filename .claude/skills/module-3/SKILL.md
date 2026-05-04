@@ -179,5 +179,7 @@ Click the **Chat Assistant** node on the diagram. Show the inspect panel — thi
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-an-agent.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-an-agent.md` — the three-level hierarchy, with additional context on how agents compose
 - `concepts/what-is-a-system-prompt.md` — deeper reference on how system prompts control model behavior

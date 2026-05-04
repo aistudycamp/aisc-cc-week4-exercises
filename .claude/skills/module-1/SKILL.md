@@ -145,6 +145,8 @@ Ask:
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-an-agent.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-an-agent.md` — the three-level hierarchy (chat assistant → workflow → agentic system) in detail
 - `concepts/what-is-an-orchestrator.md` — deeper on how orchestrators coordinate specialists
 - `concepts/systems-thinking.md` — systems-thinking vocabulary for talking about agents

@@ -191,4 +191,6 @@ Listen. Reflect back. The point is to plant the seed: this pattern is portable. 
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/agent-archetypes.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/agent-archetypes.md` — patterns for how to think about any new agent you build next

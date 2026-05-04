@@ -193,4 +193,6 @@ Ctrl+C in the watcher's terminal.
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-a-workflow.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-a-workflow.md` — full workflow reference, including trigger types and the comparison to chat assistants

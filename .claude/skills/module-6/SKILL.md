@@ -171,6 +171,8 @@ Click into each node on the diagram. Show the inspect panels.
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-an-orchestrator.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-an-orchestrator.md` — goes deeper on orchestration patterns and sequential vs. parallel dispatch
 - `concepts/what-is-a-workflow.md` — compare the workflow pattern to the agentic system you just built
 - `concepts/what-is-an-agent.md` — re-read the hierarchy section now that you've built all three levels

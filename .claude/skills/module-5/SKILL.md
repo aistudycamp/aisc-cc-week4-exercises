@@ -150,4 +150,6 @@ If something's off, describe it to Claude. "The workflow ran but the summary fil
 
 ## Optional deeper reading
 
+Just ask me: *"Read concepts/what-is-a-workflow.md and walk me through it."* I'll pull it up and explain it.
+
 - `concepts/what-is-a-workflow.md` — deeper reference on workflow patterns, trigger types, and when to use a workflow vs. an agentic system
