@@ -1,181 +1,157 @@
 ---
 name: module-5
-description: Extend the Workflow — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Student picks one of three pre-written extensions, tells Claude to add it to workflow.js, and runs it to confirm the new step fires. The vibe coding lesson — "I extended a running system by describing what I wanted" — with zero code-generation risk because the extension code is already written.
+description: Specialists & Prompts — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Two acts. Act 1: quick look at how the workflow is pluggable (extensions). Act 2: show how the chat assistant evolves into three specialists by swapping system prompts — analyst, extractor, synthesizer. The "same ask() function, different system prompt = different specialist" moment.
 ---
 
-# Module 5: Extend the Workflow
+# Module 5: Specialists & Prompts
 
 **Time:** ~20 minutes
-**You'll produce:** an extended workflow with one additional step — added by telling Claude what you want, not by editing code yourself.
+**You'll produce:** a deep understanding of how one function call + three different system prompts creates three distinct specialist agents — the building blocks Stage 3 depends on.
 
 ## Coach Instructions
 
-This module teaches the vibe-coding pattern: describe what you want → Claude applies it → you run it → you see it work. No student should touch a line of code directly.
+Two acts. Act 1 is short (5 min) — show that the workflow is pluggable, don't dwell on it. Act 2 is the point: students see how the chat assistant they built in Stage 1 becomes three specialists just by swapping the system prompt. **They don't write these prompts — they're pre-written. The lesson is understanding what makes each specialist different.**
 
-Three pre-written, tested extensions live in `stage-2/extensions/`:
-- `save-summary.js` — generates an AI summary and saves it alongside the transcript
-- `json-log.js` — appends a JSON record to a log file after each classification
-- `slack-notify.js` — posts a Slack message with the meeting type and filename
+## Act 1: The Workflow Is Pluggable (~5 min)
 
-When a student picks an option, read the matching extension file and integrate it into `workflow.js` — two changes: one import line at the top, one function call at the end of `runWorkflow()`. Do not generate extension code from scratch.
-
-## Step 1: Set the frame (2 min)
+### Step 1: Set the frame (1 min)
 
 Say:
 
-> "Your workflow classifies and routes files automatically. That's already useful. But what if you wanted it to do more? Save a summary alongside the transcript? Post to Slack? Keep a log?
->
-> Here's the key insight: **the pipeline is just a sequence of steps**. Adding a new step means describing what you want at the end of the sequence. You tell me what you want in plain English. I wire it in. You run it and see it work.
->
-> That's vibe coding. You're the director. I'm the developer."
+> "Before we move into Stage 3, a quick note about the workflow you built. It classifies and routes — that's its core job. But the output side is pluggable. You could swap the macOS notification for anything."
 
-## Step 2: Pick a new step (3 min)
-
-Show them the options:
+Show them the extension options without dwelling on them:
 
 ```
-  1. Save a summary  — after routing, also save a one-paragraph AI summary
-     alongside the transcript file. Both land in the same folder.
-
-  2. Slack notification — post the meeting type and filename to a Slack channel.
-     Feels real. Team can see it land in real time.
-
-  3. JSON log — append { timestamp, classification, filename } to a log file.
-     Useful if you want to analyze trends across many transcripts.
+  What you could add to the workflow's output:
+  ─────────────────────────────────────────────
+  save-summary.js     — AI summary saved alongside the transcript
+  json-log.js         — JSON record appended to a log file
+  slack-notify.js     — Slack message with meeting type + filename
 ```
 
-Ask: **"Which feels most useful or fun to you? Pick one."**
+> "These are pre-written and ready to wire in. The pattern: one import line at the top of `workflow.js`, one function call at the end of `runWorkflow()`. That's it. If you want to try one, say so and I'll wire it in. But the bigger thing is Stage 3 — let's go there."
 
-## Step 3: Tell Claude to add it (5 min)
+**Coach:** If the student wants to add an extension, do it — two lines, confirm it fires, move on. Don't spend more than 5 minutes here.
 
-The student describes what they want. You apply the matching pre-written extension.
+---
 
-### Option 1: Save a summary
+## Act 2: How Specialists Are Made (~15 min)
 
-Have the student say:
+### Step 2: Set the frame (2 min)
 
-> "Add the save-summary extension to my workflow."
+Say:
 
-Read `stage-2/extensions/save-summary.js`. Make two changes to `workflow.js`:
+> "The chat assistant you built in Module 2 is a single specialist. It has one job because of one file: `prompts/system.md`. That file says: 'You are a meeting analyst. Answer questions directly.'
+>
+> Stage 3 needs three specialists: one that finds themes, one that pulls action items, and one that synthesizes both into a final report. Here's the thing: **each one is just the chat assistant with a different system prompt.** Same `ask()` function. Same API call. Different personality, different job, different output.
+>
+> Let's look at them."
 
-1. Add at the top (with the other imports):
-   ```js
-   import { saveSummary } from './extensions/save-summary.js';
-   ```
-2. Add inside `runWorkflow()`, after the `notify()` call:
-   ```js
-   await saveSummary(transcript, outputPath);
-   ```
+### Step 3: Read the specialist prompts side by side (6 min)
 
-### Option 2: Slack notification
-
-First, the student needs a Slack webhook URL:
-1. Go to `api.slack.com/apps` → Create New App → Incoming Webhooks → Activate → Add to Workspace → pick a channel → copy the URL.
-2. Have the student say: "Add `SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...` to my `.env` file."
-
-Then have the student say:
-
-> "Add the slack-notify extension to my workflow."
-
-Read `stage-2/extensions/slack-notify.js`. Make two changes to `workflow.js`:
-
-1. Add at the top:
-   ```js
-   import { slackNotify } from './extensions/slack-notify.js';
-   ```
-2. Add inside `runWorkflow()`, after the `notify()` call:
-   ```js
-   await slackNotify(result.type, outputPath);
-   ```
-
-### Option 3: JSON log
-
-Have the student say:
-
-> "Add the JSON log extension to my workflow."
-
-Read `stage-2/extensions/json-log.js`. Make two changes to `workflow.js`:
-
-1. Add at the top:
-   ```js
-   import { logToJson } from './extensions/json-log.js';
-   ```
-2. Add inside `runWorkflow()`, after the `notify()` call:
-   ```js
-   logToJson(result.type, sourceFilename, outputPath);
-   ```
-
-## Step 4: Test it (3 min)
-
-Start the watcher, drop a test file, confirm both the routing AND the new step fire:
+In the current terminal, from `student-output/`:
 
 ```bash
-npm run stage-2
-# second terminal:
-npm run drop-test
+cat prompts/analyst.md
 ```
 
-**Option 1 — check the folder:**
+Read it together. Point out:
+
+> "The role: 'You are a meeting analyst.' The output format: KEY THEMES and KEY DECISIONS. Rules: use names from the transcript, don't pad. This is a focused specialist — one job."
+
+Then:
+
 ```bash
-ls transcripts/team-standup/
+cat prompts/extractor.md
 ```
-Two files should appear: the original transcript and a `-summary.txt` alongside it.
 
-**Option 2 — check Slack:** the message should appear in the channel within a few seconds.
+> "Different specialist. Role: action item extractor. Output: JSON with owner, task, deadline for every action item. Rules: only output valid JSON. That JSON rule is critical — the orchestrator parses this output programmatically."
 
-**Option 3 — check the log:**
+Then:
+
 ```bash
-cat outputs/log.jsonl
+cat prompts/synthesizer.md
 ```
-One JSON line per transcript processed.
 
-If the new step doesn't fire, check the error in the terminal and tell Claude what you see. "The summary file isn't appearing — the terminal shows [error]" gives Claude exactly what it needs to diagnose.
+> "Third specialist. It receives the other two specialists' output and synthesizes them into the final structured report. It's downstream — it needs the analyst and extractor to finish first. That's why Stage 3 sequences them the way it does."
 
-## Step 5: Verify it in the browser (2 min)
+Ask:
 
-Restart the server first to pick up the workflow changes — press `Ctrl+C` in the server terminal, then run `npm run server` again.
+> "What's different between these three files?"
 
-Now confirm the new step fires through the live interface. Switch to **http://localhost:3000**, click the **Stage 2 tab**, load the sample transcript, and hit **Run Workflow**.
+Wait for their answer. The key insight: **the format instruction** — each specialist's output format is totally different. That's not a coincidence; it's the whole design.
 
-> "You should see the same classification result you got in the terminal. The new step you added — does it also fire? Check the terminal logs while you click Run Workflow in the browser."
+> "Right. Same function, same API call, different format instruction in the system prompt = a different kind of output. That's the lever. When you see an AI product that does something specific and useful, this is usually what's happening underneath: a focused system prompt telling it exactly what shape to return."
 
-> "This is the full loop: describe → applied → terminal confirms → browser confirms. You extended a running system and verified it without touching a line of code."
+### Step 4: Open the browser — inspect each specialist (4 min)
 
-## Step 6: The big idea (2 min)
+Open **http://localhost:3000** and click the **Stage 3** tab.
 
-> "Look at what you just did. You extended a running automated system by describing what you wanted. No file paths. No syntax. No 'which line do I put this on?' You just said what you needed and it happened.
+Click each specialist node on the diagram:
+
+- **Analyst node** — the inspect panel shows `prompts/analyst.md`. This is the same file you just `cat`'d.
+- **Extractor node** — shows `prompts/extractor.md`.
+- **Synthesizer node** — shows `prompts/synthesizer.md`.
+
+> "The diagram is a window into your code. Each node maps to a prompt file. The prompt file IS the specialist."
+
+Point to the orchestrator node:
+
+> "The orchestrator doesn't have a personality — it coordinates. Analyst and Extractor run in parallel. Then Synthesizer takes both results and combines them. Then Router classifies and saves. That sequence is what you'll look at in Module 6."
+
+### Step 5: The key insight (2 min)
+
+Stop and say:
+
+> "Here's the thing to hold onto:
 >
-> Now look at the shape of the pipeline:
+> - Stage 1: one system prompt (`system.md`) → one meeting analyst
+> - Stage 3: three system prompts → three specialists
 >
->     File drops in → Classify → Route → [your new step]
+> The `ask()` function doesn't change. The Anthropic API call doesn't change. Only the system prompt changes. And that changes everything about what the agent does.
 >
-> Each step adds capability. The trigger doesn't change. The classification doesn't change. The rest of the pipeline stays exactly the same. **You composed a new behavior without touching what was already working.**"
-
-## Step 7: The handoff (30 seconds)
-
-> "Stage 2 complete. You built a pipeline that fires without you, makes an AI decision, routes files, and outputs to multiple destinations.
+> In Stage 1 you felt that: you edited `system.md` and watched the output personality change completely. Same principle here — but now we're using three different prompts to create three different specialists that each do one focused job.
 >
-> Stage 3 is a different scale. Instead of a fixed sequence of steps, the orchestrator runs *three specialists in sequence* — each one handing its result back before the next one starts. And here's the payoff you've been set up for: two of those three specialists are the things you already built. Type `module-6` when you're ready."
+> This is the whole pattern of building agents: **every specialist is a system prompt.**"
 
-## Step 8: Wrap and commit (1 min)
+## Step 6: Wrap and commit (1 min)
+
+What you've built so far:
+
+```
+┌──────────────────────────────┐   ┌──────────────────────────────┐
+│  Stage 1 — Chat Assistant    │   │  Stage 2 — Workflow           │
+│  stage-1/chat.js             │   │  stage-2/workflow.js          │
+│  ask() · system.md           │   │  runWorkflow()                │
+└──────────────────────────────┘   │  classifier.md               │
+                                   └──────────────────────────────┘
+
+Specialist prompts (pre-written, ready for Stage 3):
+  prompts/analyst.md  ·  prompts/extractor.md  ·  prompts/synthesizer.md  ← you just read these
+```
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
-2. **Commit:**
+2. **Commit** — in a terminal at the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module 5: Extend the Workflow"
+   git add -A && git commit -m "Complete Module 5: Specialists & Prompts"
    ```
+3. **Run `/compact`** — type `/compact` to clear context before Module 6.
+4. Hand off:
+
+> "You now have all the pieces: a chat assistant, a workflow, and three specialist prompts. Stage 3 is just wiring them together. In Module 6 you'll see the orchestrator that coordinates them — and there's one new idea we haven't introduced yet. Type `module-6` when you're ready."
 
 ## Coach Guardrails
 
-- **Use the pre-written extension files — never generate from scratch.** The three options in `stage-2/extensions/` are tested and ready. Read the matching file, make the two changes (import + call), and you're done. Generating new code introduces failure modes that have nothing to do with the lesson.
-- **The integration is always two lines.** One import at the top of `workflow.js`, one function call inside `runWorkflow()`. If you're making more than two changes, stop and re-read the extension file.
-- **Never ask the student to edit code directly** — all changes go through "tell Claude [what you want]." If a student reaches for a file to edit it, redirect: "Just describe what you want and I'll wire it in."
-- **For Option 2 (Slack)** — warn them upfront it requires creating a Slack app and webhook before anything else. If they're not sure they want to do that, suggest Option 1 instead.
-- **If the new step doesn't fire**, read the terminal error and diagnose from there. Common causes: server wasn't restarted (Step 5 fix), import path wrong, `.env` missing the webhook URL. Fix the specific issue — don't rewrite the extension.
-- **Test before committing** — confirm the new step fires before running the commit.
+- **Act 1 is a detour — don't let it take over.** If the student is curious about extensions, do it quickly (two lines, confirm it fires) and move on. The specialists lesson is the point of this module.
+- **Don't generate extension code from scratch.** The three options in `stage-2/extensions/` are tested and ready. If you add one, read the file and make exactly two changes: one import, one call.
+- **Students don't write the specialist prompts** — they're pre-written. The lesson is *reading* them and understanding what makes each one different.
+- **The JSON rule in extractor.md is load-bearing** — the orchestrator parses extractor's output with `JSON.parse()`. If a student asks why the prompt is so strict about JSON format, explain this.
+- **The "same function, different prompt" insight is the whole lesson.** If students grasp that, Module 6 will click immediately.
 
 ## Optional deeper reading
 
-Just ask me: *"Read concepts/what-is-a-workflow.md and walk me through it."* I'll pull it up and explain it.
+Just ask me: *"Read concepts/what-is-a-system-prompt.md and walk me through it."*
 
-- `concepts/what-is-a-workflow.md` — deeper reference on workflow patterns, trigger types, and when to use a workflow vs. an agentic system
+- `concepts/what-is-a-system-prompt.md` — deeper reference on how system prompts control model behavior
+- `concepts/what-is-an-orchestrator.md` — preview for Module 6

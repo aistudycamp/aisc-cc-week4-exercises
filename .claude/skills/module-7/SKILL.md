@@ -32,7 +32,7 @@ Open **http://localhost:3000**.
 
 ## Step 3: Stage 1 tab — chat with your assistant (4 min)
 
-Click the **Stage 1** tab. Load the sample transcript. Ask 3 questions:
+Click the **Stage 1** tab. Load the sample transcript (click "Load standup"). Ask 3 questions:
 
 ```
 What are the top action items?
@@ -43,6 +43,8 @@ Write a one-sentence Slack summary of this meeting.
 After each response:
 
 > "That response came from your `chat.js` → the `ask()` function → the `system.md` prompt you edited in Module 3. Same chain. Now running in a browser."
+
+Notice the **Show JSON** button that appears after the first response — click it to see the raw request and response payload. That's the same JSON from Module 2, now visible in the browser instead of the terminal.
 
 Click the **Chat Assistant** node on the diagram. Show the inspect panel.
 
@@ -60,28 +62,27 @@ Try dropping a different transcript if you have one. The classification changes.
 
 ## Step 5: Stage 3 tab — run the full orchestrator (6 min)
 
-Click the **Stage 3** tab. Load the sample transcript. Hit **Run Orchestrator →**.
+Click the **Stage 3** tab. Load the sample transcript (click "Load standup"). Hit **Run Orchestrator →**.
 
 Watch each step light up:
 
 ```
-Step 1 ✓  Chat assistant: executive summary     (your ask() from Stage 1)
-Step 2 ✓  Chat assistant: action items          (your ask() from Stage 1)
-Step 3 ✓  Workflow: classify + route            (your runWorkflow() from Stage 2)
-Step 4 ✓  Synthesize final report               (final assembly)
+Step 1 ✓  Analyst + Extractor (parallel)  ← both running at the same time
+Step 2 ✓  Synthesizer                     ← combines both outputs
+Step 3 ✓  Router: classify + save + notify ← your runWorkflow() from Stage 2
 ```
 
 The full report appears below.
 
-> "Each one of those check marks is a real API call completing. You can see the order: the chat assistant runs twice, then the workflow runs, then synthesis. That's `orchestrator.js` executing in your browser."
+> "Each one of those check marks is a real API call completing. Step 1 fires Analyst and Extractor simultaneously — that's the parallel dispatch from Module 6. Step 2 is Synthesizer. Step 3 is the workflow you built in Module 4. That's `orchestrator.js` executing in your browser."
 
 While the orchestrator runs: click each node on the diagram and point to the code behind it.
 
-> "Orchestrator → `stage-3/orchestrator.js`. The ask() nodes → `stage-1/chat.js`. The workflow node → `stage-2/workflow.js`. You wrote every file behind this diagram."
+> "Orchestrator → `stage-3/orchestrator.js`. The Analyst and Extractor nodes → `prompts/analyst.md` and `prompts/extractor.md`. The Synthesizer → `prompts/synthesizer.md`. The Router → `stage-2/workflow.js`. You touched every file behind this diagram."
 
 ## Step 6: Screenshot moment (2 min)
 
-> "This is the share-worthy moment. Stage 3 tab, all four steps checked, report visible below. Take a screenshot."
+> "This is the share-worthy moment. Stage 3 tab, all three steps checked, report visible below. Take a screenshot."
 
 Have them save it somewhere accessible (Desktop, screenshots folder).
 
@@ -89,12 +90,25 @@ Have them save it somewhere accessible (Desktop, screenshots folder).
 
 ## Step 7: Wrap and commit (1 min)
 
+What you've built so far:
+
+```
+┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │
+│  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
+│  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
+└────────────┘   └────────────┘   │            ↓ [Synthesizer]            │
+                                  │            ↓ [Router]                 │
+                                  └──────────────────────────────────────┘
+```
+
 1. **Update `CLAUDE.md`**: change `- [ ] Module 7:` to `- [x] Module 7:`
-2. **Commit:**
+2. **Commit** — in any terminal at the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 7: Use Your Live System"
    ```
-3. Hand off:
+3. **Run `/compact`** — type `/compact` to clear context before Module 8.
+4. Hand off:
 
 > "One module to go. The agent works on meeting transcripts — but what if it worked on *your* thing? Module 8 is where you make it yours. Type `module-8` when you're ready."
 

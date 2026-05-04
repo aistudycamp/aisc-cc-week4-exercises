@@ -45,10 +45,13 @@ function notify(title, message) {
 
 // ─── Building block: run the full pipeline for one transcript ─────────────
 // Step 1: AI classifies the meeting type
-// Step 2: Route the file to the right folder
+// Step 2: Route the file to the right folder (team-standup, client-call, planning-session, or other)
 // Step 3: Send a notification
 // Returns: { classification, outputPath }
-export async function runWorkflow(transcript, sourceFilename = "transcript.txt") {
+//
+// Stage 3 passes an optional `report` — if provided, the synthesized report is
+// saved alongside the transcript in the same typed folder.
+export async function runWorkflow(transcript, sourceFilename = "transcript.txt", report = null) {
   // Step 1 — classify
   console.log("  🔍 Classifying meeting type...");
   const result = await classify(transcript);
@@ -60,6 +63,14 @@ export async function runWorkflow(transcript, sourceFilename = "transcript.txt")
   const outputPath = path.join(destDir, result.suggested_filename);
   fs.writeFileSync(outputPath, transcript, "utf-8");
   console.log(`  ✓ Routed → transcripts/${result.type}/${result.suggested_filename}`);
+
+  // Save synthesized report alongside transcript (Stage 3 only)
+  if (report) {
+    const reportFilename = result.suggested_filename.replace(/\.(txt|md)$/, "") + "-report.md";
+    const reportPath = path.join(destDir, reportFilename);
+    fs.writeFileSync(reportPath, report, "utf-8");
+    console.log(`  ✓ Report  → transcripts/${result.type}/${reportFilename}`);
+  }
 
   // Step 3 — notify
   notify("Agent Sprint Workflow", `Routed to: ${result.type}`);

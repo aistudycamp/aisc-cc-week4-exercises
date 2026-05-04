@@ -81,7 +81,21 @@ Wait for their answer. The answer: `runWorkflow`. The point: the same export pat
 
 ## Step 4: Start the workflow (2 min)
 
-Have them run:
+You'll need three terminals for this module. Set them up before running anything:
+
+```
+Terminal 1 (already open)   npm run server       ← already running from Module 3, keep it
+Terminal 2 (open now)       npm run stage-2      ← watcher, stays running
+Terminal 3 (open now)       npm run drop-test    ← one-shot trigger
+```
+
+Open a new terminal tab — `Cmd+T` on Mac. Navigate to your project folder:
+
+```bash
+cd <path-to-your-repo>/student-output
+```
+
+In Terminal 2, start the watcher:
 
 ```bash
 npm run stage-2
@@ -99,10 +113,10 @@ They should see:
 
 ## Step 5: Trigger it (6 min)
 
-Open a **second terminal tab** — on Mac: `Cmd+T` opens a new tab in the same window. In that second terminal, navigate to your project:
+Open Terminal 3 — `Cmd+T` for a new tab. Navigate to `student-output/`:
 
 ```bash
-cd student-output
+cd <path-to-your-repo>/student-output
 npm run drop-test
 ```
 
@@ -121,9 +135,11 @@ This copies the sample transcript into `incoming/` automatically. Watch the watc
   Saved:   transcripts/team-standup/2026-04-29-team-standup.txt
 ```
 
-A macOS notification should also appear in the top-right corner: **"Routed to: team-standup"**
+A macOS notification should appear in the top-right corner of the screen: **"Routed to: team-standup"**. This is a built-in macOS banner — nothing to install, it comes from the `osascript` command in the workflow.
 
 > "The pipeline fired. You didn't type anything. You dropped a file. The AI classified it, routed it, and notified you — all automatically. Check the folder:"
+
+In Terminal 3 (still in `student-output/`):
 
 ```bash
 ls transcripts/team-standup/
@@ -133,7 +149,7 @@ There's the routed transcript. Drop a few more via `npm run drop-test` to show t
 
 ## Step 6: Trigger it from the browser (4 min)
 
-If the server isn't running, start it:
+Terminal 1 should still have the server running. If it crashed, restart it in Terminal 1:
 
 ```bash
 npm run server
@@ -155,8 +171,10 @@ Hit **Run Agent** to watch the Stage 2 architecture animation.
 
 ## Step 7: Stop the watcher cleanly (1 min)
 
+In Terminal 2 (the watcher):
+
 ```
-Ctrl+C in the watcher's terminal.
+Ctrl+C
 ```
 
 > "The pipeline stops listening. Nothing else changes. The classified transcripts stay in their folders."
@@ -170,16 +188,44 @@ Ctrl+C in the watcher's terminal.
 >
 > The AI made a decision — that's the intelligence. The pipeline handled the rest — that's the automation.
 >
-> Chat assistants are great for back-and-forth. Workflows are great for automated, event-triggered processing. Once you see this pattern, you can swap any trigger and any output. An incoming email. A Slack message. A file from Google Drive. The pipeline doesn't care. **The trigger and the output steps are pluggable.**"
+> The macOS notification was the output step. You could swap it for anything. Three examples on the output side:"
+
+Print this:
+
+```
+  Trigger side — what fires the pipeline:    Output side — what happens at the end:
+  ─────────────────────────────────────      ─────────────────────────────────────
+  File dropped into a folder                 macOS notification (what you just saw)
+  Email arriving in an inbox                 Slack message to a channel
+  Scheduled timer (every 6 hours)            Write a row to a spreadsheet
+
+  The classify-and-route logic in the middle stays the same.
+  The trigger and destination are the pluggable parts.
+```
+
+> "Chat assistants are great for back-and-forth. Workflows are great for automated, event-triggered processing. Once you see this pattern, you start seeing it everywhere — any 'something happens → AI decides → something else happens' problem is a workflow."
 
 ## Step 9: Wrap and commit (2 min)
 
+What you've built so far:
+
+```
+┌──────────────────────────────┐   ┌──────────────────────────────┐
+│  Stage 1 — Chat Assistant    │   │  Stage 2 — Workflow           │  ← you just built this
+│  stage-1/chat.js             │   │  stage-2/workflow.js          │
+│  ask() · system.md           │   │  runWorkflow()                │
+└──────────────────────────────┘   │  classifier.md               │
+                                   └──────────────────────────────┘
+```
+
 1. **Update `CLAUDE.md`**: change `- [ ] Module 4:` to `- [x] Module 4:`
-2. **Commit:**
+2. **Commit** — use Terminal 3 (or any terminal at the repo root):
    ```bash
    git add -A && git commit -m "Complete Module 4: Build the Workflow"
    ```
-3. Hand off:
+   *(Keep Terminal 1 running the server — you'll use it in Module 5.)*
+3. **Run `/compact`** — type `/compact` to clear context before Module 5.
+4. Hand off:
 
 > "Stage 2 running. In Module 5 we'll extend the pipeline — add a new step by telling Claude what you want, not by editing code. Type `module-5` when you're ready."
 

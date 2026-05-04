@@ -28,11 +28,10 @@ Print this:
    CHAT ASSISTANT      →      WORKFLOW            →      AGENTIC SYSTEM
 
    You paste a                A file drops into a        An orchestrator
-   transcript, ask            folder. AI classifies      calls three
-   questions, get             the meeting, routes        specialists in
-   answers back.              the file, sends a          sequence, then
-                              notification.              synthesizes a
-                                                         final report.
+   transcript, ask            folder. AI classifies      runs two specialists
+   questions, get             the meeting, routes        in parallel, then a
+   answers back.              the file, sends a          third synthesizes
+                              notification.              the final report.
 
    ~1 hour                    ~45 min                    ~1 hour
 ```
@@ -47,7 +46,7 @@ Say:
 
 > "Quick prereq check. We'll be writing JavaScript — no React, no Next.js, just simple Node scripts. Let's make sure Node is installed."
 
-Run for them:
+In the current terminal:
 
 ```bash
 node --version
@@ -84,7 +83,7 @@ Now scaffold the working folder. Confirm they're ready:
 
 > "Ready to set up your project folder? This copies the starter template into `student-output/` — that'll be your working directory for the whole sprint."
 
-Wait for them to confirm (a "yes" or "yep" or "go for it"). Then run:
+Wait for them to confirm (a "yes" or "yep" or "go for it"). Then in the current terminal, from the repo root:
 
 ```bash
 command cp -R templates/transcripts-to-insights/. student-output/
@@ -119,7 +118,9 @@ student-output/
 
 ## Step 5: Install dependencies + add API key (3 min)
 
-Two steps. Walk them through both:
+Two steps. Walk them through both. (You're still in `student-output/` from Step 4.)
+
+In the current terminal:
 
 ```bash
 # Install the packages (Anthropic SDK, chokidar for watching files, dotenv for the key)
@@ -153,11 +154,12 @@ Explain inline (don't make them open a file):
 Wrap and update progress:
 
 1. **Update `CLAUDE.md`**: change `- [ ] Stage 1 Intro:` to `- [x] Stage 1 Intro:`
-2. **Commit:**
+2. **Commit** — in the current terminal, from the repo root (one level up from `student-output/`):
    ```bash
    git add -A && git commit -m "Complete Stage 1 Intro: setup + API key"
    ```
-3. Say:
+3. **Run `/compact`** — type `/compact` to clear the context window before moving to the next module. This keeps Claude focused and fast.
+4. Say:
 
 > "You're set up. Project scaffolded, API key in place, dependencies installed. When you're ready, type `module-1` and we'll do the systems-thinking tour."
 

@@ -32,7 +32,7 @@ Before we run anything, name the three roles in every AI conversation:
 
 ## Step 3: Run it with a transcript (8 min)
 
-Run with the sample transcript pre-loaded:
+In the current terminal, from `student-output/`:
 
 ```bash
 npm run stage-1 -- transcripts/sample-transcript.txt
@@ -65,11 +65,19 @@ When done:
 > exit
 ```
 
-## Step 4: Open and read the system prompt (3 min)
+## Step 4: Read the system prompt (3 min)
 
-Have Claude open `prompts/system.md`:
+Print the system prompt inline. In the current terminal, from `student-output/`:
 
-> "Tell Claude: 'Show me the contents of prompts/system.md'"
+```bash
+cat prompts/system.md
+```
+
+If they want to view it in an editor, they can also run:
+
+```bash
+code prompts/system.md
+```
 
 Read it together. Land:
 
@@ -85,7 +93,7 @@ Have the student say to Claude:
 
 > "Tell Claude: 'Update prompts/system.md — change the first line to: You are a sarcastic meeting analyst who has seen too many standups.'"
 
-After Claude edits it, re-run:
+After Claude edits it, re-run in the current terminal:
 
 ```bash
 npm run stage-1 -- transcripts/sample-transcript.txt
@@ -99,13 +107,21 @@ Have the student say to Claude:
 
 > "Tell Claude: 'Update prompts/system.md — replace the KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format with: **TLDR** (one sentence), **WHO OWES WHAT** (bullet list of person + task), **SHOULD I CARE?** (Yes/No and why)'"
 
-Re-run. Different shape entirely.
+In the current terminal:
+
+```bash
+npm run stage-1 -- transcripts/sample-transcript.txt
+```
+
+Different shape entirely.
 
 > "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output is shaped by it."
 
 ### Step 5c: Restore the original prompt ⚠️ (required)
 
 Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
+
+In the current terminal, from `student-output/`:
 
 ```bash
 cp prompts/system-original.md prompts/system.md
@@ -127,7 +143,7 @@ Then restore.
 
 ## Step 6: Use it in the browser (4 min)
 
-Start the server — this runs until the student is done with the course:
+Start the server — this runs until the student is done with the course. In the current terminal, from `student-output/`:
 
 ```bash
 npm run server
@@ -141,7 +157,7 @@ You'll see:
 
 Open **http://localhost:3000** in the browser. Make sure the **Stage 1** tab is active.
 
-On the right side you'll see the live interface. Click **Load sample transcript**, then ask the same 4 questions they asked in the terminal:
+On the right side you'll see the live interface. Click **Load standup**, then ask the same 4 questions they asked in the terminal:
 
 ```
 What are the top 3 action items?
@@ -160,12 +176,25 @@ Click the **Chat Assistant** node on the diagram. Show the inspect panel — thi
 
 ## Step 7: Wrap and commit (1 min)
 
+What you've built so far:
+
+```
+┌──────────────────────────────┐
+│  Stage 1 — Chat Assistant    │  ← running live in the browser
+│  stage-1/chat.js             │
+│  ask() · system.md prompt    │
+│  server running at :3000     │
+└──────────────────────────────┘
+```
+
 1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:`
-2. **Commit:**
+2. **Commit** — open a new terminal tab (`Cmd+T`), navigate to the repo root, then:
    ```bash
    git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
    ```
-3. Hand off:
+   *(Leave the server terminal running — you'll use it in Module 4.)*
+3. **Run `/compact`** — type `/compact` to clear context before Module 4.
+4. Hand off:
 
 > "Stage 1 done. You have a working chat assistant — interactive, back-and-forth, and driven entirely by a system prompt you can change anytime. Next: Stage 2. We build something that runs *automatically* every time a file appears — no typing required. Type `module-4` when you're ready."
 

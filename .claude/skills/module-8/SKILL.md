@@ -49,49 +49,32 @@ If they pick "Custom," ask:
 2. **What two specialists** make sense? (the equivalents of "themes" and "actions")
 3. **What does the final report** look like?
 
-## Step 3: Edit the orchestrator's prompt (5 min)
+## Step 3: Edit the analyst and synthesizer prompts (5 min)
 
-Have the student describe what they want, then tell Claude to update the file:
+The three prompts that define this agent: `analyst.md`, `extractor.md`, `synthesizer.md`.
+
+Have the student describe what they want, then tell Claude to update the files.
 
 For customer interviews, the student would say to Claude:
 
-> "Tell Claude: 'Update prompts/system.md to be a customer interview analyst. Change the role to: You are a customer interview analyst. Change the output format to: **JTBD THEMES** (what the user is fundamentally trying to accomplish), **VERBATIM QUOTES** (exact quotes from the interview), **WHAT TO DO ABOUT IT** (one sentence on the implication for the product).'"
+> "Tell Claude: 'Update prompts/analyst.md — change the role to: You are a customer interview analyst. Change the output format sections to: JTBD THEMES (what the user is fundamentally trying to accomplish) and KEY INSIGHTS (surprising or non-obvious findings from the interview).'"
 
-Coach: help them phrase this for their specific use case. The pattern is always: "Tell Claude: 'Update prompts/system.md to be a [role]. Change the output format to: [their desired sections].'"
+Coach: help them phrase this for their specific use case. The pattern for each file: "Tell Claude: 'Update prompts/[file].md — change the role to [role]. Change the output format to [their desired format].'"
 
-## Step 4: Edit the sub-agent prompts (5 min)
+## Step 4: Edit the extractor prompt (3 min)
 
-Now `prompts/summarizer.md` and `prompts/action_extractor.md`.
+Now `prompts/extractor.md`. This one returns JSON — be careful. Have them swap the **labels** but keep the JSON-only rule and the schema.
 
-These return JSON, so be careful. Have them swap the **labels** but keep the JSON-only rule and the schema.
+For customer interviews, the extractor might pull verbatim quotes:
 
-For customer interviews, the summarizer might find "JTBD themes" and the extractor might find "verbatim quotes":
-
-`prompts/summarizer.md`:
-```
-You are a JTBD (Jobs to Be Done) theme finder.
-
-Given a customer interview, identify the 3 most prominent
-"jobs to be done" — the underlying tasks or goals the customer is trying to accomplish.
-
-Return ONLY a JSON object:
-
-{
-  "themes": [
-    { "label": "Job to be done", "summary": "Evidence from the interview." },
-    ...
-  ]
-}
-```
-
-`prompts/action_extractor.md`:
+`prompts/extractor.md`:
 ```
 You are a verbatim quote extractor.
 
 Given a customer interview, find the 5 most striking direct quotes
 that capture the customer's pain or desire.
 
-Return ONLY a JSON object:
+Return ONLY valid JSON:
 
 {
   "actions": [
@@ -100,13 +83,13 @@ Return ONLY a JSON object:
 }
 ```
 
-(Note: keep the field names — `owner`, `task`, `deadline` — even if the meaning shifts. The orchestrator code expects them.)
+(Note: keep the field names — `owner`, `task`, `deadline` — even if the meaning shifts. The orchestrator parses this JSON programmatically.)
 
 Save.
 
 ## Step 5: Bring a real input (3 min)
 
-Have them grab a real document and put it in `transcripts/`:
+Have them grab a real document and put it in `transcripts/`. In the current terminal, from `student-output/`:
 
 ```bash
 cp /path/to/their-real-document.txt transcripts/real-input.txt
@@ -122,7 +105,11 @@ Anything ~300+ words works.
 
 ## Step 6: Run it — in the browser (3 min)
 
-Restart the server to pick up the edited prompts — `Ctrl+C` in the server terminal, then `npm run server`.
+Restart the server to pick up the edited prompts. In Terminal 1 (the server terminal): `Ctrl+C`, then:
+
+```bash
+npm run server
+```
 
 Open **http://localhost:3000**, click the **Stage 3** tab.
 
@@ -140,17 +127,18 @@ Take a screenshot of the Stage 3 panel with your personalized report showing.
 
 Save their personalized version somewhere they can find it later. The `student-output/` folder is theirs forever.
 
-Suggest they save the working version of the prompts:
+Suggest they save the working version of the prompts. In the current terminal, from `student-output/`:
 
 ```bash
-mkdir -p student-output/personalized
-cp prompts/system.md student-output/personalized/system.md
-cp prompts/summarizer.md student-output/personalized/summarizer.md
-cp prompts/action_extractor.md student-output/personalized/action_extractor.md
-cp transcripts/real-input.txt student-output/personalized/sample-input.txt
+mkdir -p personalized
+cp prompts/system.md personalized/system.md
+cp prompts/analyst.md personalized/analyst.md
+cp prompts/extractor.md personalized/extractor.md
+cp prompts/synthesizer.md personalized/synthesizer.md
+cp transcripts/real-input.txt personalized/sample-input.txt
 ```
 
-> "That `personalized/` folder is your take-home. Three prompts, one real input, one real output — your fingerprint on a multi-agent system."
+> "That `personalized/` folder is your take-home. Four prompts (analyst, extractor, synthesizer, system), one real input, one real output — your fingerprint on a multi-agent system."
 
 ## Step 8: Reflect (2 min)
 
@@ -162,11 +150,25 @@ Listen. Reflect back. The point is to plant the seed: this pattern is portable. 
 
 ## Step 9: Wrap and final commit (1 min)
 
+What you've built:
+
+```
+┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Personalized               │
+│  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
+│  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
+└────────────┘   └────────────┘   │            ↓ [Synthesizer]            │
+                                  │            ↓ [Router]                 │
+                                  │  personalized/ prompts saved          │
+                                  └──────────────────────────────────────┘
+```
+
 1. **Update `CLAUDE.md`**: change `- [ ] Module 8:` to `- [x] Module 8:`
-2. **Commit:**
+2. **Commit** — in any terminal at the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 8: Make It Yours"
    ```
+3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
 ## Step 10: Celebrate (genuinely — 1 min)
 
@@ -185,7 +187,7 @@ Listen. Reflect back. The point is to plant the seed: this pattern is portable. 
 
 - **Use only `npm run stage-3 -- transcripts/real-input.txt`** as the run command. Don't offer alternative invocation patterns — consistency matters at the sprint's most important moment.
 - **Use-case selection cap: 3 minutes** — if the student hasn't picked after 3 minutes, nudge them to the option that matches a document they have on their laptop right now.
-- **Warn about JSON field names before Step 4** — when editing the sub-agent prompts, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator code expects them. A student who renames these fields will get a confusing runtime error.
+- **Warn about JSON field names before Step 4** — when editing `prompts/extractor.md`, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator parses the extractor's output with `JSON.parse()` and expects those keys. A student who renames them will get a confusing runtime error.
 - **JTBD = Jobs to Be Done** — if the student doesn't recognize the term, explain it: "Jobs to Be Done — what the user is fundamentally trying to accomplish, not just what they're doing on the surface."
 - **If the output is bad, iterate** — bad first output is expected and pedagogically useful. Tune one prompt, re-run, compare. That process is the craft.
 

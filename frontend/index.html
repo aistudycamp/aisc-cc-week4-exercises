@@ -714,6 +714,10 @@
     border-color: var(--orch);
     box-shadow: 0 0 0 3px var(--orch-glow);
   }
+  .panel-textarea.drag-over {
+    border-color: var(--orch);
+    background: color-mix(in srgb, var(--orch-glow) 30%, transparent);
+  }
   .panel-input {
     width: 100%;
     padding: 8px 11px;
@@ -790,6 +794,19 @@
   }
 
   .panel-result { font-size: 13px; line-height: 1.5; animation: outIn 0.35s ease; }
+  .json-toggle-row { margin-top: 10px; }
+  .json-toggle-btn {
+    font-family: var(--mono); font-size: 11px;
+    background: none; border: 1px solid var(--border); border-radius: 4px;
+    padding: 3px 8px; cursor: pointer; color: var(--muted);
+  }
+  .json-toggle-btn:hover { color: var(--ink); border-color: var(--ink); }
+  .json-block {
+    margin-top: 8px; padding: 10px 12px;
+    background: #1a1a1a; color: #a8d1a8;
+    font-family: var(--mono); font-size: 11px; line-height: 1.5;
+    border-radius: 6px; overflow-x: auto; white-space: pre-wrap;
+  }
   .class-badge {
     display: inline-block;
     font-family: var(--mono);
@@ -999,7 +1016,7 @@
       <!-- Stage banners -->
       <div class="stage-banner" data-stages="1">— Stage 1 · <em>Chat assistant — one call, one conversation</em> —</div>
       <div class="stage-banner" data-stages="2">— Stage 2 · <em>Workflow — file drops in, AI classifies, routes to folder, sends notification</em> —</div>
-      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Agentic system — orchestrator runs three specialists in sequence, then synthesizes</em> —</div>
+      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Agentic system — Analyst + Extractor run in parallel, Synthesizer combines results, Router classifies + saves</em> —</div>
 
       <div class="sub-label" data-stages="3">— Orchestrator's <em>building blocks</em> —</div>
 
@@ -1161,10 +1178,10 @@
           <div class="ag-dot"></div>
         </div>
         <div class="ag-body">
-          <div class="ag-desc"><ul><li>Dispatches Summarizer + Extractor <em>in parallel</em> — both run at once</li><li>Waits for both to return, then sends everything to the Router</li><li>Router classifies, merges, routes, saves, and notifies</li><li>Conductor assembles the final report</li></ul></div>
+          <div class="ag-desc"><ul><li>Dispatches Analyst + Extractor <em>in parallel</em> — both run at the same time</li><li>Waits for both to return, then sends themes + actions to the Synthesizer</li><li>Synthesizer produces the final report, then calls Stage 2's router to classify, save, and notify</li></ul></div>
           <div class="ag-meta-grid">
             <div><div class="k">brain</div><div class="v">Claude</div></div>
-            <div><div class="k">steps</div><div class="v">3 + synthesize</div></div>
+            <div><div class="k">steps</div><div class="v">parallel → synthesize → route</div></div>
           </div>
         </div>
         <div class="ag-foot">
@@ -1188,14 +1205,14 @@
 
       <div class="node node-sub-agent sub" id="s3-summ" data-stages="3" data-node="s3-summ">
         <div class="sa-header">
-          <div class="sa-icon">s</div>
+          <div class="sa-icon">a</div>
           <div class="sa-info">
-            <div class="sa-tag">Specialist 1</div>
-            <div class="sa-name">The <em>Summarizer</em></div>
+            <div class="sa-tag">Specialist 1 · parallel</div>
+            <div class="sa-name">The <em>Analyst</em></div>
           </div>
           <div class="sa-dot"></div>
         </div>
-        <div class="sa-body">Reads the transcript. Finds the 3 key themes — <em>the same job the Stage 1 Analyst did, but focused only on themes.</em></div>
+        <div class="sa-body">Reads the transcript. Finds key themes and decisions — <em>same API call as Stage 1, just analyst.md as the system prompt instead.</em></div>
         <div class="sa-foot">
           <span id="s3-summState">idle</span>
           <span id="s3-summTime">—</span>
@@ -1211,7 +1228,7 @@
           </div>
           <div class="sa-dot"></div>
         </div>
-        <div class="sa-body">Reads the transcript. Pulls out who said what and every commitment made — <em>the same job the Stage 1 Analyst did, but focused only on actions.</em></div>
+        <div class="sa-body">Reads the transcript. Pulls out every commitment, owner, and deadline — <em>same API call as Stage 1, just extractor.md as the system prompt. Runs in parallel with the Analyst.</em></div>
         <div class="sa-foot">
           <span id="s3-extrState">idle</span>
           <span id="s3-extrTime">—</span>
@@ -1220,14 +1237,14 @@
 
       <div class="node node-sub-agent extr" id="s3-route" data-stages="3" data-node="s3-route">
         <div class="sa-header">
-          <div class="sa-icon">r</div>
+          <div class="sa-icon">s</div>
           <div class="sa-info">
             <div class="sa-tag">Specialist 3</div>
-            <div class="sa-name">The <em>Router</em></div>
+            <div class="sa-name">The <em>Synthesizer</em></div>
           </div>
           <div class="sa-dot"></div>
         </div>
-        <div class="sa-body">Gets the transcript, summary, and actions. Classifies the meeting type, merges everything into one document, routes the file, and fires the notification.</div>
+        <div class="sa-body">Gets themes from the Analyst and actions from the Extractor. Combines them into the final report — then calls Stage 2's router to classify, save both files, and notify.</div>
         <div class="sa-foot">
           <span id="s3-routeState">idle</span>
           <span id="s3-routeTime">—</span>
@@ -1273,11 +1290,17 @@
             <div class="panel-eyebrow">Try it live — Chat Assistant</div>
             <textarea class="panel-textarea" id="chatTranscript" placeholder="Paste a transcript here…"></textarea>
             <div class="panel-row">
-              <button class="panel-sample-btn" id="chatSampleBtn">Load sample transcript</button>
+              <button class="panel-sample-btn" id="chatSampleBtn">Load standup</button>
+              <button class="panel-sample-btn" id="chatClientBtn">Load client call</button>
+              <button class="panel-sample-btn" id="chatPlanningBtn">Load planning</button>
             </div>
             <input class="panel-input" id="chatQuestion" placeholder="Ask a question about this transcript…" />
             <button class="panel-btn" id="chatSubmit">Ask →</button>
             <div class="panel-chat" id="chatOutput"></div>
+            <div class="json-toggle-row" id="chatJsonRow" style="display:none">
+              <button class="json-toggle-btn" id="chatJsonBtn">Show JSON</button>
+              <pre class="json-block" id="chatJsonBlock" style="display:none"></pre>
+            </div>
           </div>
 
           <!-- Stage 2: Workflow panel -->
@@ -1285,7 +1308,9 @@
             <div class="panel-eyebrow">Try it live — Workflow Pipeline</div>
             <textarea class="panel-textarea" id="workflowTranscript" placeholder="Paste a transcript here…"></textarea>
             <div class="panel-row">
-              <button class="panel-sample-btn" id="workflowSampleBtn">Load sample transcript</button>
+              <button class="panel-sample-btn" id="workflowSampleBtn">Load standup</button>
+              <button class="panel-sample-btn" id="workflowClientBtn">Load client call</button>
+              <button class="panel-sample-btn" id="workflowPlanningBtn">Load planning</button>
             </div>
             <button class="panel-btn" id="workflowSubmit">Run Workflow →</button>
             <div class="panel-result" id="workflowResult"></div>
@@ -1296,14 +1321,15 @@
             <div class="panel-eyebrow">Try it live — Agentic System</div>
             <textarea class="panel-textarea" id="orchTranscript" placeholder="Paste a transcript here…"></textarea>
             <div class="panel-row">
-              <button class="panel-sample-btn" id="orchSampleBtn">Load sample transcript</button>
+              <button class="panel-sample-btn" id="orchSampleBtn">Load standup</button>
+              <button class="panel-sample-btn" id="orchClientBtn">Load client call</button>
+              <button class="panel-sample-btn" id="orchPlanningBtn">Load planning</button>
             </div>
             <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
             <div class="orch-steps" id="orchSteps">
-              <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Chat assistant: executive summary</span></div>
-              <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Chat assistant: action items</span></div>
-              <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Workflow: classify + route</span></div>
-              <div class="orch-step" id="orchStep4"><span class="step-check">○</span><span>Step 4 — Synthesize final report</span></div>
+              <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Analyst + Extractor (parallel)</span></div>
+              <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Synthesizer: combine results</span></div>
+              <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Router: classify + save + notify</span></div>
             </div>
             <div class="panel-result" id="orchResult"></div>
           </div>
@@ -1357,50 +1383,40 @@
 <script>
   // ============ NODE INSPECT DATA (per stage) ============
 
-  // Shared system prompt (the orchestrator/synthesizer prompt)
+  // system.md — the chat assistant's conversational prompt (Stage 1 + Module 3)
   const promptSystem = `<span class="role">You are a meeting analyst.</span>
 
-When given a meeting transcript, return a clean,
-structured insights report.
+Answer questions about this transcript
+directly and naturally.
 
-Always respond in this format:
+Be specific. Reference exact names,
+decisions, and numbers from the transcript
+when relevant. If you're not sure about
+something, say so.`;
 
-<span class="em">--- format ---</span>
-<span class="key">**KEY THEMES**</span>
-- <span class="str">[Theme name]: [one-sentence summary]</span>
+  // analyst.md — Specialist 1 (parallel with Extractor)
+  const promptAnalyst = `<span class="role">You are a meeting analyst.</span>
 
-<span class="key">**ACTION ITEMS**</span>
-- <span class="str">[Person]: [task] (by [date if mentioned])</span>
+Read this transcript and identify the
+key themes and decisions.
 
-<span class="key">**RECOMMENDED NEXT STEP**</span>
-<span class="str">[One sentence — the single most important thing to do next.]</span>
+<span class="key">KEY THEMES</span>
+- <span class="str">[Theme]: [one-sentence description]</span>
+(list 2–5 themes)
 
-<span class="com">// Use names from the transcript. Never invent people.</span>
+<span class="key">KEY DECISIONS</span>
+- <span class="str">[Decision made, with context]</span>
+
+<span class="com">// Use names from the transcript.</span>
 <span class="com">// Be specific. Don't pad with filler.</span>`;
 
-  const promptSummarizer = `<span class="role">You are a meeting summarizer.</span>
-
-Given a transcript, identify the <span class="num">3</span> most important themes
-discussed.
-
-Return ONLY a JSON object:
-
-{
-  <span class="key">"themes"</span>: [
-    { <span class="key">"label"</span>: <span class="str">"Theme name"</span>, <span class="key">"summary"</span>: <span class="str">"One sentence."</span> },
-    { <span class="key">"label"</span>: <span class="str">"..."</span>, <span class="key">"summary"</span>: <span class="str">"..."</span> },
-    { <span class="key">"label"</span>: <span class="str">"..."</span>, <span class="key">"summary"</span>: <span class="str">"..."</span> }
-  ]
-}
-
-<span class="com">// Be concrete. Use names. Don't invent.</span>`;
-
+  // extractor.md — Specialist 2 (parallel with Analyst)
   const promptExtractor = `<span class="role">You are an action item extractor.</span>
 
-Given a transcript, find every commitment, task, or
-next step that came up in the conversation.
+Given a transcript, find every commitment,
+task, or next step mentioned.
 
-Return ONLY a JSON object:
+Return ONLY a valid JSON object:
 
 {
   <span class="key">"actions"</span>: [
@@ -1412,18 +1428,39 @@ Return ONLY a JSON object:
   ]
 }
 
-<span class="com">// Use exact wording from the transcript when possible.</span>`;
+<span class="com">// Use exact wording from transcript.</span>`;
 
-  const promptClassifier = `You are a meeting classifier.
+  // synthesizer.md — Specialist 3 (combines Analyst + Extractor outputs)
+  const promptSynthesizer = `<span class="role">You are a report synthesizer.</span>
 
-Given a meeting transcript, identify the meeting type.
+You receive themes from the Analyst and
+action items from the Extractor. Combine
+them into a final structured report.
+
+<span class="key">**KEY THEMES**</span>
+<span class="str">[From the Analyst — reformat lightly]</span>
+
+<span class="key">**ACTION ITEMS**</span>
+- <span class="str">[Owner]: [task] (by [deadline])</span>
+
+<span class="key">**RECOMMENDED NEXT STEP**</span>
+<span class="str">[One sentence synthesis]</span>
+
+<span class="com">// Synthesize, don't just copy.</span>
+<span class="com">// No filler, no padding.</span>`;
+
+  // classifier.md — Stage 2 workflow
+  const promptClassifier = `<span class="role">You are a meeting classifier.</span>
+
+Given a transcript, determine the meeting type.
 
 Return ONLY a JSON object:
 
 {
-  "type": "team-standup" | "client-call" | "planning-session",
-  "suggested_filename": "YYYY-MM-DD-[type].txt",
-  "confidence": "high" | "medium" | "low"
+  "type": <span class="str">"team-standup"</span> | <span class="str">"client-call"</span>
+       | <span class="str">"planning-session"</span> | <span class="str">"other"</span>,
+  "suggested_filename": <span class="str">"YYYY-MM-DD-[type].txt"</span>,
+  "confidence": <span class="str">"high"</span> | <span class="str">"low"</span>
 }`;
 
   const nodeData = {
@@ -1580,17 +1617,15 @@ Return ONLY a JSON object:
       title: "The <em>Conductor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The coordinator. In Stage 1, one Analyst did all of this alone. Here, the Conductor splits the work across three specialists:<br><br>• Summarizer + Extractor run <em>at the same time</em> (parallel)<br>• Router takes their combined outputs, merges everything into one document, classifies, routes, and notifies<br>• Conductor assembles the final report` },
+          content: `The coordinator. In Stage 1, one Analyst did everything alone. Here, the Conductor splits the work:<br><br>• Analyst + Extractor run <em>at the same time</em> (parallel dispatch — first time anything runs simultaneously)<br>• Synthesizer combines their outputs into the final report<br>• Synthesizer calls Stage 2's router to classify, save both files, and notify<br><br>The Conductor contains zero prompt logic — all the content comes from the specialist prompts.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 synthesized report" } },
-        { label: "Its instructions (system prompt)", type: "prompt", content: promptSystem },
+          content: { in: "📝 a transcript", out: "📊 synthesized report + 📁 saved files" } },
         { label: "Connects to", type: "connections",
           content: [
             { arrow: "←", target: "The transcript", note: "receives input" },
-            { arrow: "↓", target: "The Summarizer", note: "step 1: finds key themes" },
-            { arrow: "↓", target: "The Extractor", note: "step 2: pulls action items" },
-            { arrow: "↓", target: "The Router", note: "step 3: classifies, merges, saves, notifies" },
-            { arrow: "→", target: "Saved report", note: "step 4: final output" }
+            { arrow: "↓‖", target: "The Analyst + Extractor", note: "step 1: parallel dispatch" },
+            { arrow: "↓", target: "The Synthesizer", note: "step 2: combine results" },
+            { arrow: "→", target: "Saved report", note: "step 3: classify, save, notify" }
           ] }
       ]
     },
@@ -1612,42 +1647,42 @@ Return ONLY a JSON object:
       ]
     },
     's3-summ': {
-      eyebrow: "Inspecting · Specialist 1",
-      title: "The <em>Summarizer</em>",
+      eyebrow: "Inspecting · Specialist 1 · Analyst",
+      title: "The <em>Analyst</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `One half of what the Stage 1 Analyst did alone — but as a dedicated specialist. Runs in parallel with the Extractor. Does one thing: reads the transcript, finds 3 key themes, returns them.` },
+          content: `One of two specialists running in parallel. Does one thing: reads the transcript, identifies key themes and decisions, returns them as plain text.<br><br>This is the <em>exact same API call</em> as Stage 1 — the only difference is the system prompt file (<code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">analyst.md</code> instead of <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">system.md</code>). Same function, different specialist.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "🏷️ 3 themes" } },
-        { label: "Its instructions (system prompt)", type: "prompt", content: promptSummarizer },
+          content: { in: "📝 a transcript", out: "📝 themes + decisions" } },
+        { label: "Its instructions (analyst.md)", type: "prompt", content: promptAnalyst },
         { label: "Connects to", type: "connections",
-          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns to" }] }
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns themes to" }] }
       ]
     },
     's3-extr': {
-      eyebrow: "Inspecting · Specialist 2",
+      eyebrow: "Inspecting · Specialist 2 · Extractor",
       title: "The <em>Extractor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The other half of what the Stage 1 Analyst did alone — but as a dedicated specialist. Runs in parallel with the Summarizer. Does one thing: reads the transcript, pulls out every action item with owner and deadline.` },
+          content: `The second of two specialists running in parallel with the Analyst. Does one thing: reads the transcript, pulls out every commitment, owner, and deadline as JSON.<br><br>Same API call as Stage 1 — different system prompt (<code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">extractor.md</code>). Same function, different specialist.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "✅ a list of actions" } },
-        { label: "Its instructions (system prompt)", type: "prompt", content: promptExtractor },
+          content: { in: "📝 a transcript", out: "✅ action items (JSON)" } },
+        { label: "Its instructions (extractor.md)", type: "prompt", content: promptExtractor },
         { label: "Connects to", type: "connections",
-          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns to" }] }
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns actions to" }] }
       ]
     },
     's3-route': {
-      eyebrow: "Inspecting · Sub-agent",
-      title: "The <em>Router</em>",
+      eyebrow: "Inspecting · Specialist 3 · Synthesizer",
+      title: "The <em>Synthesizer</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `Specialist 3. Gets the transcript, summary, and action items from the first two specialists. Classifies the meeting type, merges everything into one document, routes it to the right folder, and fires the macOS notification.` },
+          content: `The final specialist. Receives themes from the Analyst and action items from the Extractor. Combines them into a clean, structured insights report.<br><br>Same API call as Stage 1 — different system prompt (<code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">synthesizer.md</code>). Then calls Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> to classify the transcript, save both files to the right folder, and fire the macOS notification.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 transcript + themes + actions", out: "📄 saved merged report + 🔔 notification" } },
-        { label: "Its instructions (system prompt)", type: "prompt", content: promptClassifier },
+          content: { in: "📝 themes + actions", out: "📄 final report + 📁 saved files + 🔔 notification" } },
+        { label: "Its instructions (synthesizer.md)", type: "prompt", content: promptSynthesizer },
         { label: "Connects to", type: "connections",
-          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns saved file path" }] }
+          content: [{ arrow: "↑", target: "The Conductor", note: "called by, returns report to" }] }
       ]
     }
   };
@@ -1674,19 +1709,19 @@ Return ONLY a JSON object:
     3: [
       { t: 0,    src: 'input', srcLabel: 'A transcript',    msg: 'Transcript received. Sending to the Conductor.', node: 's3-input', state: 'active' },
       { t: 800,  src: 'input', srcLabel: 'A transcript',    msg: 'On its way.', particle: 's3-input>s3-agent', complete: 's3-input' },
-      { t: 1500, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Got it. Dispatching Summarizer and Extractor at the same time — both run in parallel.', node: 's3-agent', state: 'active' },
-      { t: 2100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Summarizer: find the key themes. Extractor: pull out every action item. Both working now.', particle: 's3-agent>s3-summ' },
+      { t: 1500, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Got it. Dispatching Analyst and Extractor at the same time — this is the parallel dispatch.', node: 's3-agent', state: 'active' },
+      { t: 2100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Analyst: find the key themes. Extractor: pull out every action item. Both working now.', particle: 's3-agent>s3-summ' },
       { t: 2200, src: 'orch',  srcLabel: 'The Conductor',   msg: '', particle: 's3-agent>s3-extr' },
-      { t: 2500, src: 'sub',   srcLabel: 'The Summarizer',  msg: 'Reading the transcript. Finding key themes…', node: 's3-summ', state: 'active' },
-      { t: 2600, src: 'extr',  srcLabel: 'The Extractor',   msg: 'Reading the transcript. Pulling out who said what and every commitment made.', node: 's3-extr', state: 'active' },
-      { t: 3800, src: 'sub',   srcLabel: 'The Summarizer',  msg: '3 themes found. Returning to Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
+      { t: 2500, src: 'sub',   srcLabel: 'The Analyst',     msg: 'Reading the transcript. Identifying key themes and decisions…', node: 's3-summ', state: 'active' },
+      { t: 2600, src: 'extr',  srcLabel: 'The Extractor',   msg: 'Reading the transcript. Pulling out every commitment, owner, and deadline.', node: 's3-extr', state: 'active' },
+      { t: 3800, src: 'sub',   srcLabel: 'The Analyst',     msg: '3 themes + 2 decisions found. Returning to Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
       { t: 4300, src: 'extr',  srcLabel: 'The Extractor',   msg: '4 action items with owners and deadlines. Returning to Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
-      { t: 5100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Both back. Sending themes + actions + full transcript to the Router.', particle: 's3-agent>s3-route' },
-      { t: 5900, src: 'extr',  srcLabel: 'The Router',      msg: 'Got the transcript, 3 themes, 4 action items. Classifying meeting type…', node: 's3-route', state: 'active' },
-      { t: 7000, src: 'extr',  srcLabel: 'The Router',      msg: 'Team standup. Merging themes + actions + transcript into one document. Routing to team-standup/. Notification sent.' },
-      { t: 7900, src: 'extr',  srcLabel: 'The Router',      msg: 'Document written. Returning to Conductor.', particle: 's3-route>s3-agent', complete: 's3-route' },
-      { t: 8600, src: 'orch',  srcLabel: 'The Conductor',   msg: 'All three done. Assembling final report.', particle: 's3-agent>s3-output', complete: 's3-agent' },
-      { t: 9300, src: 'output',srcLabel: 'Saved report',    msg: 'Merged document saved: <code>team-standup/2026-04-29-insights.md</code>. <em>Two specialists in parallel, one Router, one report.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
+      { t: 5100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Both back. Sending themes + actions to the Synthesizer.', particle: 's3-agent>s3-route' },
+      { t: 5900, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Got 3 themes and 4 action items. Combining into the final insights report…', node: 's3-route', state: 'active' },
+      { t: 7000, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Report complete. Calling Stage 2\'s runWorkflow() — classifying as team-standup, saving transcript + report, sending notification.' },
+      { t: 7900, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Both files saved. Returning to Conductor.', particle: 's3-route>s3-agent', complete: 's3-route' },
+      { t: 8600, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Done. <span class="arrow">→</span> Sending the final report.', particle: 's3-agent>s3-output', complete: 's3-agent' },
+      { t: 9300, src: 'output',srcLabel: 'Saved report',    msg: 'Saved: <code>team-standup/2026-04-29-team-standup-report.md</code>. <em>Two specialists in parallel, one Synthesizer, one saved report.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
     ]
   };
 
@@ -2092,15 +2127,34 @@ Return ONLY a JSON object:
     if (serverOnline) $('panel' + s).style.display = 'block';
   }
 
-  async function loadSample(targetId) {
+  async function loadSample(targetId, filename) {
     try {
-      const r = await fetch('/api/sample-transcript');
+      const url = filename ? `/api/sample-transcript/${filename}` : '/api/sample-transcript';
+      const r = await fetch(url);
       $(targetId).value = await r.text();
     } catch {}
   }
 
+  // ── File drop support — drag a .txt file onto any transcript textarea ──
+  ['chatTranscript', 'workflowTranscript', 'orchTranscript'].forEach(id => {
+    const el = $(id);
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => { el.value = ev.target.result; };
+      reader.readAsText(file);
+    });
+  });
+
   // ── Stage 1: Chat ──
   $('chatSampleBtn').addEventListener('click', () => loadSample('chatTranscript'));
+  $('chatClientBtn').addEventListener('click', () => loadSample('chatTranscript', 'sample-client-call.txt'));
+  $('chatPlanningBtn').addEventListener('click', () => loadSample('chatTranscript', 'sample-planning-session.txt'));
 
   $('chatSubmit').addEventListener('click', async () => {
     const question = $('chatQuestion').value.trim();
@@ -2114,18 +2168,26 @@ Return ONLY a JSON object:
     $('chatQuestion').value = '';
     $('chatSubmit').disabled = true;
     $('chatSubmit').textContent = 'Thinking…';
+    const requestPayload = { question, context: context.slice(0, 200) + (context.length > 200 ? '…' : '') };
     try {
       const r = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, context }),
       });
-      const { response } = await r.json();
+      const data = await r.json();
+      const { response } = data;
       const aiBubble = document.createElement('div');
       aiBubble.className = 'chat-bubble assistant';
       aiBubble.textContent = response;
       chatOut.appendChild(aiBubble);
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
+      // JSON toggle — show last request/response for Module 2 teaching
+      $('chatJsonBlock').textContent = JSON.stringify({
+        request: { method: 'POST', url: '/api/chat', body: requestPayload },
+        response: { status: r.status, body: { response: response.slice(0, 300) + (response.length > 300 ? '…' : '') } },
+      }, null, 2);
+      $('chatJsonRow').style.display = 'block';
     } catch (err) {
       const errBubble = document.createElement('div');
       errBubble.className = 'chat-bubble assistant';
@@ -2137,12 +2199,22 @@ Return ONLY a JSON object:
     }
   });
 
+  $('chatJsonBtn').addEventListener('click', () => {
+    const block = $('chatJsonBlock');
+    const btn = $('chatJsonBtn');
+    const visible = block.style.display !== 'none';
+    block.style.display = visible ? 'none' : 'block';
+    btn.textContent = visible ? 'Show JSON' : 'Hide JSON';
+  });
+
   $('chatQuestion').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSubmit').click(); }
   });
 
   // ── Stage 2: Workflow ──
   $('workflowSampleBtn').addEventListener('click', () => loadSample('workflowTranscript'));
+  $('workflowClientBtn').addEventListener('click', () => loadSample('workflowTranscript', 'sample-client-call.txt'));
+  $('workflowPlanningBtn').addEventListener('click', () => loadSample('workflowTranscript', 'sample-planning-session.txt'));
 
   $('workflowSubmit').addEventListener('click', async () => {
     const transcript = $('workflowTranscript').value.trim();
@@ -2156,13 +2228,17 @@ Return ONLY a JSON object:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript }),
       });
-      const { classification, outputPath, error } = await r.json();
+      const { steps, classification, outputPath, error } = await r.json();
       if (error) throw new Error(error);
-      const routed = outputPath ? outputPath.split('/').slice(-2).join('/') : '—';
-      $('workflowResult').innerHTML = `
-        <span class="class-badge">${classification}</span>
-        <div class="result-meta">Routed → transcripts/${routed}</div>
-      `;
+      let html = '<div class="orch-steps">';
+      if (steps && steps.length) {
+        for (const step of steps) {
+          html += `<div class="orch-step done"><span class="step-check">✓</span><span>${step.step}</span></div>`;
+        }
+      }
+      html += '</div>';
+      html += `<span class="class-badge">${classification}</span>`;
+      $('workflowResult').innerHTML = html;
     } catch (err) {
       $('workflowResult').textContent = 'Error: ' + err.message;
     } finally {
@@ -2173,6 +2249,8 @@ Return ONLY a JSON object:
 
   // ── Stage 3: Orchestrator ──
   $('orchSampleBtn').addEventListener('click', () => loadSample('orchTranscript'));
+  $('orchClientBtn').addEventListener('click', () => loadSample('orchTranscript', 'sample-client-call.txt'));
+  $('orchPlanningBtn').addEventListener('click', () => loadSample('orchTranscript', 'sample-planning-session.txt'));
 
   function setStep(stepId, state) {
     const el = $(stepId);
@@ -2189,46 +2267,47 @@ Return ONLY a JSON object:
     $('orchSubmit').disabled = true;
     $('orchSubmit').textContent = 'Running…';
     $('orchResult').innerHTML = '';
-    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+    ['orchStep1','orchStep2','orchStep3'].forEach(id => setStep(id, 'idle'));
     try {
+      // Step 1: Analyst + Extractor run in parallel (both fired at once)
       setStep('orchStep1', 'running');
       const r1 = await fetch('/api/orchestrate/step1', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript }),
       });
-      const { summary } = await r1.json();
+      const { themes, actions, error: e1 } = await r1.json();
+      if (e1) throw new Error(e1);
       setStep('orchStep1', 'done');
 
+      // Step 2: Synthesizer combines themes + actions → report
       setStep('orchStep2', 'running');
       const r2 = await fetch('/api/orchestrate/step2', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ themes, actions }),
       });
-      const { actions } = await r2.json();
+      const { report, error: e2 } = await r2.json();
+      if (e2) throw new Error(e2);
       setStep('orchStep2', 'done');
 
+      // Step 3: Router classifies transcript, saves transcript + report, notifies
       setStep('orchStep3', 'running');
       const r3 = await fetch('/api/orchestrate/step3', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript, report }),
       });
-      const { classification } = await r3.json();
+      const { classification, error: e3 } = await r3.json();
+      if (e3) throw new Error(e3);
       setStep('orchStep3', 'done');
 
-      setStep('orchStep4', 'running');
-      const r4 = await fetch('/api/orchestrate/step4', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ summary, actions, classification }),
-      });
-      const { report } = await r4.json();
-      setStep('orchStep4', 'done');
-
       const safe = report.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      $('orchResult').innerHTML = `<div class="result-report">${safe}</div>`;
+      $('orchResult').innerHTML = `
+        <span class="class-badge">${classification}</span>
+        <div class="result-report">${safe}</div>
+      `;
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
     } catch (err) {
       $('orchResult').textContent = 'Error: ' + err.message;
-      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+      ['orchStep1','orchStep2','orchStep3'].forEach(id => setStep(id, 'idle'));
     } finally {
       $('orchSubmit').disabled = false;
       $('orchSubmit').textContent = 'Run Orchestrator →';

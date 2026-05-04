@@ -1,18 +1,16 @@
 import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
-import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import { ask } from './stage-1/chat.js';
 import { runWorkflow } from './stage-2/workflow.js';
+import { analyst, extractor, synthesizer } from './stage-3/orchestrator.js';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
 const ROOT = path.join(import.meta.dirname, '..');
 const PROMPTS_DIR = path.join(import.meta.dirname, 'prompts');
-const client = new Anthropic();
-const systemPrompt = fs.readFileSync(path.join(PROMPTS_DIR, 'system.md'), 'utf-8');
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true }));
@@ -23,9 +21,22 @@ app.use(express.static(path.join(ROOT, 'frontend')));
 // Serve the frontend
 app.get('/', (req, res) => res.sendFile(path.join(ROOT, 'frontend', 'index.html')));
 
-// Sample transcript
+// Sample transcripts
 app.get('/api/sample-transcript', (req, res) => {
   const p = path.join(import.meta.dirname, 'transcripts', 'sample-transcript.txt');
+  res.type('text').send(fs.readFileSync(p, 'utf-8'));
+});
+
+app.get('/api/sample-transcript/:name', (req, res) => {
+  const p = path.join(import.meta.dirname, 'transcripts', req.params.name);
+  if (!fs.existsSync(p)) return res.status(404).json({ error: 'Not found' });
+  res.type('text').send(fs.readFileSync(p, 'utf-8'));
+});
+
+// Serve prompt files (for browser inspect in Module 5/6)
+app.get('/api/prompts/:name', (req, res) => {
+  const p = path.join(PROMPTS_DIR, req.params.name);
+  if (!fs.existsSync(p)) return res.status(404).json({ error: 'Not found' });
   res.type('text').send(fs.readFileSync(p, 'utf-8'));
 });
 
@@ -41,73 +52,57 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Stage 2 — Workflow pipeline
+// Returns step-by-step log for frontend visualization
 app.post('/api/workflow', async (req, res) => {
   try {
     const { transcript, filename = 'transcript.txt' } = req.body;
+    const steps = [];
+
+    steps.push({ step: 'Classifying...', status: 'running' });
     const result = await runWorkflow(transcript, filename);
-    res.json(result);
+    steps[0].status = 'done';
+    steps[0].step = `Classified as: ${result.classification}`;
+
+    steps.push({ step: `Routed → transcripts/${result.classification}/`, status: 'done' });
+    steps.push({ step: 'Notified', status: 'done' });
+
+    res.json({ steps, classification: result.classification, outputPath: result.outputPath });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Stage 3 — Orchestrator step 1: executive summary
+// Stage 3 — Orchestrator step 1: Analyst + Extractor in parallel
 app.post('/api/orchestrate/step1', async (req, res) => {
   try {
     const { transcript } = req.body;
-    const summary = await ask(
-      'Give me a one-paragraph executive summary of this meeting.',
-      transcript
-    );
-    res.json({ summary });
+    const [themes, actions] = await Promise.all([
+      analyst(transcript),
+      extractor(transcript),
+    ]);
+    res.json({ themes, actions });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Stage 3 — Orchestrator step 2: action items
+// Stage 3 — Orchestrator step 2: Synthesizer
 app.post('/api/orchestrate/step2', async (req, res) => {
   try {
-    const { transcript } = req.body;
-    const actions = await ask(
-      'List every action item from this meeting. For each one: who owns it, what they need to do, and the deadline if mentioned.',
-      transcript
-    );
-    res.json({ actions });
+    const { themes, actions } = req.body;
+    const report = await synthesizer(themes, actions);
+    res.json({ report });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Stage 3 — Orchestrator step 3: classify and route
+// Stage 3 — Orchestrator step 3: Router (classify, save transcript + report, notify)
 app.post('/api/orchestrate/step3', async (req, res) => {
   try {
-    const { transcript, filename = 'transcript.txt' } = req.body;
-    const { classification, outputPath } = await runWorkflow(transcript, filename);
+    const { transcript, report, filename = 'transcript.txt' } = req.body;
+    const { classification, outputPath } = await runWorkflow(transcript, filename, report);
     res.json({ classification, outputPath });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Stage 3 — Orchestrator step 4: synthesize final report
-app.post('/api/orchestrate/step4', async (req, res) => {
-  try {
-    const { summary, actions, classification } = req.body;
-    const userMessage = [
-      'Here are the results from each specialist:\n',
-      `EXECUTIVE SUMMARY:\n${summary}\n`,
-      `ACTION ITEMS:\n${actions}\n`,
-      `CLASSIFICATION: ${classification}\n`,
-      'Combine these into the final insights report following your system prompt format.',
-    ].join('\n');
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-    });
-    res.json({ report: response.content[0].text });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

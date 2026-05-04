@@ -49,7 +49,7 @@ Then explain:
 
 ## Step 3: Walk through the example (4 min)
 
-Open `examples/example-transcripts-insights.md` together:
+Open `examples/example-transcripts-insights.md` together. In the current terminal, from the repo root:
 
 ```bash
 cat examples/example-transcripts-insights.md
@@ -86,20 +86,22 @@ Print the staircase:
        ───────                ───────                 ───────
 
        chat.js           →    workflow.js       →    orchestrator.js
-       Ask questions          Drop a file →          Coordinates
-       get answers back       AI classifies →        three steps in
-                              routes file →           sequence →
-                              sends notification      final report
+       You ask                A file drops in.       An orchestrator runs
+       questions.             AI classifies +        Analyst + Extractor
+       Get answers back.      routes + notifies.     in parallel →
+                              Automatic.             Synthesizer →
+                                                     Router (saves + notifies).
 
-       1 prompt          →    1 prompt          →    1 shared prompt
-                              (classifier)           + synthesizer
+       1 system prompt        1 classifier           3 specialist prompts
+       (meeting analyst)      prompt                 (analyst, extractor,
+                                                     synthesizer)
 
-       you paste              file lands             file lands
-       a transcript           in incoming/           in incoming/
-                              triggers pipeline      triggers full system
+       Interactive.           Event-triggered.       Fully automated.
+       You drive it.          File drops in,         One input →
+                              pipeline runs.         full structured report.
 ```
 
-> "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across specialists and the orchestrator sequences them.
+> "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across three specialists and an orchestrator coordinates them.
 >
 > One stage at a time."
 
@@ -128,11 +130,12 @@ Ask:
 ## Step 8: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:`
-2. **Commit:**
+2. **Commit** — in the current terminal, from the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 1: Tour the System"
    ```
-3. Say:
+3. **Run `/compact`** — type `/compact` to clear context before Module 2.
+4. Say:
 
 > "You now understand the shape of every agentic system — input, orchestrator, specialists, synthesize, output. That's the skeleton. In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 

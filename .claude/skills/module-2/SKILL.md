@@ -18,29 +18,27 @@ Say:
 
 > "Module 2. Today is the moment AI stops being a black box. By the end of the next 20 minutes, you will have called the Claude API yourself, seen the exact JSON that gets sent, and seen the exact JSON that comes back. Once you've seen this — once — you understand how every AI product on Earth works underneath. That's not an exaggeration."
 
-## Step 2: Open the file together (3 min)
+## Step 2: Walk through what's happening (3 min)
 
-Open `student-output/stage-1/chat.js`. Read it with them top to bottom. It's ~50 lines, mostly comments.
+Tell the student what `stage-1/chat.js` does — don't open the file, just walk through the five things that happen when it runs:
 
-Walk through the 5 numbered sections:
-
-1. **Set up the Anthropic client** — `new Anthropic()` reads your API key from `.env`.
-2. **Read the system prompt from a file** — `prompts/system.md`. We'll dig into prompts in Module 3.
-3. **Read the transcript** — whatever file path you pass on the command line.
-4. **Make the API call** — `client.messages.create(...)`. *This is the doorbell.*
+1. **Set up the Anthropic client** — `new Anthropic()` reads their API key from `.env`. Nothing fancy.
+2. **Read the system prompt from a file** — loads `prompts/system.md`. This is the personality. We'll dig into it in Module 3.
+3. **Read the transcript** — whatever file path is passed in.
+4. **Make the API call** — `client.messages.create(...)`. This is the line that reaches Anthropic's servers — where the AI thinking actually happens. One function call, one network request, one JSON response back.
 5. **Print the response** — the actual text lives at `response.content[0].text`.
 
 Ask:
 
-> "Where in this file does the actual 'AI thinking' happen? Point to the line."
+> "Which of those five steps is the AI part — the actual intelligence?"
 
-They should land on the `client.messages.create({...})` block. Affirm:
+They should land on step 4. Affirm:
 
-> "Right. Everything else in this file is plumbing. That one call — sending JSON to Anthropic, getting JSON back — is the entire AI part."
+> "Right. Everything else is plumbing. That one call — sending JSON to Anthropic, getting JSON back — is the entire AI part."
 
 ## Step 3: Look at what's getting sent (3 min)
 
-Have them look at the object inside `messages.create()`. Print it out yourself, JSON-style:
+Show them what the code is about to send to Anthropic — this is the JSON object inside `messages.create()`:
 
 ```json
 {
@@ -66,10 +64,9 @@ Have them look at the object inside `messages.create()`. Print it out yourself, 
 
 ## Step 4: Run it (3 min)
 
-Now run it. Have them type:
+Now run it. In the current terminal, from `student-output/`:
 
 ```bash
-cd student-output
 npm run stage-1
 ```
 
@@ -95,13 +92,7 @@ Once it works, point at the output:
 
 Then add:
 
-> "Quick exercise. Inside the script, after the response comes back, the line that prints the actual text is:
->
-> ```js
-> console.log(response.content[0].text);
-> ```
->
-> That `response` object has more in it than just the text. Want to see the whole thing?"
+> "The response object has more in it than just the text. Want to see the whole JSON that came back?"
 
 If they want to: have them edit the file to add `console.log(JSON.stringify(response, null, 2));` right after the `messages.create` call, save, re-run, and see the full JSON response object. The keys to point out:
 
@@ -125,12 +116,23 @@ Stop and say:
 
 ## Step 7: Wrap and commit (2 min)
 
+What you've built so far:
+
+```
+┌──────────────────────────────┐
+│  Stage 1 — Chat Assistant    │  ← you built this
+│  stage-1/chat.js             │
+│  ask() · system.md prompt    │
+└──────────────────────────────┘
+```
+
 1. **Update `CLAUDE.md`**: change `- [ ] Module 2:` to `- [x] Module 2:`
-2. **Commit:**
+2. **Commit** — in the current terminal, from the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 2: First API Call"
    ```
-3. Hand off:
+3. **Run `/compact`** — type `/compact` to clear context before Module 3.
+4. Hand off:
 
 > "Big moment. You've called the API. Next up — Module 3, where we look at the system prompt that controls Claude's personality. Once you understand prompts, you understand the leverage point of the whole system. Type `module-3` when you're ready."
 
