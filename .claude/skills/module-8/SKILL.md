@@ -134,25 +134,47 @@ Pattern 1 — Pipeline (what you built)
   Best for: defined input/output, clear sub-tasks.
   Example: any "analyze this document" problem.
 
-Pattern 2 — G Stack (Gary Tan)
-  One specialist per business domain.
-  Sales Agent | Ops Agent | Support Agent | Eng Agent
-       ↓             ↓             ↓            ↓
-                [Orchestrator]
-  Same pattern — domain-scoped specialists instead of task-scoped.
-  Each agent knows one domain deeply, handles requests in that lane.
-  Best for: routing across business functions, complex orgs.
-  Example: an internal assistant that routes questions to the right domain agent.
+Pattern 2 — Domain Stack (Garry Tan's G-Stack)
+  One specialist per business domain — same routing pattern you built,
+  but instead of task-scoped specialists (analyst/extractor), each agent
+  owns a whole domain and handles anything in that lane.
 
-Pattern 3 — Council
-  input → [Analyst A] + [Analyst B] + [Analyst C]   ← same input, different lenses
-                  ↓           ↓           ↓
-                      [Arbiter — synthesizes all three]
-  Multiple agents read the same input and form independent opinions.
-  Arbiter synthesizes into a final recommendation.
-  Best for: high-stakes decisions where multiple lenses catch more.
-  Example: three analyst agents review a transcript from different angles
-           (risk / action / sentiment), arbiter produces the final report.
+  input (e.g. "What's our churn rate?")
+    ↓
+  [Classifier]
+    ↓         ↓         ↓         ↓
+  [Sales]  [Ops]  [Support]  [Eng]   ← each is a system prompt + ask()
+    ↓         ↓         ↓         ↓
+               [Response]
+
+  Each domain agent has deep context about its area — its own system prompt,
+  its own knowledge, its own output format.
+  The classifier reads the input and routes to the right lane.
+  Best for: internal assistants, cross-functional routing, complex orgs.
+  Example: "What are our biggest support tickets this week?" → Support agent.
+           "What's blocking the Q3 release?" → Eng agent.
+
+Pattern 3 — Council (Ole Lehmann's LLM Council)
+  Same input, multiple agents with completely different thinking styles —
+  each forced to attack the question from their own angle.
+  Then a peer review round. Then a chairman synthesizes.
+
+  input
+    ↓
+  [Contrarian]  [First Principles]  [Expansionist]  [Outsider]  [Executor]
+       ↓               ↓                  ↓              ↓           ↓
+                  [Anonymous peer review — each reads all five,
+                   picks strongest, names biggest blind spot,
+                   identifies what all five missed]
+                              ↓
+                    [Chairman — final verdict + one clear next step]
+
+  The peer review round is the key: anonymizing who said what, then forcing
+  each agent to critique the others, surfaces the blind spots a single-agent
+  synthesis would miss.
+  Best for: high-stakes decisions, strategy calls, anywhere a single lens misleads.
+  Example: five advisors review a job offer — Contrarian hunts for the fatal flaw,
+           Outsider catches what's invisible to you, Executor says what to do Monday.
 ```
 
 Ask: **"Which of these maps to something you actually want to build?"**
@@ -181,21 +203,27 @@ for [their use case]. Keep the orchestrator and server unchanged.
 Let's start by agreeing on what the analyst and extractor should each return.
 ```
 
-**If they picked G Stack:**
+**If they picked Domain Stack (G-Stack):**
 
 ```
 I just completed an AISC Agent Sprint and built a pipeline agent in student-output/.
-I understand: ask(), runWorkflow(), Promise.all for parallel dispatch, system prompt = specialist.
+I understand: ask(), Promise.all for parallel dispatch, system prompt = specialist,
+and classifier-based routing (from workflow.js + conductor.md).
 
-I want to build a G Stack agent — one specialist per business domain:
-[their domains, e.g. Sales / Ops / Support]
+I want to build a domain stack — one specialist per business domain:
+[their domains, e.g. Sales / Ops / Support / Eng]
 
 New folder: [folder name]. Please scaffold it:
 - One specialist per domain (each is a system prompt + ask() call)
-- An orchestrator that routes incoming requests to the right specialist
-- A classifier that reads the input and decides which specialist handles it
+- A classifier that reads the input and routes to the right domain agent
+  (same pattern as the Conductor, but routing to domains instead of tools)
+- Each domain agent should return a structured response in its own format
 
-Start by asking me what each domain agent should know and what it should return.
+The reference code is in student-output/ — especially orchestrator.js and
+prompts/conductor.md for the routing pattern.
+
+Start by asking me: what are the domains, and what does a request in each domain
+look like?
 ```
 
 **If they picked Council:**
@@ -204,18 +232,27 @@ Start by asking me what each domain agent should know and what it should return.
 I just completed an AISC Agent Sprint and built a pipeline agent in student-output/.
 I understand: ask(), Promise.all for parallel dispatch, system prompt = specialist.
 
-I want to build a Council agent — multiple analysts read the same input,
-then an Arbiter synthesizes their independent views into a final recommendation.
+I want to build a Council agent — inspired by Ole Lehmann's LLM Council pattern.
+Multiple advisors read the same input with completely different thinking styles,
+then a peer review round, then a Chairman synthesizes a final verdict.
 
 My use case: [their use case]
-Analysts I want: [e.g. Risk Reviewer / Action Extractor / Sentiment Reader]
+Advisors I want: [e.g. Contrarian / First Principles / Expansionist / Executor]
+  — or define your own roles based on the use case
 
 New folder: [folder name]. Please scaffold it:
-- N analyst agents running in parallel (same Promise.all pattern)
-- An Arbiter that receives all outputs and synthesizes a final recommendation
-- Each analyst gets its own system prompt
+- N advisor agents in parallel (same Promise.all pattern from student-output/)
+- Each advisor has its own system prompt with a specific thinking style / lens
+- A peer review round: each advisor reads all other outputs, names the strongest
+  response and the biggest blind spot (optional but powerful — adds one more
+  Promise.all pass)
+- A Chairman that synthesizes all advisor outputs + peer reviews into a final
+  verdict with one clear next step
 
-Start by helping me define what each analyst should focus on.
+The reference code is in student-output/ — orchestrator.js shows the
+Promise.all dispatch pattern. Each advisor = analyst() with a different prompt.
+
+Start by helping me define what each advisor's thinking style should be.
 ```
 
 > "Copy that, open a new folder, start a new Claude Code session, paste it in. Claude already knows these building blocks — it helped you build them this week. `student-output/` is the reference it can read if you want it to look at your actual code."
