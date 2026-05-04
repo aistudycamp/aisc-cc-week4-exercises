@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import 'dotenv/config';
 import { ask } from './stage-1/chat.js';
 import { runWorkflow } from './stage-2/workflow.js';
-import { analyst, extractor, synthesizer, reflect } from './stage-3/orchestrator.js';
+import { analyst, extractor, synthesizer, reflect, conductor } from './stage-3/orchestrator.js';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -114,6 +114,17 @@ app.post('/api/orchestrate/step4', async (req, res) => {
     const { transcript, themes, actions, report, classification } = req.body;
     const runReport = await reflect(transcript, themes, actions, report, classification);
     res.json({ runReport });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Stage 3 — Conductor planning step: decides which tools to call
+app.post('/api/orchestrate/conductor', async (req, res) => {
+  try {
+    const { transcript, instruction } = req.body;
+    const plan = await conductor(transcript, instruction);
+    res.json({ plan });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

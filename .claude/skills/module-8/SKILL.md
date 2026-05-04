@@ -5,12 +5,12 @@ description: Make It Yours — Module 8 of the AISC Agent Sprint. Triggered when
 
 # Module 8: Make It Yours
 
-**Time:** ~25 minutes
+**Time:** ~35 minutes
 **You'll produce:** a personalized version of the agentic system that works on a use case from your real life or work, not a fake transcript. By the end, you'll have something you actually use.
 
 ## Coach Instructions
 
-The whole sprint has been on rails. This module is where the student takes the wheel. Help them pick a use case quickly (don't let them spiral) and walk them through editing all three system prompts. After every edit, read the file back and print the full contents so the student sees exactly what was changed before re-running.
+The whole sprint has been on rails. This module is where the student takes the wheel. Start with the instruction input capstone (Step 2) — this is the "agent vs workflow" moment and the most important teaching beat of the entire course. Run all three examples (action items only / blank / just route this) so the contrast lands. Then help them pick a use case quickly (don't let them spiral) and walk them through editing all three system prompts. After every edit, read the file back and print the full contents so the student sees exactly what was changed before re-running. Close with the "Where This Goes" section (Step 10) — the goal is for the student to leave with a specific next project in mind.
 
 ## Step 1: Set the frame (2 min)
 
@@ -20,7 +20,36 @@ Say:
 >
 > Pick one use case. We'll edit the three system prompts together. Then we'll run it on a real document you bring."
 
-## Step 2: Pick a use case (3 min)
+## Step 2: The Instruction Input (5 min) — capstone
+
+Say:
+
+> "Before we personalize this, I want to show you something. Right now the orchestrator always runs the same 4 steps — every time, no matter what you give it. That's a workflow. You're about to turn it into an agent."
+
+"Go to **http://localhost:3000**, Stage 3 tab. You'll see a new field below the transcript area: **Optional instruction.**"
+
+Tell the student to:
+1. Load the standup transcript (click Load standup)
+2. Type in the instruction field: `Just give me the action items`
+3. Click **Run Orchestrator →**
+
+Ask: **"What happened? How many steps ran?"**
+
+Wait for their answer. Then explain:
+
+> "The Conductor read your instruction, made one planning call, and decided: 'They only need the Extractor — skip the Analyst, Synthesizer, Router, and Reflect.' It chose the minimum set of tools.
+>
+> That's the difference between a workflow and an agent. A workflow follows steps. An agent decides which steps to take."
+
+Try two more:
+- Clear the instruction, click **Run Orchestrator →** with no instruction → full pipeline
+- Type `Just route this` → Router only
+
+> "Same pipeline, same tools — but now you can steer it with a sentence. The Conductor is a planning step that runs first and decides what happens next."
+
+This is the capstone teaching moment of the whole course. Don't rush past it.
+
+## Step 3: Pick a use case (3 min)
 
 Give them the menu, then nudge them to pick fast:
 
@@ -53,7 +82,7 @@ If they pick "Custom," ask:
 
 Wait for their answers before continuing.
 
-## Step 3: Edit the analyst prompt (5 min)
+## Step 4: Edit the analyst prompt (5 min)
 
 **Coach:** Read `student-output/prompts/analyst.md` with the Read tool first and show the student what it looks like before editing:
 
@@ -73,7 +102,7 @@ For customer interviews, the update would be: change role to "You are a customer
 
 Only then: "Ready to move on to the extractor?"
 
-## Step 4: Edit the extractor prompt (3 min)
+## Step 5: Edit the extractor prompt (3 min)
 
 **Coach:** Read `student-output/prompts/extractor.md` with the Read tool first and show the student what it looks like before editing:
 
@@ -111,7 +140,7 @@ Return ONLY valid JSON:
 
 Only then continue to the synthesizer.
 
-## Step 5: Edit the synthesizer prompt (3 min)
+## Step 6: Edit the synthesizer prompt (3 min)
 
 **Coach:** Read `student-output/prompts/synthesizer.md` with the Read tool first and show the student what it looks like before editing:
 
@@ -127,7 +156,7 @@ Have the student describe what the final report should look like given their use
 
 **[Coach: Read `student-output/prompts/synthesizer.md` again and print the full updated contents]**
 
-## Step 6: Bring a real input (3 min)
+## Step 7: Bring a real input (3 min)
 
 Have them paste or share the text of a real document. Options if they don't have something on hand:
 - Paste the contents of a recent customer interview
@@ -139,7 +168,7 @@ Anything ~300+ words works.
 
 **Coach:** Write the text directly to `student-output/transcripts/real-input.txt` using the Write tool. The student should not run any terminal commands to do this.
 
-## Step 7: Run it — in the browser (3 min)
+## Step 8: Run it — in the browser (3 min)
 
 Restart the server to pick up the edited prompts. If you just opened a fresh terminal, run `cd [repo-root]` first (use `pwd` to confirm the repo root).
 
@@ -161,7 +190,7 @@ If the output is bad, the system prompts need more rules. Describe the problem t
 
 Take a screenshot of the Stage 3 panel with your personalized report showing.
 
-## Step 8: Save the personalized version (2 min)
+## Step 9: Save the personalized version (2 min)
 
 **Coach:** Save the working version of the prompts directly using the Bash tool — do not ask the student to run `cp` commands:
 
@@ -181,7 +210,51 @@ Then copy each file:
 
 > "Saved. Your `personalized/` folder now has four prompts (analyst, extractor, synthesizer, system) and one real input — your fingerprint on a multi-agent system."
 
-## Step 9: Reflect (2 min)
+## Step 10: Where This Goes (3 min)
+
+Say:
+
+> "You built one pattern this week. Here's how it extends."
+
+Show three architecture patterns:
+
+```
+Pattern 1 — Pipeline (what you built)
+  transcript
+      ↓
+  [Analyst ‖ Extractor]
+           ↓
+      [Synthesizer]
+           ↓
+        [Router]
+  Sequential specialists, each feeds the next.
+  Best for: defined input/output, clear sub-tasks.
+
+Pattern 2 — G Stack (Gary Tan)
+  One specialist per business function.
+  Sales Agent | Ops Agent | Support Agent | Eng Agent
+       ↓             ↓             ↓            ↓
+                [Orchestrator]
+  Same pattern you built — just domain-scoped specialists
+  instead of task-scoped. Each agent knows one domain deeply.
+  Best for: complex orgs, domain boundaries are real.
+
+Pattern 3 — Council
+  transcript → [Analyst] + [Risk Reviewer] + [Sentiment Reader]
+                     ↓             ↓                  ↓
+                         [Arbiter — synthesizes all three]
+  Multiple agents receive the same input, form independent opinions.
+  Arbiter synthesizes into a final recommendation.
+  Best for: high-stakes decisions where multiple lenses catch more.
+```
+
+> "The code you wrote this week runs all three of these. Different prompts, different dispatch logic — same building blocks."
+
+Ask: **"Which of these maps to a problem you have right now?"**
+
+Wait for their answer. Reflect back. The goal is for them to leave with a specific next project in mind.
+
+## Step 11: Reflect (2 min)
 
 Pause and ask:
 
@@ -189,19 +262,21 @@ Pause and ask:
 
 Listen. Reflect back. The point is to plant the seed: this pattern is portable. Once they see it, they'll see it everywhere.
 
-## Step 10: Wrap and final commit (1 min)
+## Step 12: Wrap and final commit (1 min)
 
 What you've built:
 
 ```
-┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Personalized               │
-│  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
-│  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
-└────────────┘   └────────────┘   │            ↓ [Synthesizer]            │
-                                  │            ↓ [Router]                 │
-                                  │  personalized/ prompts saved          │
-                                  └──────────────────────────────────────┘
+┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────────────┐
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Personalized                       │
+│  chat.js   │   │workflow.js │ → │  orchestrator.js                              │
+│  ask()     │   │runWorkflow │   │  [Conductor — plans which steps to run]       │
+└────────────┘   └────────────┘   │  [Analyst ‖ Extractor] (parallel)            │
+                                  │            ↓ [Synthesizer]                    │
+                                  │            ↓ [Router]                         │
+                                  │            ↓ [Reflect]                        │
+                                  │  personalized/ prompts saved                  │
+                                  └──────────────────────────────────────────────┘
 ```
 
 **Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
@@ -211,7 +286,7 @@ What you've built:
 
 3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
-## Step 11: Celebrate (genuinely — 1 min)
+## Step 13: Celebrate (genuinely — 1 min)
 
 > "You did it. You went from never having called an API to building a working multi-agent system. The skill is now yours forever — the next agent you build will take a fraction of the time, because you have the pattern.
 >
@@ -221,18 +296,21 @@ What you've built:
 > - **Specialists beat generalists.** Split work into focused sub-agents when it has distinct sub-tasks.
 > - **Trigger and destination are pluggable.** The agent in the middle is reusable.
 > - **Three questions for any new agent**: What's the input? What's the output? What sub-agents fit between them?
+> - **A workflow follows steps. An agent decides which steps.** The instruction input is how you steer the agent.
 >
 > Go build something."
 
 ## Coach Guardrails
 
+- **The instruction input capstone is the 'aha' moment of the whole course.** Don't skip it and don't rush it. Run 3 examples (action items only / blank / just route this) so the contrast lands.
 - **Show the full file after every edit** — after every prompt edit (analyst, extractor, synthesizer), read the file back with the Read tool and print the full updated contents before moving on. The student should always be able to see exactly what changed.
 - **Coach does all file operations** — never ask the student to run `cp`, `mkdir`, or any file command. The coach handles file copies, directory creation, and file writes directly via tools.
 - **Use-case selection cap: 3 minutes** — if the student hasn't picked after 3 minutes, nudge them to the option that matches a document they have on their laptop right now.
-- **Warn about JSON field names before Step 4** — when editing `prompts/extractor.md`, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator parses the extractor's output with `JSON.parse()` and expects those keys. A student who renames them will get a confusing runtime error.
+- **Warn about JSON field names before Step 5** — when editing `prompts/extractor.md`, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator parses the extractor's output with `JSON.parse()` and expects those keys. A student who renames them will get a confusing runtime error.
 - **JTBD = Jobs to Be Done** — if the student doesn't recognize the term, explain it: "Jobs to Be Done — what the user is fundamentally trying to accomplish, not just what they're doing on the surface."
 - **If the output is bad, iterate** — bad first output is expected and pedagogically useful. Tune one prompt, re-run, compare. That process is the craft.
 - **Questions stop and wait** — never ask a question and immediately answer it. Wait for the student's actual response.
+- **End with a specific next project** — the "Where This Goes" section (Step 10) closes when the student has named a concrete problem they want to apply this to. Don't let them leave with "I'll think about it."
 
 ## Optional deeper reading
 

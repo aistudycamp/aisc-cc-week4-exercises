@@ -926,6 +926,35 @@
   .orch-step.done { color: var(--ink); border-color: var(--line); background: var(--panel-soft); }
   .step-check { font-size: 13px; flex-shrink: 0; width: 16px; text-align: center; }
 
+  .panel-instruction {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    border: 1px solid #D4CFC7;
+    border-radius: 6px;
+    background: #FDFCFA;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 48px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .panel-instruction:focus { outline: none; border-color: #8B8074; }
+
+  .conductor-plan {
+    padding: 6px 10px;
+    background: #F5F2EE;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .conductor-label { color: #8B8074; margin-right: 6px; }
+  .conductor-tools { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+  .conductor-reason { color: #8B8074; margin-left: 8px; font-style: italic; }
+
   /* INSPECT MODE */
   .inspect { display: none; }
   .inspect.visible { display: block; animation: outIn 0.4s ease; }
@@ -1418,7 +1447,18 @@
               <button class="panel-sample-btn" id="orchClientBtn">Load client call</button>
               <button class="panel-sample-btn" id="orchPlanningBtn">Load planning</button>
             </div>
+            <textarea
+              class="panel-instruction"
+              id="orchInstruction"
+              placeholder="Optional: tell the Conductor what you want. e.g. &quot;Just give me the action items&quot; or &quot;Only route this — skip the analysis&quot; — leave blank for full pipeline"
+              rows="2"
+            ></textarea>
             <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
+            <div id="orchConductorPlan" style="display:none" class="conductor-plan">
+              <span class="conductor-label">Conductor chose:</span>
+              <span id="orchConductorTools" class="conductor-tools"></span>
+              <span id="orchConductorReason" class="conductor-reason"></span>
+            </div>
             <div class="orch-steps" id="orchSteps">
               <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Analyst + Extractor (parallel)</span></div>
               <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Synthesizer: combine results</span></div>
@@ -2424,53 +2464,108 @@ Return ONLY a JSON object:
     $('s3RunReport').style.display = 'none';
     ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
     try {
-      // Step 1: Analyst + Extractor run in parallel (both fired at once)
-      setStep('orchStep1', 'running');
-      const r1 = await fetch('/api/orchestrate/step1', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript }),
-      });
-      const { themes, actions, error: e1 } = await r1.json();
-      if (e1) throw new Error(e1);
-      setStep('orchStep1', 'done');
+      $('orchConductorPlan').style.display = 'none';
+      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
 
-      // Step 2: Synthesizer combines themes + actions → report
-      setStep('orchStep2', 'running');
-      const r2 = await fetch('/api/orchestrate/step2', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ themes, actions }),
-      });
-      const { report, error: e2 } = await r2.json();
-      if (e2) throw new Error(e2);
-      setStep('orchStep2', 'done');
+      const instruction = $('orchInstruction') ? $('orchInstruction').value.trim() : '';
+      let tools = ['analyst', 'extractor', 'synthesizer', 'router', 'reflect'];
 
-      // Step 3: Router classifies transcript, saves transcript + report, notifies
-      setStep('orchStep3', 'running');
-      const r3 = await fetch('/api/orchestrate/step3', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript, report }),
-      });
-      const { classification, error: e3 } = await r3.json();
-      if (e3) throw new Error(e3);
-      setStep('orchStep3', 'done');
+      // If instruction given, ask Conductor to plan
+      if (instruction) {
+        const rPlan = await fetch('/api/orchestrate/conductor', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript, instruction }),
+        });
+        const { plan, error: ePlan } = await rPlan.json();
+        if (ePlan) throw new Error(ePlan);
+        tools = plan.tools;
+        $('orchConductorTools').textContent = plan.tools.join(' → ');
+        $('orchConductorReason').textContent = plan.reasoning;
+        $('orchConductorPlan').style.display = 'block';
+      }
+
+      let themes = null, actions = null, report = null, classification = null;
+
+      // Step 1: Analyst + Extractor
+      const needsAnalyst = tools.includes('analyst');
+      const needsExtractor = tools.includes('extractor');
+      if (needsAnalyst || needsExtractor) {
+        setStep('orchStep1', 'running');
+        if (needsAnalyst && needsExtractor) {
+          const r1 = await fetch('/api/orchestrate/step1', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript }),
+          });
+          const { themes: t, actions: a, error: e1 } = await r1.json();
+          if (e1) throw new Error(e1);
+          themes = t; actions = a;
+        } else if (needsAnalyst) {
+          const r1 = await fetch('/api/orchestrate/step1', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript }),
+          });
+          const { themes: t, error: e1 } = await r1.json();
+          if (e1) throw new Error(e1);
+          themes = t;
+        } else {
+          const r1 = await fetch('/api/orchestrate/step1', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript }),
+          });
+          const { actions: a, error: e1 } = await r1.json();
+          if (e1) throw new Error(e1);
+          actions = a;
+        }
+        setStep('orchStep1', 'done');
+      }
+
+      // Step 2: Synthesizer
+      if (tools.includes('synthesizer') && themes && actions) {
+        setStep('orchStep2', 'running');
+        const r2 = await fetch('/api/orchestrate/step2', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ themes, actions }),
+        });
+        const { report: rpt, error: e2 } = await r2.json();
+        if (e2) throw new Error(e2);
+        report = rpt;
+        setStep('orchStep2', 'done');
+      }
+
+      // Step 3: Router
+      if (tools.includes('router')) {
+        setStep('orchStep3', 'running');
+        const r3 = await fetch('/api/orchestrate/step3', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript, report }),
+        });
+        const { classification: cls, error: e3 } = await r3.json();
+        if (e3) throw new Error(e3);
+        classification = cls;
+        setStep('orchStep3', 'done');
+      }
 
       // Step 4: Reflect
-      setStep('orchStep4', 'running');
-      const r4 = await fetch('/api/orchestrate/step4', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript, themes, actions, report, classification }),
-      });
-      const { runReport, error: e4 } = await r4.json();
-      if (e4) throw new Error(e4);
-      setStep('orchStep4', 'done');
+      if (tools.includes('reflect')) {
+        setStep('orchStep4', 'running');
+        const r4 = await fetch('/api/orchestrate/step4', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript, themes, actions, report, classification }),
+        });
+        const { runReport, error: e4 } = await r4.json();
+        if (e4) throw new Error(e4);
+        setStep('orchStep4', 'done');
+        $('s3RunReportContent').textContent = runReport;
+        $('s3RunReport').style.display = 'block';
+      }
 
-      const safe = report.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      // Show results
+      const resultContent = report || themes || actions || 'Done.';
+      const safe = resultContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       $('orchResult').innerHTML = `
-        <span class="class-badge">${classification}</span>
+        ${classification ? `<span class="class-badge">${classification}</span>` : ''}
         <div class="result-report">${safe}</div>
       `;
-      $('s3RunReportContent').textContent = runReport;
-      $('s3RunReport').style.display = 'block';
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
     } catch (err) {
       $('orchResult').textContent = 'Error: ' + err.message;

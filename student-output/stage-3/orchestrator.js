@@ -30,6 +30,7 @@ const promptAnalyst    = fs.readFileSync(path.join(ROOT, "prompts", "analyst.md"
 const promptExtractor  = fs.readFileSync(path.join(ROOT, "prompts", "extractor.md"),  "utf-8");
 const promptSynthesizer = fs.readFileSync(path.join(ROOT, "prompts", "synthesizer.md"), "utf-8");
 const promptReflect    = fs.readFileSync(path.join(ROOT, "prompts", "reflect.md"),    "utf-8");
+const promptConductor  = fs.readFileSync(path.join(ROOT, "prompts", "conductor.md"),  "utf-8");
 
 // ─── Specialist: Analyst ──────────────────────────────────────────────────────
 // Identifies key themes and decisions — same API call as Stage 1, different prompt
@@ -94,33 +95,87 @@ export async function reflect(transcript, themes, actions, report, classificatio
   return response.content[0].text;
 }
 
+// ─── Specialist: Conductor ────────────────────────────────────────────────────
+// Planning step — decides which tools to call based on optional instruction
+export async function conductor(transcript, instruction) {
+  const userMessage = [
+    `TRANSCRIPT:\n${transcript}`,
+    `INSTRUCTION: ${instruction || "Process this transcript — run the full pipeline."}`,
+    "Decide which tools to call.",
+  ].join("\n\n");
+
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 512,
+    system: promptConductor,
+    messages: [{ role: "user", content: userMessage }],
+  });
+
+  try {
+    return JSON.parse(response.content[0].text);
+  } catch {
+    // Fallback to full pipeline if JSON parse fails
+    return { tools: ["analyst", "extractor", "synthesizer", "router", "reflect"], reasoning: "Defaulting to full pipeline." };
+  }
+}
+
 // ─── Orchestrator: coordinates the full sequence ──────────────────────────────
-export async function orchestrator(transcript, sourceFilename = "transcript.txt") {
-  // Step 1: Analyst + Extractor run in parallel — first time anything runs simultaneously
-  console.log("  🔀 Step 1: Analyst + Extractor running in parallel...");
-  const [themes, actions] = await Promise.all([
-    analyst(transcript),
-    extractor(transcript),
-  ]);
-  console.log("  ✓ Analyst complete. Extractor complete.");
+export async function orchestrator(transcript, sourceFilename = "transcript.txt", instruction = null) {
+  let plan = null;
 
-  // Step 2: Synthesizer combines results into the final report
-  console.log("  🧠 Step 2: Synthesizer combining results...");
-  const report = await synthesizer(themes, actions);
-  console.log("  ✓ Report synthesized.");
+  // If instruction given, ask Conductor to plan which tools to call
+  if (instruction && instruction.trim()) {
+    console.log("  🧭 Conductor planning — deciding which tools to call...");
+    plan = await conductor(transcript, instruction);
+    console.log(`  ✓ Plan: [${plan.tools.join(", ")}] — ${plan.reasoning}`);
+  }
 
-  // Step 3: Router — classify from transcript, save both files, notify
-  console.log("  ⚙️  Step 3: Router — classifying, saving, notifying...");
-  const { classification, outputPath } = await runWorkflow(transcript, sourceFilename, report);
-  console.log("  ✓ Routed and saved.");
+  const tools = plan ? plan.tools : ["analyst", "extractor", "synthesizer", "router", "reflect"];
 
-  // Step 4: Reflect — Conductor evaluates the run and produces recommendations
-  console.log("  🪞 Step 4: Conductor reflecting on the run...");
-  const runReport = await reflect(transcript, themes, actions, report, classification);
-  console.log("  ✓ Run report complete.");
+  let themes = null, actions = null, report = null, classification = null, outputPath = null, runReport = null;
+
+  // Step 1: Analyst + Extractor (parallel if both needed)
+  const needsAnalyst = tools.includes("analyst");
+  const needsExtractor = tools.includes("extractor");
+
+  if (needsAnalyst && needsExtractor) {
+    console.log("  🔀 Step 1: Analyst + Extractor running in parallel...");
+    [themes, actions] = await Promise.all([analyst(transcript), extractor(transcript)]);
+    console.log("  ✓ Analyst complete. Extractor complete.");
+  } else if (needsAnalyst) {
+    console.log("  🔍 Running Analyst...");
+    themes = await analyst(transcript);
+    console.log("  ✓ Analyst complete.");
+  } else if (needsExtractor) {
+    console.log("  📋 Running Extractor...");
+    actions = await extractor(transcript);
+    console.log("  ✓ Extractor complete.");
+  }
+
+  // Step 2: Synthesizer (requires themes + actions)
+  if (tools.includes("synthesizer") && themes && actions) {
+    console.log("  🧠 Synthesizer combining results...");
+    report = await synthesizer(themes, actions);
+    console.log("  ✓ Report synthesized.");
+  }
+
+  // Step 3: Router
+  if (tools.includes("router")) {
+    const routerInput = report || themes || actions || transcript;
+    console.log("  ⚙️  Router — classifying, saving, notifying...");
+    ({ classification, outputPath } = await runWorkflow(transcript, sourceFilename, report));
+    console.log("  ✓ Routed and saved.");
+  }
+
+  // Step 4: Reflect
+  if (tools.includes("reflect") && report) {
+    console.log("  🪞 Conductor reflecting on the run...");
+    runReport = await reflect(transcript, themes, actions, report, classification);
+    console.log("  ✓ Run report complete.");
+  }
 
   console.log("✓ Orchestration complete.\n");
-  return { report, classification, outputPath, runReport };
+  return { report, themes, actions, classification, outputPath, runReport, plan };
 }
 
 // ─── CLI entry point ───────────────────────────────────────────────────────────
