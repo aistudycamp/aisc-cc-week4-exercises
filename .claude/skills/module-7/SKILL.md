@@ -24,6 +24,8 @@ Say:
 
 If the server is still running from Module 3 or 6, skip this. If not:
 
+**Coach:** Run `pwd` via Bash to confirm the repo root. If you just opened a fresh terminal, run `cd [repo-root]` first (replace `[repo-root]` with the actual path from `pwd`). Then start the server:
+
 ```bash
 npm run server
 ```
@@ -56,9 +58,9 @@ Click the **Stage 2** tab. Load the sample transcript. Hit **Run Workflow →**.
 
 Watch the classification result appear.
 
-> "Your `workflow.js` just fired. It classified the meeting, routed the file, sent the notification. Same pipeline you triggered with `npm run drop-test` in Module 4 — now triggered by a button click."
+> "Your `workflow.js` just fired. It classified the meeting, routed the file, sent the notification. Same pipeline you triggered with a button click in Module 4 — now you're doing it again from here."
 
-Try dropping a different transcript if you have one. The classification changes.
+Try loading a different transcript if you have one. The classification changes.
 
 ## Step 5: Stage 3 tab — run the full orchestrator (6 min)
 
@@ -102,11 +104,11 @@ What you've built so far:
                                   └──────────────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 7:` to `- [x] Module 7:`
-2. **Commit** — in any terminal at the repo root:
-   ```bash
-   git add -A && git commit -m "Complete Module 7: Use Your Live System"
-   ```
+**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+
+1. Run `git add -A && git commit -m "Complete Module 7: Use Your Live System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+2. Update `CLAUDE.md`: change `- [ ] Module 7:` to `- [x] Module 7:` via Edit tool.
+
 3. **Run `/compact`** — type `/compact` to clear context before Module 8.
 4. Hand off:
 

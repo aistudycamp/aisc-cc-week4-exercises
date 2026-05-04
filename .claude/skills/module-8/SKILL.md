@@ -10,7 +10,7 @@ description: Make It Yours — Module 8 of the AISC Agent Sprint. Triggered when
 
 ## Coach Instructions
 
-The whole sprint has been on rails. This module is where the student takes the wheel. Help them pick a use case quickly (don't let them spiral) and walk them through editing all three system prompts.
+The whole sprint has been on rails. This module is where the student takes the wheel. Help them pick a use case quickly (don't let them spiral) and walk them through editing all three system prompts. After every edit, read the file back and print the full contents so the student sees exactly what was changed before re-running.
 
 ## Step 1: Set the frame (2 min)
 
@@ -40,6 +40,8 @@ Give them the menu, then nudge them to pick fast:
 
 Ask: **"Which one feels useful to you right now?"**
 
+Wait for their answer before continuing.
+
 If they hesitate:
 
 > "Don't over-think it. Pick the one you can run on a real document you have on your laptop today. We can do another later."
@@ -49,21 +51,39 @@ If they pick "Custom," ask:
 2. **What two specialists** make sense? (the equivalents of "themes" and "actions")
 3. **What does the final report** look like?
 
-## Step 3: Edit the analyst and synthesizer prompts (5 min)
+Wait for their answers before continuing.
 
-The three prompts that define this agent: `analyst.md`, `extractor.md`, `synthesizer.md`.
+## Step 3: Edit the analyst prompt (5 min)
 
-Have the student describe what they want, then tell Claude to update the files.
+**Coach:** Read `student-output/prompts/analyst.md` with the Read tool first and show the student what it looks like before editing:
 
-For customer interviews, the student would say to Claude:
+> "Here's what `prompts/analyst.md` looks like right now:"
 
-> "Tell Claude: 'Update prompts/analyst.md — change the role to: You are a customer interview analyst. Change the output format sections to: JTBD THEMES (what the user is fundamentally trying to accomplish) and KEY INSIGHTS (surprising or non-obvious findings from the interview).'"
+**[Coach: Read `student-output/prompts/analyst.md` and print full contents]**
 
-Coach: help them phrase this for their specific use case. The pattern for each file: "Tell Claude: 'Update prompts/[file].md — change the role to [role]. Change the output format to [their desired format].'"
+Have the student describe what they want. Help them phrase the change for their specific use case. The pattern: change the role and change the output format sections.
+
+For customer interviews, the update would be: change role to "You are a customer interview analyst," change output format to JTBD THEMES and KEY INSIGHTS.
+
+**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
+
+> "Here's what it looks like now:"
+
+**[Coach: Read `student-output/prompts/analyst.md` again and print the full updated contents]**
+
+Only then: "Ready to move on to the extractor?"
 
 ## Step 4: Edit the extractor prompt (3 min)
 
-Now `prompts/extractor.md`. This one returns JSON — be careful. Have them swap the **labels** but keep the JSON-only rule and the schema.
+**Coach:** Read `student-output/prompts/extractor.md` with the Read tool first and show the student what it looks like before editing:
+
+> "Here's what `prompts/extractor.md` looks like right now:"
+
+**[Coach: Read `student-output/prompts/extractor.md` and print full contents]**
+
+This one returns JSON — warn before editing:
+
+> "One constraint here: keep the field names — `owner`, `task`, `deadline` — even if the meaning shifts. The orchestrator parses this JSON programmatically and expects those exact keys. You can change what they *mean*, but not what they're *called*."
 
 For customer interviews, the extractor might pull verbatim quotes:
 
@@ -83,64 +103,85 @@ Return ONLY valid JSON:
 }
 ```
 
-(Note: keep the field names — `owner`, `task`, `deadline` — even if the meaning shifts. The orchestrator parses this JSON programmatically.)
+**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
 
-Save.
+> "Here's what it looks like now:"
 
-## Step 5: Bring a real input (3 min)
+**[Coach: Read `student-output/prompts/extractor.md` again and print the full updated contents]**
 
-Have them grab a real document and put it in `transcripts/`. In the current terminal, from `student-output/`:
+Only then continue to the synthesizer.
 
-```bash
-cp /path/to/their-real-document.txt transcripts/real-input.txt
-```
+## Step 5: Edit the synthesizer prompt (3 min)
 
-If they don't have something on their laptop, give them options:
-- Paste the contents of a recent customer interview into a new `.txt` file
+**Coach:** Read `student-output/prompts/synthesizer.md` with the Read tool first and show the student what it looks like before editing:
+
+> "Here's what `prompts/synthesizer.md` looks like right now:"
+
+**[Coach: Read `student-output/prompts/synthesizer.md` and print full contents]**
+
+Have the student describe what the final report should look like given their use case. Update the output format to match.
+
+**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
+
+> "Here's what it looks like now:"
+
+**[Coach: Read `student-output/prompts/synthesizer.md` again and print the full updated contents]**
+
+## Step 6: Bring a real input (3 min)
+
+Have them paste or share the text of a real document. Options if they don't have something on hand:
+- Paste the contents of a recent customer interview
 - Export their notes from a real meeting/call
 - Save a podcast transcript from a service that produces one
 - Paste their last 10 Slack DMs with a teammate
 
 Anything ~300+ words works.
 
-## Step 6: Run it — in the browser (3 min)
+**Coach:** Write the text directly to `student-output/transcripts/real-input.txt` using the Write tool. The student should not run any terminal commands to do this.
 
-Restart the server to pick up the edited prompts. In Terminal 1 (the server terminal): `Ctrl+C`, then:
+## Step 7: Run it — in the browser (3 min)
 
-```bash
-npm run server
-```
+Restart the server to pick up the edited prompts. If you just opened a fresh terminal, run `cd [repo-root]` first (use `pwd` to confirm the repo root).
+
+The server terminal needs a restart to pick up the edited prompts. Tell the student:
+
+> "Press Ctrl+C in the server terminal to stop it, then run `npm run server` again."
+
+That's the only terminal command the student needs to run — just the server restart.
 
 Open **http://localhost:3000**, click the **Stage 3** tab.
 
-Paste the real input text into the transcript area and hit **Run Orchestrator →**.
+Paste the real input text into the transcript area (or click Load and use the file you just saved) and hit **Run Orchestrator →**.
 
 Watch the four steps light up with the personalized prompts firing. Read the report.
 
 > "How is it? Useful? Surprising? Wrong about something?"
 
-If the output is bad, the system prompts need more rules. Describe the problem to Claude — "the themes are too generic, make them more specific to customer insights" — and let Claude revise the prompt. Re-run in the browser. Compare. This is the actual craft of building agents: tune the prompt until the output is what you want.
+If the output is bad, the system prompts need more rules. Describe the problem to me — "the themes are too generic, make them more specific to customer insights" — and I'll revise the prompt directly. After every revision I'll show you the full updated file before we re-run. This is the actual craft of building agents: tune the prompt until the output is what you want.
 
 Take a screenshot of the Stage 3 panel with your personalized report showing.
 
-## Step 7: Save the result (2 min)
+## Step 8: Save the personalized version (2 min)
 
-Save their personalized version somewhere they can find it later. The `student-output/` folder is theirs forever.
+**Coach:** Save the working version of the prompts directly using the Bash tool — do not ask the student to run `cp` commands:
 
-Suggest they save the working version of the prompts. In the current terminal, from `student-output/`:
-
+Run:
 ```bash
-mkdir -p personalized
-cp prompts/system.md personalized/system.md
-cp prompts/analyst.md personalized/analyst.md
-cp prompts/extractor.md personalized/extractor.md
-cp prompts/synthesizer.md personalized/synthesizer.md
-cp transcripts/real-input.txt personalized/sample-input.txt
+mkdir -p student-output/personalized
 ```
 
-> "That `personalized/` folder is your take-home. Four prompts (analyst, extractor, synthesizer, system), one real input, one real output — your fingerprint on a multi-agent system."
+Then copy each file:
+- `student-output/prompts/system.md` → `student-output/personalized/system.md`
+- `student-output/prompts/analyst.md` → `student-output/personalized/analyst.md`
+- `student-output/prompts/extractor.md` → `student-output/personalized/extractor.md`
+- `student-output/prompts/synthesizer.md` → `student-output/personalized/synthesizer.md`
+- `student-output/transcripts/real-input.txt` → `student-output/personalized/sample-input.txt`
 
-## Step 8: Reflect (2 min)
+**Coach:** Do this via Bash tool, then confirm to the student:
+
+> "Saved. Your `personalized/` folder now has four prompts (analyst, extractor, synthesizer, system) and one real input — your fingerprint on a multi-agent system."
+
+## Step 9: Reflect (2 min)
 
 Pause and ask:
 
@@ -148,7 +189,7 @@ Pause and ask:
 
 Listen. Reflect back. The point is to plant the seed: this pattern is portable. Once they see it, they'll see it everywhere.
 
-## Step 9: Wrap and final commit (1 min)
+## Step 10: Wrap and final commit (1 min)
 
 What you've built:
 
@@ -163,14 +204,14 @@ What you've built:
                                   └──────────────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 8:` to `- [x] Module 8:`
-2. **Commit** — in any terminal at the repo root:
-   ```bash
-   git add -A && git commit -m "Complete Module 8: Make It Yours"
-   ```
+**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+
+1. Run `git add -A && git commit -m "Complete Module 8: Make It Yours"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+2. Update `CLAUDE.md`: change `- [ ] Module 8:` to `- [x] Module 8:` via Edit tool.
+
 3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
-## Step 10: Celebrate (genuinely — 1 min)
+## Step 11: Celebrate (genuinely — 1 min)
 
 > "You did it. You went from never having called an API to building a working multi-agent system. The skill is now yours forever — the next agent you build will take a fraction of the time, because you have the pattern.
 >
@@ -185,11 +226,13 @@ What you've built:
 
 ## Coach Guardrails
 
-- **Use only `npm run stage-3 -- transcripts/real-input.txt`** as the run command. Don't offer alternative invocation patterns — consistency matters at the sprint's most important moment.
+- **Show the full file after every edit** — after every prompt edit (analyst, extractor, synthesizer), read the file back with the Read tool and print the full updated contents before moving on. The student should always be able to see exactly what changed.
+- **Coach does all file operations** — never ask the student to run `cp`, `mkdir`, or any file command. The coach handles file copies, directory creation, and file writes directly via tools.
 - **Use-case selection cap: 3 minutes** — if the student hasn't picked after 3 minutes, nudge them to the option that matches a document they have on their laptop right now.
 - **Warn about JSON field names before Step 4** — when editing `prompts/extractor.md`, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator parses the extractor's output with `JSON.parse()` and expects those keys. A student who renames them will get a confusing runtime error.
 - **JTBD = Jobs to Be Done** — if the student doesn't recognize the term, explain it: "Jobs to Be Done — what the user is fundamentally trying to accomplish, not just what they're doing on the surface."
 - **If the output is bad, iterate** — bad first output is expected and pedagogically useful. Tune one prompt, re-run, compare. That process is the craft.
+- **Questions stop and wait** — never ask a question and immediately answer it. Wait for the student's actual response.
 
 ## Optional deeper reading
 

@@ -52,9 +52,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log("   Ask your first question.\n");
   } else {
     console.log("💬 Chat Assistant — Meeting Analyst");
-    console.log("   Paste a transcript as your first message,");
-    console.log("   then ask follow-up questions.");
-    console.log('   Type "exit" to quit.\n');
+    console.log("   Paste your transcript as the first message, then ask questions.\n");
   }
 
   // If a transcript was pre-loaded, seed the conversation with it
@@ -74,8 +72,17 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   let buffer = [];
 
   const showPrompt = () => {
-    process.stdout.write("> ");
+    process.stdout.write("> (Enter twice to send, or type 'exit' to quit) ");
     buffer = [];
+  };
+
+  // F-27: format token usage line
+  const formatUsage = (usage) => {
+    const inputCost = (usage.input_tokens / 1_000_000) * 3;
+    const outputCost = (usage.output_tokens / 1_000_000) * 15;
+    const totalCost = inputCost + outputCost;
+    const totalTokens = usage.input_tokens + usage.output_tokens;
+    return `   [~${totalTokens} tokens · ~$${totalCost.toFixed(4)}]`;
   };
 
   const submit = async () => {
@@ -85,27 +92,58 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
     messages.push({ role: "user", content: text });
 
-    try {
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages,
-      });
+    // F-25: thinking indicator
+    process.stdout.write("⏳ Thinking...");
 
-      const reply = response.content[0].text;
-      messages.push({ role: "assistant", content: reply });
-      console.log(`\nAssistant: ${reply}\n`);
-    } catch (err) {
-      messages.pop();
-      if (err.status === 429) {
-        console.log("\n⚠️  Too many connections right now — wait a moment and try again.\n");
-      } else if (err.status === 401) {
-        console.log("\n⚠️  API key issue — check that your .env has a valid ANTHROPIC_API_KEY.\n");
-      } else {
-        console.log(`\n⚠️  Something went wrong (${err.status ?? err.message}) — try again.\n`);
+    let retryShown = false;
+    let response;
+
+    while (true) {
+      try {
+        response = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages,
+        });
+        break; // success — exit retry loop
+      } catch (err) {
+        // Clear the thinking indicator line
+        process.stdout.write("\r" + " ".repeat(20) + "\r");
+
+        if (err.status === 429) {
+          if (!retryShown) {
+            console.log("⚠️  API is busy — retrying in 5 seconds…");
+            retryShown = true;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          process.stdout.write("⏳ Thinking...");
+          continue; // retry silently
+        } else if (err.status === 401) {
+          messages.pop();
+          console.log("\n⚠️  API key issue — check that your .env has a valid ANTHROPIC_API_KEY.\n");
+          showPrompt();
+          return;
+        } else {
+          messages.pop();
+          console.log(`\n⚠️  Something went wrong (${err.status ?? err.message}) — try again.\n`);
+          showPrompt();
+          return;
+        }
       }
     }
+
+    // Clear the thinking indicator line
+    process.stdout.write("\r" + " ".repeat(20) + "\r");
+
+    const reply = response.content[0].text;
+    messages.push({ role: "assistant", content: reply });
+    console.log(`\nAssistant: ${reply}`);
+    // F-27: token usage
+    if (response.usage) {
+      console.log(formatUsage(response.usage));
+    }
+    console.log();
     showPrompt();
   };
 
@@ -118,8 +156,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   });
 
-  if (!preloadedTranscript) {
-    console.log("   Press Enter twice to send.\n");
-  }
   showPrompt();
 }

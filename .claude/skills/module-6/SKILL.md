@@ -1,6 +1,6 @@
 ---
 name: module-6
-description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student opens stage-3/orchestrator.js, sees the parallel dispatch (Promise.all), walks through the 3-step sequence (Analyst+Extractor parallel → Synthesizer → Router), runs the full system, and arrives at the Claude Code connection — "you've been using this pattern all week."
+description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student reads stage-3/orchestrator.js inline (coach prints it), sees the parallel dispatch (Promise.all), walks through the 3-step sequence (Analyst+Extractor parallel → Synthesizer → Router), runs the full system, and arrives at the Claude Code connection — "you've been using this pattern all week."
 ---
 
 # Module 6: The Agentic System
@@ -27,7 +27,7 @@ Say:
 >
 > And here's the payoff you've been set up for: the specialists you just read in Module 5, the workflow you built in Module 4 — the orchestrator is what wires them all together. You're not starting over. You're composing what you have."
 
-Before we open anything, ask:
+Before we look at any code, ask:
 
 > "What's the difference between running two things *in sequence* versus running them *in parallel*?"
 
@@ -54,15 +54,15 @@ transcript
 >
 > Three steps. Four API calls total (two parallel, one synthesis, one classifier). Two building blocks you already built."
 
-## Step 3: Open orchestrator.js — start at the imports (5 min)
+## Step 3: Read orchestrator.js — start at the imports (5 min)
 
-In the current terminal, from `student-output/`:
+**Coach:** Use the Read tool to read `student-output/stage-3/orchestrator.js` and print the relevant sections inline. Do not ask the student to open the file or run any terminal command just to view it.
 
-```bash
-cat stage-3/orchestrator.js
-```
+Here's what's at the top of `stage-3/orchestrator.js` right now:
 
-Start at the very top — the prompt file loads:
+**[Coach: Read `student-output/stage-3/orchestrator.js` and print the prompt-loading block and the import line below]**
+
+Start with the prompt file loads:
 
 ```js
 const promptAnalyst    = fs.readFileSync(path.join(ROOT, 'prompts', 'analyst.md'),    'utf-8');
@@ -88,7 +88,7 @@ Wait for their answer. The answer: Analyst and Extractor fire at the same time.
 
 ## Step 4: Walk through the parallel dispatch (4 min)
 
-Find the `orchestrator()` function — specifically the Promise.all:
+**Coach:** Print the `orchestrator()` function — specifically the Promise.all block and the two lines that follow:
 
 ```js
 // Step 1: Analyst + Extractor run in parallel — first time anything runs simultaneously
@@ -122,13 +122,17 @@ const { classification, outputPath } = await runWorkflow(transcript, sourceFilen
 
 ## Step 5: Run it (5 min)
 
-In the current terminal, from `student-output/`:
+The server should already be running from Module 3. If you just opened a fresh terminal, run `cd [repo-root]` first (use `pwd` to confirm the repo root), then:
 
 ```bash
-npm run stage-3 -- transcripts/sample-transcript.txt
+npm run server
 ```
 
-The terminal shows the live trace:
+Open **http://localhost:3000** and click the **Stage 3** tab.
+
+Click **Load standup**, then hit **Run Orchestrator →**.
+
+Watch each step light up:
 
 ```
 📄 Input: transcripts/sample-transcript.txt (N words)
@@ -151,33 +155,19 @@ The terminal shows the live trace:
 
 Point at the output:
 
-> "Step 1 says 'Analyst + Extractor running in parallel' — both fired at once. Step 2 is Synthesizer — it waited. Step 3 is the workflow you built in Module 4. And after it, there's now a report file alongside the transcript in the typed folder.
->
-> Go look:"
+> "Step 1 says 'Analyst + Extractor running in parallel' — both fired at once. Step 2 is Synthesizer — it waited. Step 3 is the workflow you built in Module 4. And after it, there's now a report file alongside the transcript in the typed folder."
 
-```bash
-ls transcripts/team-standup/
-```
+**Coach:** Use the Read tool to list the `student-output/transcripts/team-standup/` directory and show the student the two files: the transcript and the report.
 
-Two files: the transcript and the report. That's Stage 3.
+> "Two files: the transcript and the report. That's Stage 3."
 
 ## Step 6: Run it through the browser (4 min)
 
-Terminal 1 should have the server running. Open **http://localhost:3000** and click the **Stage 3** tab.
-
-Click **Load standup**, then hit **Run Orchestrator →**.
-
-Watch each step light up as it completes:
-
-- Step 1 ✓ — Analyst + Extractor (parallel)
-- Step 2 ✓ — Synthesizer
-- Step 3 ✓ — Router: classify + save + notify
-
-The full report appears below.
+You're already in the browser. Click each node on the diagram and point to the code behind it.
 
 > "Each checkmark is a real API call completing. Step 1 shows both analysts finishing simultaneously — you can see the parallel dispatch happening."
 
-Click each node on the diagram. Show the inspect panels — each one maps to a specific file you've now run.
+Show the inspect panels — each one maps to a specific file you've now run.
 
 ## Step 7: The Claude Code connection (3 min)
 
@@ -221,11 +211,11 @@ What you've built so far:
                                   └──────────────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 6:` to `- [x] Module 6:`
-2. **Commit** — use any terminal at the repo root:
-   ```bash
-   git add -A && git commit -m "Complete Module 6: The Agentic System"
-   ```
+**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+
+1. Run `git add -A && git commit -m "Complete Module 6: The Agentic System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+2. Update `CLAUDE.md`: change `- [ ] Module 6:` to `- [x] Module 6:` via Edit tool.
+
 3. **Run `/compact`** — type `/compact` to clear context before Module 7.
 4. Hand off:
 
@@ -236,8 +226,9 @@ What you've built so far:
 - **Slow down at the Promise.all** — "This is the most important line in Stage 3" means it. Don't move past the parallel dispatch until the student understands why it matters.
 - **Make the prediction first** — "What do you think happens first when the orchestrator runs?" in Step 3 is not optional. Wait for their prediction before walking through the code.
 - **The Claude Code connection is the capstone** — don't skip Step 7. It reframes everything they did this week. Land it before the commit.
+- **Coach reads files inline** — never ask the student to open `orchestrator.js` or run `cat`. Use the Read tool and print the relevant sections directly in chat.
 - **"Agentic" vs "workflow"** — the distinction is: parallel dispatch, context passing between specialists, and synthesis. If a student asks what makes Stage 3 *agentic* specifically, those are the three answers.
-- **Have them look at the output folder** — seeing both the transcript file *and* the report file in `transcripts/team-standup/` is the tangible proof that the router saved both. Don't just describe it.
+- **Have them look at the output folder** — show the two files via Read tool. Don't just describe it.
 
 ## Optional deeper reading
 

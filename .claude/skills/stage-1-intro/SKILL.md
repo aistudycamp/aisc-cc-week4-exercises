@@ -40,13 +40,21 @@ Print this:
 >
 > **Second — what AI products actually are.** Spoiler: they're not magic. By the end of Module 2, you'll have called the Claude API yourself and seen the JSON come back. Once you've seen that, AI stops being a black box and becomes 'JSON in, JSON out, with a clever system prompt in the middle.' That moment is the whole point of Stage 1."
 
-## Step 2: Check Node.js (2 min)
+## Step 2: Establish the repo root anchor
+
+Run `pwd` (Bash tool) to get the absolute path of the repo root. Tell the student:
+
+> "Your repo is at `[path from pwd]`. Any time you open a fresh terminal tab during this sprint, run `cd [path from pwd]` first before any other command. That's your home base for the whole sprint."
+
+Save this path — all future modules will use it for navigation.
+
+## Step 3: Check Node.js (2 min)
 
 Say:
 
-> "Quick prereq check. We'll be writing JavaScript — no React, no Next.js, just simple Node scripts. Let's make sure Node is installed."
+> "Quick prereq check. We'll be writing JavaScript — no React, no Next.js, just simple Node scripts. Let me make sure Node is installed."
 
-In the current terminal:
+Run via Bash tool:
 
 ```bash
 node --version
@@ -62,7 +70,7 @@ If they have an older version (< 20):
 
 > "Your Node is a bit old. The Anthropic SDK needs Node 20+. Easiest fix: install the latest LTS from <https://nodejs.org/>."
 
-## Step 3: Get an Anthropic API key (4 min)
+## Step 4: Get an Anthropic API key (4 min)
 
 Say:
 
@@ -77,22 +85,21 @@ Walk them through:
 
 > "Got your key copied? Keep it ready — we'll put it in a file in a second. Don't paste it in chat."
 
-## Step 4: Scaffold the project (3 min)
+## Step 5: Scaffold the project (3 min)
 
-Now scaffold the working folder. Confirm they're ready:
+Now scaffold the working folder. Ask:
 
-> "Ready to set up your project folder? This copies the starter template into `student-output/` — that'll be your working directory for the whole sprint."
+> "Ready to set up your project folder?"
 
-Wait for them to confirm (a "yes" or "yep" or "go for it"). Then in the current terminal, from the repo root:
+Wait for them to confirm (a "yes" or "yep" or "go for it"). Then run via Bash tool (from the repo root):
 
 ```bash
 command cp -R templates/transcripts-to-insights/. student-output/
-cd student-output
 ```
 
 Tell them what just happened:
 
-> "I just copied the starter project into `student-output/`. That folder is yours — it's where you'll work for the rest of the sprint. Let's look at what's inside:"
+> "I just copied the starter project into `student-output/`. That folder is yours — it's where you'll work for the rest of the sprint. Here's what's inside:"
 
 Show them:
 
@@ -116,48 +123,43 @@ student-output/
 
 > "Don't try to read all the code yet. Each module opens one file together. For now, just know: every piece you'll touch is in this folder."
 
-## Step 5: Install dependencies + add API key (3 min)
+## Step 6: Install dependencies + add API key (3 min)
 
-Two steps. Walk them through both. (You're still in `student-output/` from Step 4.)
-
-In the current terminal:
+Two steps. First, install packages. In your terminal:
 
 ```bash
-# Install the packages (Anthropic SDK, chokidar for watching files, dotenv for the key)
+cd [repo-root]/student-output
 npm install
 ```
 
-Now add the API key. Run this command, replacing `sk-ant-your-key-here` with the real key they copied:
+(Use the repo root path from Step 2.)
+
+Now add the API key. Run this command in your terminal, replacing `sk-ant-your-key-here` with the real key you copied:
 
 ```bash
 echo "ANTHROPIC_API_KEY=sk-ant-your-key-here" > .env
 ```
 
-Verify it worked:
-
-```bash
-cat .env
-```
-
-They should see `ANTHROPIC_API_KEY=sk-ant-...` with their real key. If it still shows the example value:
+After they run it, verify via Read tool that `.env` exists and starts with `ANTHROPIC_API_KEY=sk-ant-` (do **not** print the key value inline — just confirm it's real). If it still shows the placeholder:
 
 > "That's still a placeholder. Re-run the echo command with your actual key from console.anthropic.com."
 
-## Step 6: Read the API concept doc (2 min)
+## Step 7: Read the API concept doc (2 min)
 
 Explain inline (don't make them open a file):
 
 > "Before Module 2, one thing to know about APIs: they're just a doorbell. You ring it with a JSON message — 'here's my question, here's my system prompt' — and the server sends back a JSON answer. That's it. Every AI product you've ever used — ChatGPT, Claude, Gemini — is JSON in, JSON out with a clever system prompt in the middle. In Module 2 you'll see exactly what that looks like."
 
-## Step 7: Handoff (1 min)
+## Step 8: Handoff (1 min)
 
 Wrap and update progress:
 
-1. **Update `CLAUDE.md`**: change `- [ ] Stage 1 Intro:` to `- [x] Stage 1 Intro:`
-2. **Commit** — in the current terminal, from the repo root (one level up from `student-output/`):
+1. **Update `CLAUDE.md`**: change `- [ ] Stage 1 Intro:` to `- [x] Stage 1 Intro:` (Edit tool)
+2. **Commit** — run via Bash tool from the repo root:
    ```bash
    git add -A && git commit -m "Complete Stage 1 Intro: setup + API key"
    ```
+   Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear the context window before moving to the next module. This keeps Claude focused and fast.
 4. Say:
 
@@ -165,9 +167,9 @@ Wrap and update progress:
 
 ## Coach Guardrails
 
-- **Ask before scaffolding** — confirm the student is ready before running the `command cp` in Step 4. Never copy files ahead of them without asking.
+- **Ask before scaffolding** — confirm the student is ready before running the `command cp` in Step 5. Never copy files ahead of them without asking.
 - **Use `command cp`, not `cp`** — the `command` prefix bypasses any shell aliases. Plain `cp` may be aliased in the student's shell and silently fail.
-- **Wait for real API key** — confirm `cat .env` shows their actual key (not the placeholder) before moving on. A placeholder key hits a `401` in Module 2.
+- **Wait for real API key** — after the `echo` command, read `.env` via Read tool and confirm the key starts with `sk-ant-` and isn't the placeholder. Do NOT print the key value inline. A placeholder key hits a `401` in Module 2.
 - **Never ask the student to paste their API key in chat** — always use the `echo` command to write it directly to `.env`.
 - **If Node isn't installed, stop and wait** — don't continue until `node --version` succeeds with v20+.
 - **`.env` is in `.gitignore`** — if the student asks whether to commit it, say no.

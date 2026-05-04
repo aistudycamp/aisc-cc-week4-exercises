@@ -20,7 +20,7 @@ Say:
 
 ## Step 2: Walk through what's happening (3 min)
 
-Tell the student what `stage-1/chat.js` does — don't open the file, just walk through the five things that happen when it runs:
+Here's what `stage-1/chat.js` does — five things that happen when it runs:
 
 1. **Set up the Anthropic client** — `new Anthropic()` reads their API key from `.env`. Nothing fancy.
 2. **Read the system prompt from a file** — loads `prompts/system.md`. This is the personality. We'll dig into it in Module 3.
@@ -28,13 +28,7 @@ Tell the student what `stage-1/chat.js` does — don't open the file, just walk 
 4. **Make the API call** — `client.messages.create(...)`. This is the line that reaches Anthropic's servers — where the AI thinking actually happens. One function call, one network request, one JSON response back.
 5. **Print the response** — the actual text lives at `response.content[0].text`.
 
-Ask:
-
-> "Which of those five steps is the AI part — the actual intelligence?"
-
-They should land on step 4. Affirm:
-
-> "Right. Everything else is plumbing. That one call — sending JSON to Anthropic, getting JSON back — is the entire AI part."
+Notice step 4 — `client.messages.create()`. That's the only line that reaches Anthropic's servers. Everything else is plumbing: reading files, setting up the client, printing the result. One function call is where all the AI thinking happens.
 
 ## Step 3: Look at what's getting sent (3 min)
 
@@ -64,7 +58,7 @@ Show them what the code is about to send to Anthropic — this is the JSON objec
 
 ## Step 4: Run it (3 min)
 
-Now run it. In the current terminal, from `student-output/`:
+Now run it. In your terminal (from `[repo-root]/student-output/` — use the repo root path established in Stage 1 Intro):
 
 ```bash
 npm run stage-1
@@ -126,11 +120,12 @@ What you've built so far:
 └──────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 2:` to `- [x] Module 2:`
-2. **Commit** — in the current terminal, from the repo root:
+1. **Update `CLAUDE.md`**: change `- [ ] Module 2:` to `- [x] Module 2:` (Edit tool)
+2. **Commit** — run via Bash tool from the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 2: First API Call"
    ```
+   Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear context before Module 3.
 4. Hand off:
 
@@ -149,3 +144,4 @@ Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pu
 - **Don't skip the JSON walkthrough** — Steps 2 and 3 (reading the file and showing the request object) are the point of this module. Don't jump straight to running it.
 - **Diagnose errors before moving on** — if the student gets a `401`, `Cannot find module`, or `ANTHROPIC_API_KEY undefined`, fix it here. A broken setup will block every module from here forward.
 - **The "full JSON response" step is optional** — follow the student's curiosity. If they want to see the full response object, great. If not, move on without guilt.
+- **Fresh terminal recovery** — if the student just opened a new terminal, remind them: `cd [repo-root]/student-output` before running `npm run stage-1`. The repo root path is the one established in Stage 1 Intro.

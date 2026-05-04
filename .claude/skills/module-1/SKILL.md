@@ -23,49 +23,44 @@ Say:
 Print this ASCII:
 
 ```
-       ┌────────────────┐         ┌──────────────────────┐         ┌────────────────┐
-       │     INPUT      │   →     │   THE ORCHESTRATOR   │   →     │     OUTPUT     │
-       │ a transcript   │         │  "coordinates the    │         │ a saved report │
-       └────────────────┘         │   sequence"          │         └────────────────┘
-                                  └──────────┬───────────┘
-                                             │
-                              ┌──────────────┼──────────────┐
-                              ↓              ↓              ↓
-                         ┌─────────┐  ┌──────────┐  ┌──────────┐
-                         │  ask()  │  │  ask()   │  │workflow()│
-                         │ summary │  │ actions  │  │ classify │
-                         └─────────┘  └──────────┘  └──────────┘
-                              ↓              ↓              ↓
-                         └──────────────────────────────────┘
-                                     back to orchestrator
-                                     → synthesize → output
+┌─────────────────────────────────────────────────────────────────────┐
+│  Stage 3 — Agentic System                                           │
+│                                                                      │
+│  transcript                                                          │
+│      ↓                                                               │
+│  [Analyst ‖ Extractor]   ← parallel specialists (Promise.all)       │
+│           ↓                                                          │
+│      [Synthesizer]        ← combines themes + actions into report    │
+│           ↓                                                          │
+│        [Router]           ← Stage 2 reused: classify + save + notify│
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 Then explain:
 
-> "Read this left-to-right, then top-to-bottom. The transcript comes in. The orchestrator coordinates three specialists in sequence: the first gets a summary, the second gets action items, the third classifies the meeting and routes the file. Each specialist finishes and hands its result back. The orchestrator combines everything into a final report.
+> "Read this top-to-bottom. The transcript comes in. Two specialists — Analyst and Extractor — read it at the same time in parallel. The Analyst finds key themes and decisions. The Extractor pulls every action item. They run simultaneously — same input, different specialists, different jobs, done at the same time.
 >
-> That's the whole shape of every agentic system you'll ever build. Different inputs, different outputs, different specialists — but always: **input → orchestrator → specialists → synthesize → output.**"
+> Then Synthesizer takes both results and combines them into the final structured report. Finally, Router — which is just Stage 2 reused — classifies the meeting, saves the file, and sends a notification.
+>
+> That's the whole shape of every agentic system you'll ever build. Different inputs, different outputs, different specialists — but always: **input → parallel specialists → synthesize → output.**"
 
 ## Step 3: Walk through the example (4 min)
 
-Open `examples/example-transcripts-insights.md` together. In the current terminal, from the repo root:
+Read the example file and show them its contents. Use the Read tool on `examples/example-transcripts-insights.md` and print the relevant sections inline.
 
-```bash
-cat examples/example-transcripts-insights.md
-```
-
-Read it with them. Point out:
+Point out:
 1. **The actual report output** — show them what the agent produces. Key themes, action items, recommended next step. This is what they're working toward.
-2. **The three specialists** — the summary came from one `ask()` call, the action items from another, the classification from the workflow.
+2. **The specialists** — the themes came from the Analyst, the action items came from the Extractor, the classification from the Router.
 
 Ask:
 
 > "Notice something? This report is more structured than you'd get from one ChatGPT message. Why do you think splitting it into specialists produces better output?"
 
-Wait for their answer. If they're stuck, prompt:
+Wait for their answer.
 
-> "Two reasons. First — **focus.** Each specialist has one job and a focused system prompt for that one job. They're better at their narrow task than a generalist would be. Second — **the orchestrator decides the sequence.** It can run things in order when each step feeds the next, or it could run some things in parallel if they're independent. The architecture is flexible."
+If they're stuck, prompt:
+
+> "Three reasons. First — **parallel = faster.** Both Analyst and Extractor work at the same time, not one after the other. Second — **focus = better output.** Each prompt is laser-focused on one job. The Analyst isn't distracted by action items; the Extractor isn't guessing at themes. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
 
 ## Step 4: The three principles (3 min)
 
@@ -101,23 +96,19 @@ Print the staircase:
                               pipeline runs.         full structured report.
 ```
 
-> "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across three specialists and an orchestrator coordinates them.
+> "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across specialists and an orchestrator coordinates them.
 >
 > One stage at a time."
 
-## Step 6: Find the example output (2 min)
+## Step 6: The specialists in the example (2 min)
 
-You already opened the example file. Ask:
+Look back at the KEY THEMES section in the example output shown earlier. Point out:
 
-> "Find the **KEY THEMES** section in this example. How many themes are there?"
-
-Wait for them to look.
-
-> "Good. Each of those themes came from the first `ask()` call in the orchestrator. The action items came from the second one. The meeting type came from the workflow. Three specialists. One orchestrator that put it all together."
+> "Each of those themes came from the Analyst specialist — one focused prompt, one job. The action items below it came from the Extractor — a different prompt, running in parallel. The meeting classification at the top came from the Router. Three specialists. One orchestrator that put it all together."
 
 ## Step 7: Reflection (1 min)
 
-Ask:
+Say:
 
 > "Before we move on, hold onto this picture in your head. After Module 8, when you go back to your day job, the question you'll ask about *any* problem is:
 >
@@ -129,22 +120,24 @@ Ask:
 
 ## Step 8: Wrap and commit (1 min)
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:`
-2. **Commit** — in the current terminal, from the repo root:
+1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
+2. **Commit** — run via Bash tool from the repo root:
    ```bash
    git add -A && git commit -m "Complete Module 1: Tour the System"
    ```
+   Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear context before Module 2.
 4. Say:
 
-> "You now understand the shape of every agentic system — input, orchestrator, specialists, synthesize, output. That's the skeleton. In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
+> "You now understand the shape of every agentic system — input, parallel specialists, synthesize, output. That's the skeleton. In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 
 ## Coach Guardrails
 
 - **This module is intentionally code-free** — don't open any files in `student-output/`. The mental model comes first.
+- **Read the example file via Read tool** — don't send the student to the terminal to `cat` it. Print the relevant sections inline in the chat.
 - **Wait for the student's answer** to "Why do specialists produce better output?" in Step 3 before giving the answer. Their attempt matters more than getting it right.
 - **Print the ASCII diagrams** — don't describe them, show them. The visual anchor is the whole point.
-- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator decides if things run in sequence or in parallel — in this course they run in sequence, and that's the right call here.
+- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator runs Analyst and Extractor in parallel (Promise.all) — both work simultaneously.
 
 ## Optional deeper reading
 

@@ -10,7 +10,7 @@ description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Trigg
 
 ## Coach Instructions
 
-This module is about the *experience* of the chat assistant — not building it. Students run an existing scaffold, feel the leverage of the system prompt, and restore the original for Module 4. The key exercise is the system prompt edits. Don't rush past them.
+This module is about the *experience* of the chat assistant — not building it. Students interact in the browser, feel the leverage of the system prompt, and restore the original for Module 4. The key exercise is the system prompt edits. Don't rush past them.
 
 ## Step 1: Set the frame (2 min)
 
@@ -30,120 +30,19 @@ Before we run anything, name the three roles in every AI conversation:
 >
 > Three roles. The system prompt is what makes this a *meeting analyst* instead of a generic AI. Change the system prompt and you change everything."
 
-## Step 3: Run it with a transcript (8 min)
+## Step 3: Read the system prompt (3 min)
 
-In the current terminal, from `student-output/`:
+Read `prompts/system.md` via Read tool and print the full contents inline:
 
-```bash
-npm run stage-1 -- transcripts/sample-transcript.txt
-```
+"Here's what's inside `prompts/system.md` right now:"
 
-They'll see:
-
-```
-💬 Chat Assistant — Meeting Analyst
-   Transcript loaded from: transcripts/sample-transcript.txt
-   Ask your first question.
-
->
-```
-
-The transcript is already in the conversation. Have them ask follow-up questions — at least 4:
-
-```
-> What are the top 3 action items?
-> Who looks most blocked right now?
-> What should I bring to next week's standup?
-> Write a one-sentence summary I can put in Slack.
-```
-
-> "See how each answer knows the transcript? It's all in memory. The `messages[]` array grows with every exchange — that's what 'context window' means in practice."
-
-When done:
-
-```
-> exit
-```
-
-## Step 4: Read the system prompt (3 min)
-
-Print the system prompt inline. In the current terminal, from `student-output/`:
-
-```bash
-cat prompts/system.md
-```
-
-If they want to view it in an editor, they can also run:
-
-```bash
-code prompts/system.md
-```
-
-Read it together. Land:
+[print full file contents]
 
 > "This is what makes every output look the way it does. KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined here. Change this file and the output format changes entirely. That's the leverage."
 
-## Step 5: Edit the system prompt (5 min)
+## Step 4: Start the server (1 min)
 
-Two quick edits. **Tell Claude to make each one** — the student should not touch the file directly.
-
-### Edit A: Change the role
-
-Have the student say to Claude:
-
-> "Tell Claude: 'Update prompts/system.md — change the first line to: You are a sarcastic meeting analyst who has seen too many standups.'"
-
-After Claude edits it, re-run in the current terminal:
-
-```bash
-npm run stage-1 -- transcripts/sample-transcript.txt
-```
-
-Ask one question. Watch the voice change — same structure, different personality.
-
-### Edit B: Change the output format
-
-Have the student say to Claude:
-
-> "Tell Claude: 'Update prompts/system.md — replace the KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format with: **TLDR** (one sentence), **WHO OWES WHAT** (bullet list of person + task), **SHOULD I CARE?** (Yes/No and why)'"
-
-In the current terminal:
-
-```bash
-npm run stage-1 -- transcripts/sample-transcript.txt
-```
-
-Different shape entirely.
-
-> "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output is shaped by it."
-
-### Step 5c: Restore the original prompt ⚠️ (required)
-
-Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
-
-In the current terminal, from `student-output/`:
-
-```bash
-cp prompts/system-original.md prompts/system.md
-```
-
-Run once more to confirm the original output is back:
-
-```bash
-npm run stage-1 -- transcripts/sample-transcript.txt
-```
-
-The output should have the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format. If they want to keep their custom prompt, save it first:
-
-```bash
-cp prompts/system.md prompts/system-custom.md
-```
-
-Then restore.
-
-## Step 6: Use it in the browser (4 min)
-
-Start the server — this runs until the student is done with the course. In the current terminal, from `student-output/`:
+This is the only terminal command in this module. In your terminal (from `[repo-root]/student-output/` — if you just opened a fresh terminal, run `cd [repo-root]/student-output` first using the repo root established in Stage 1 Intro):
 
 ```bash
 npm run server
@@ -155,9 +54,15 @@ You'll see:
 🚀 Server running at http://localhost:3000
 ```
 
+Leave this running for the rest of the module (and the rest of the course).
+
+## Step 5: Use it in the browser (8 min)
+
 Open **http://localhost:3000** in the browser. Make sure the **Stage 1** tab is active.
 
-On the right side you'll see the live interface. Click **Load standup**, then ask the same 4 questions they asked in the terminal:
+On the right side you'll see the live interface. Click **Load standup** to pre-load the sample transcript.
+
+Ask these 4 questions in the browser chat interface:
 
 ```
 What are the top 3 action items?
@@ -166,13 +71,57 @@ What should I bring to next week's standup?
 Write a one-sentence summary I can put in Slack.
 ```
 
-> "That's your `chat.js` — same code, same system prompt, now running through a browser. The `ask()` function doesn't know or care whether the question came from the terminal or a web request."
+> "See how each answer knows the transcript? It's all in memory. The `messages[]` array grows with every exchange — that's what 'context window' means in practice."
 
-If they want to try a different system prompt: have them edit `prompts/system.md` via Claude, then press `Ctrl+C` to stop the server and run `npm run server` again to restart it. The prompt change kicks in on restart.
+Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code you ran in Module 2. Hit **Run Agent** to watch the architecture animation alongside the live interface.
 
-Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code they wrote. Hit **Run Agent** to watch the architecture animation alongside the live interface.
+## Step 6: Edit the system prompt (5 min)
 
-> "Leave the server running — you'll use it in Module 4 too."
+Two quick edits. **Tell Claude to make each one** — you should not touch the file directly.
+
+### Edit A: Change the role
+
+Say to Claude:
+
+> "Update `prompts/system.md` — change the first line to: You are a sarcastic meeting analyst who has seen too many standups."
+
+After Claude edits it, read the file back and print the full updated contents inline:
+
+"Here's what it looks like now:" [print full file contents]
+
+Then restart the server so the new prompt takes effect. In your terminal: press `Ctrl+C` to stop, then:
+
+```bash
+npm run server
+```
+
+Go back to **http://localhost:3000**, reload the page, click **Load standup**, and ask one question. Watch the voice change — same structure, different personality.
+
+### Edit B: Change the output format
+
+Say to Claude:
+
+> "Update `prompts/system.md` — replace the KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format with: **TLDR** (one sentence), **WHO OWES WHAT** (bullet list of person + task), **SHOULD I CARE?** (Yes/No and why)"
+
+After Claude edits it, read the file back and print the full updated contents inline:
+
+"Here's what it looks like now:" [print full file contents]
+
+Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question.
+
+> "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output is shaped by it."
+
+### Step 6c: Restore the original prompt ⚠️ (required)
+
+Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
+
+Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool. Then read `prompts/system.md` back via Read tool and print the full contents inline:
+
+"Here's the original prompt restored:" [print full file contents]
+
+Restart the server (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask one question to confirm the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format is back.
+
+If they want to keep a custom prompt, save it first — write their current modified version to `prompts/system-custom.md` before restoring.
 
 ## Step 7: Wrap and commit (1 min)
 
@@ -187,12 +136,12 @@ What you've built so far:
 └──────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:`
-2. **Commit** — open a new terminal tab (`Cmd+T`), navigate to the repo root, then:
+1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:` (Edit tool)
+2. **Commit** — run via Bash tool from the repo root (in a second terminal tab if needed, so the server keeps running):
    ```bash
    git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
    ```
-   *(Leave the server terminal running — you'll use it in Module 4.)*
+   Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear context before Module 4.
 4. Hand off:
 
@@ -200,11 +149,14 @@ What you've built so far:
 
 ## Coach Guardrails
 
-- **The restore step is mandatory** — confirm the student ran it and that `npm run stage-1 -- transcripts/sample-transcript.txt` produces the original output format before committing. Module 4's workflow reads `system.md` directly. A broken prompt here causes confusing failures in Module 4.
+- **The restore step is mandatory** — use Read + Edit tools to restore `system-original.md` → `system.md`. Then restart the server and confirm the original output format appears in the browser before committing. Module 4's workflow reads `system.md` directly. A broken prompt here causes confusing failures in Module 4.
 - **Never ask the student to edit code or files directly** — all edits go through "Tell Claude: [what you want]". The student describes the change; Claude writes it.
 - **Don't skip the system prompt edits** — Edit A and Edit B are the core exercises. The visceral "I changed one file and the whole output changed" moment is the whole lesson.
+- **Restart the server after every prompt change** — the server caches the prompt at startup. `Ctrl+C` then `npm run server` is required to pick up changes. Make this explicit each time.
+- **Print the full file after every edit** — read `prompts/system.md` back and show the full contents after Edit A, Edit B, and the restore. Don't just say "done" — show them what changed.
 - **If they want to keep a custom prompt**, save it as `prompts/system-custom.md` before restoring the original.
 - **The three roles** (system/user/assistant) should land before the edits, not after. If the student seems confused about why the prompt is in a file, revisit this explanation.
+- **Fresh terminal recovery** — if the student just opened a new terminal for the server, remind them: `cd [repo-root]/student-output` first. The repo root path is the one established in Stage 1 Intro.
 
 ## Optional deeper reading
 

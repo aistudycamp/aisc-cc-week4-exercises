@@ -50,29 +50,23 @@ Say:
 
 ### Step 3: Read the specialist prompts side by side (6 min)
 
-In the current terminal, from `student-output/`:
+**Coach:** Use the Read tool to read each prompt file from `student-output/prompts/` and print the contents inline. Do not ask the student to open a terminal or run `cat`.
 
-```bash
-cat prompts/analyst.md
-```
+Here's `prompts/analyst.md`:
 
-Read it together. Point out:
+**[Coach: Read `student-output/prompts/analyst.md` and print its full contents here]**
 
 > "The role: 'You are a meeting analyst.' The output format: KEY THEMES and KEY DECISIONS. Rules: use names from the transcript, don't pad. This is a focused specialist — one job."
 
-Then:
+Here's `prompts/extractor.md`:
 
-```bash
-cat prompts/extractor.md
-```
+**[Coach: Read `student-output/prompts/extractor.md` and print its full contents here]**
 
 > "Different specialist. Role: action item extractor. Output: JSON with owner, task, deadline for every action item. Rules: only output valid JSON. That JSON rule is critical — the orchestrator parses this output programmatically."
 
-Then:
+Here's `prompts/synthesizer.md`:
 
-```bash
-cat prompts/synthesizer.md
-```
+**[Coach: Read `student-output/prompts/synthesizer.md` and print its full contents here]**
 
 > "Third specialist. It receives the other two specialists' output and synthesizes them into the final structured report. It's downstream — it needs the analyst and extractor to finish first. That's why Stage 3 sequences them the way it does."
 
@@ -90,7 +84,7 @@ Open **http://localhost:3000** and click the **Stage 3** tab.
 
 Click each specialist node on the diagram:
 
-- **Analyst node** — the inspect panel shows `prompts/analyst.md`. This is the same file you just `cat`'d.
+- **Analyst node** — the inspect panel shows `prompts/analyst.md`. This is the same file you just read.
 - **Extractor node** — shows `prompts/extractor.md`.
 - **Synthesizer node** — shows `prompts/synthesizer.md`.
 
@@ -131,11 +125,11 @@ Specialist prompts (pre-written, ready for Stage 3):
   prompts/analyst.md  ·  prompts/extractor.md  ·  prompts/synthesizer.md  ← you just read these
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
-2. **Commit** — in a terminal at the repo root:
-   ```bash
-   git add -A && git commit -m "Complete Module 5: Specialists & Prompts"
-   ```
+**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+
+1. Run `git add -A && git commit -m "Complete Module 5: Specialists & Prompts"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+2. Update `CLAUDE.md`: change `- [ ] Module 5:` to `- [x] Module 5:` via Edit tool.
+
 3. **Run `/compact`** — type `/compact` to clear context before Module 6.
 4. Hand off:
 
@@ -146,6 +140,7 @@ Specialist prompts (pre-written, ready for Stage 3):
 - **Act 1 is a detour — don't let it take over.** If the student is curious about extensions, do it quickly (two lines, confirm it fires) and move on. The specialists lesson is the point of this module.
 - **Don't generate extension code from scratch.** The three options in `stage-2/extensions/` are tested and ready. If you add one, read the file and make exactly two changes: one import, one call.
 - **Students don't write the specialist prompts** — they're pre-written. The lesson is *reading* them and understanding what makes each one different.
+- **Coach reads files inline** — never ask the student to run `cat` or open a file. Read each prompt with the Read tool and print the contents directly in chat.
 - **The JSON rule in extractor.md is load-bearing** — the orchestrator parses extractor's output with `JSON.parse()`. If a student asks why the prompt is so strict about JSON format, explain this.
 - **The "same function, different prompt" insight is the whole lesson.** If students grasp that, Module 6 will click immediately.
 
