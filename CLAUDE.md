@@ -47,15 +47,15 @@ If the progress checklist below shows completed modules, welcome them back and p
 ## Student Progress
 
 ### Stage 0 — Setup
-- [x] Stage 1 Intro: Setup + API Key
+- [ ] Stage 1 Intro: Setup + API Key
 
 ### Stage 1 — Chat Assistant
-- [x] Module 1: Tour the System
-- [x] Module 2: Your First API Call
-- [x] Module 3: Chat Assistant + System Prompt
+- [ ] Module 1: Tour the System
+- [ ] Module 2: Your First API Call
+- [ ] Module 3: Chat Assistant + System Prompt
 
 ### Stage 2 — Workflow
-- [x] Module 4: Automate the Trigger
+- [ ] Module 4: Automate the Trigger
 - [ ] Module 5: Output Destinations
 
 ### Stage 3 — Agentic System
