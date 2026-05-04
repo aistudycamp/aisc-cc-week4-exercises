@@ -104,6 +104,8 @@ If the new step doesn't fire: tell Claude what went wrong. "The summary file isn
 
 ## Step 5: Verify it in the browser (2 min)
 
+Restart the server first to pick up the workflow changes — press `Ctrl+C` in the server terminal, then run `npm run server` again.
+
 Now confirm the new step fires through the live interface. Switch to **http://localhost:3000**, click the **Stage 2 tab**, load the sample transcript, and hit **Run Workflow**.
 
 > "You should see the same classification result you got in the terminal. The new step you added — does it also fire? Check the terminal logs while you click Run Workflow in the browser."

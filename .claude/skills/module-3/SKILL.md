@@ -152,9 +152,7 @@ Write a one-sentence summary I can put in Slack.
 
 > "That's your `chat.js` — same code, same system prompt, now running through a browser. The `ask()` function doesn't know or care whether the question came from the terminal or a web request."
 
-Try this: have them change `prompts/system.md` via Claude (same as Step 5), then ask a question in the browser *without restarting the server*. The new prompt appears immediately.
-
-> "The server reads `system.md` each time it starts. If you want live prompt changes, restart the server with `Ctrl+C` then `npm run server` again."
+If they want to try a different system prompt: have them edit `prompts/system.md` via Claude, then press `Ctrl+C` to stop the server and run `npm run server` again to restart it. The prompt change kicks in on restart.
 
 Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code they wrote. Hit **Run Agent** to watch the architecture animation alongside the live interface.
 

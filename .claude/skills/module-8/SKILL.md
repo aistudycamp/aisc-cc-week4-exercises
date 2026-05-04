@@ -122,6 +122,8 @@ Anything ~300+ words works.
 
 ## Step 6: Run it — in the browser (3 min)
 
+Restart the server to pick up the edited prompts — `Ctrl+C` in the server terminal, then `npm run server`.
+
 Open **http://localhost:3000**, click the **Stage 3** tab.
 
 Paste the real input text into the transcript area and hit **Run Orchestrator →**.

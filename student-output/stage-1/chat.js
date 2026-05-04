@@ -2,11 +2,15 @@
 // An interactive multi-turn chat loop with an AI meeting analyst.
 // Also exports ask() so Stage 2 and Stage 3 can use it as a building block.
 //
-// Run it interactively:  node stage-1/chat.js
-//   Paste a transcript as your first message, then ask follow-ups.
-//   Type "exit" to quit.
+// Run interactively (no transcript):
+//   npm run stage-1
+//   Paste a transcript as your first message, then ask follow-up questions.
 //
-// Import it as a building block:
+// Run with a transcript file pre-loaded:
+//   npm run stage-1 -- transcripts/sample-transcript.txt
+//   The transcript loads automatically — just start asking questions.
+//
+// Import as a building block:
 //   import { ask } from '../stage-1/chat.js';
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -23,8 +27,8 @@ const systemPrompt = fs.readFileSync(
 );
 
 // ─── Building block: one-shot ask ─────────────────────────────────────────
-// Sends a single question to Claude, optionally with extra context.
-// Stages 2 and 3 import this function — it's the shared foundation.
+// Sends a single question to Claude with optional context.
+// Stage 2 and Stage 3 import this — it's the shared foundation.
 export async function ask(question, context) {
   const content = context ? `${question}\n\n${context}` : question;
   const response = await client.messages.create({
@@ -37,15 +41,29 @@ export async function ask(question, context) {
 }
 
 // ─── Interactive loop (only runs when invoked directly) ───────────────────
-// The loop maintains a running messages[] array for multi-turn conversation.
-// Stage 2 and Stage 3 import ask() above — they never reach this code.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  console.log("💬 Chat Assistant — Meeting Analyst");
-  console.log("   Paste a transcript as your first message,");
-  console.log("   then ask follow-up questions.");
-  console.log('   Type "exit" to quit.\n');
+  const transcriptPath = process.argv[2];
+  let preloadedTranscript = null;
 
-  const messages = [];
+  if (transcriptPath) {
+    preloadedTranscript = fs.readFileSync(transcriptPath, "utf-8");
+    console.log("💬 Chat Assistant — Meeting Analyst");
+    console.log(`   Transcript loaded from: ${transcriptPath}`);
+    console.log("   Ask your first question.\n");
+  } else {
+    console.log("💬 Chat Assistant — Meeting Analyst");
+    console.log("   Paste a transcript as your first message,");
+    console.log("   then ask follow-up questions.");
+    console.log('   Type "exit" to quit.\n');
+  }
+
+  // If a transcript was pre-loaded, seed the conversation with it
+  const messages = preloadedTranscript
+    ? [
+        { role: "user", content: preloadedTranscript },
+        { role: "assistant", content: "Transcript received. What would you like to know about this meeting?" },
+      ]
+    : [];
 
   const rl = readline.createInterface({
     input: process.stdin,
