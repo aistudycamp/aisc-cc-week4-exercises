@@ -883,6 +883,32 @@
     margin-top: 10px;
   }
 
+  .run-report {
+    margin-top: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .run-report-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-variant: small-caps;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    background: #F0EDE9;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .run-report-content {
+    font-family: var(--sans);
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--ink);
+    white-space: pre-wrap;
+    padding: 12px;
+    background: #FAF8F5;
+  }
+
   .orch-steps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
   .orch-step {
     display: flex;
@@ -1065,7 +1091,7 @@
       <!-- Stage banners -->
       <div class="stage-banner" data-stages="1">— Stage 1 · <em>Chat assistant — one call, one conversation</em> —</div>
       <div class="stage-banner" data-stages="2">— Stage 2 · <em>Workflow — file drops in, AI classifies, routes to folder, sends notification</em> —</div>
-      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Agentic system — Analyst + Extractor (parallel) → Synthesizer → Router (Stage 2 reused)</em> —</div>
+      <div class="stage-banner" data-stages="3">— Stage 3 · <em>Agentic system — Analyst + Extractor (parallel) → Synthesizer → Router → Reflect</em> —</div>
 
       <div class="sub-label" data-stages="3">— Orchestrator's <em>building blocks</em> —</div>
 
@@ -1397,8 +1423,13 @@
               <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Analyst + Extractor (parallel)</span></div>
               <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Synthesizer: combine results</span></div>
               <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Router: classify + save + notify</span></div>
+              <div class="orch-step" id="orchStep4"><span class="step-check">○</span><span>Step 4 — Conductor reflects on the run</span></div>
             </div>
             <div class="panel-result" id="orchResult"></div>
+            <div id="s3RunReport" class="run-report" style="display:none">
+              <div class="run-report-label">Run Report</div>
+              <div id="s3RunReportContent" class="run-report-content"></div>
+            </div>
           </div>
 
           <div class="live-section" id="feed">
@@ -1757,11 +1788,11 @@ Return ONLY a JSON object:
       ]
     },
     's3-router': {
-      eyebrow: "Inspecting · Step 4 · Router",
+      eyebrow: "Inspecting · Step 3 · Router",
       title: "The <em>Router</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The final step — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.` },
+          content: `Step 3 — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.<br><br>After the Router completes, <strong>Step 4: Reflect</strong> runs — the Conductor evaluates the entire run and produces a report with observations, ambiguities, and actionable recommendations for improving the agent.` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 transcript + 📄 report", out: "📁 saved files + 🔔 notification" } },
         { label: "File", type: "files",
@@ -1769,7 +1800,8 @@ Return ONLY a JSON object:
         { label: "Connects to", type: "connections",
           content: [
             { arrow: "←", target: "The Conductor", note: "called after Synthesizer completes" },
-            { arrow: "→", target: "Saved report", note: "routes, saves, notifies" }
+            { arrow: "→", target: "Saved report", note: "routes, saves, notifies" },
+            { arrow: "→", target: "Reflect (Step 4)", note: "Conductor evaluates the run next" }
           ] }
       ]
     }
@@ -2389,7 +2421,8 @@ Return ONLY a JSON object:
     $('orchSubmit').disabled = true;
     $('orchSubmit').textContent = 'Running…';
     $('orchResult').innerHTML = '';
-    ['orchStep1','orchStep2','orchStep3'].forEach(id => setStep(id, 'idle'));
+    $('s3RunReport').style.display = 'none';
+    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
     try {
       // Step 1: Analyst + Extractor run in parallel (both fired at once)
       setStep('orchStep1', 'running');
@@ -2421,15 +2454,27 @@ Return ONLY a JSON object:
       if (e3) throw new Error(e3);
       setStep('orchStep3', 'done');
 
+      // Step 4: Reflect
+      setStep('orchStep4', 'running');
+      const r4 = await fetch('/api/orchestrate/step4', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript, themes, actions, report, classification }),
+      });
+      const { runReport, error: e4 } = await r4.json();
+      if (e4) throw new Error(e4);
+      setStep('orchStep4', 'done');
+
       const safe = report.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       $('orchResult').innerHTML = `
         <span class="class-badge">${classification}</span>
         <div class="result-report">${safe}</div>
       `;
+      $('s3RunReportContent').textContent = runReport;
+      $('s3RunReport').style.display = 'block';
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
     } catch (err) {
       $('orchResult').textContent = 'Error: ' + err.message;
-      ['orchStep1','orchStep2','orchStep3'].forEach(id => setStep(id, 'idle'));
+      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
     } finally {
       $('orchSubmit').disabled = false;
       $('orchSubmit').textContent = 'Run Orchestrator →';

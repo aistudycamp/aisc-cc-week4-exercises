@@ -11,6 +11,8 @@
 //      [Synthesizer]         ← combines themes + actions into the final report
 //            ↓
 //        [Router]            ← Stage 2's runWorkflow() — classify, save, notify
+//            ↓
+//       [Reflect]            ← Conductor evaluates the run, produces recommendations
 //
 // Usage:  npm run stage-3 -- transcripts/sample-transcript.txt
 
@@ -27,6 +29,7 @@ const client = new Anthropic();
 const promptAnalyst    = fs.readFileSync(path.join(ROOT, "prompts", "analyst.md"),    "utf-8");
 const promptExtractor  = fs.readFileSync(path.join(ROOT, "prompts", "extractor.md"),  "utf-8");
 const promptSynthesizer = fs.readFileSync(path.join(ROOT, "prompts", "synthesizer.md"), "utf-8");
+const promptReflect    = fs.readFileSync(path.join(ROOT, "prompts", "reflect.md"),    "utf-8");
 
 // ─── Specialist: Analyst ──────────────────────────────────────────────────────
 // Identifies key themes and decisions — same API call as Stage 1, different prompt
@@ -70,6 +73,27 @@ export async function synthesizer(themes, actions) {
   return response.content[0].text;
 }
 
+// ─── Specialist: Reflect ──────────────────────────────────────────────────────
+// Conductor evaluates the run — what happened, what went well, recommendations
+export async function reflect(transcript, themes, actions, report, classification) {
+  const userMessage = [
+    `ORIGINAL TRANSCRIPT:\n${transcript}`,
+    `ANALYST OUTPUT (themes):\n${themes}`,
+    `EXTRACTOR OUTPUT (actions):\n${actions}`,
+    `SYNTHESIZER OUTPUT (final report):\n${report}`,
+    `ROUTER RESULT: classified as "${classification}"`,
+    "Produce the run report.",
+  ].join("\n\n");
+
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1024,
+    system: promptReflect,
+    messages: [{ role: "user", content: userMessage }],
+  });
+  return response.content[0].text;
+}
+
 // ─── Orchestrator: coordinates the full sequence ──────────────────────────────
 export async function orchestrator(transcript, sourceFilename = "transcript.txt") {
   // Step 1: Analyst + Extractor run in parallel — first time anything runs simultaneously
@@ -90,8 +114,13 @@ export async function orchestrator(transcript, sourceFilename = "transcript.txt"
   const { classification, outputPath } = await runWorkflow(transcript, sourceFilename, report);
   console.log("  ✓ Routed and saved.");
 
+  // Step 4: Reflect — Conductor evaluates the run and produces recommendations
+  console.log("  🪞 Step 4: Conductor reflecting on the run...");
+  const runReport = await reflect(transcript, themes, actions, report, classification);
+  console.log("  ✓ Run report complete.");
+
   console.log("✓ Orchestration complete.\n");
-  return { report, classification, outputPath };
+  return { report, classification, outputPath, runReport };
 }
 
 // ─── CLI entry point ───────────────────────────────────────────────────────────
@@ -103,9 +132,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(`📄 Input: ${transcriptPath} (${transcript.split(/\s+/).length} words)\n`);
   console.log("🤖 Orchestrator starting — Analyst + Extractor in parallel, then Synthesizer, then Router.\n");
 
-  const { report } = await orchestrator(transcript, filename);
+  const { report, runReport } = await orchestrator(transcript, filename);
 
   console.log("─".repeat(60));
   console.log(report);
+  console.log("─".repeat(60));
+
+  console.log("\n" + "─".repeat(60));
+  console.log("RUN REPORT");
+  console.log("─".repeat(60));
+  console.log(runReport);
   console.log("─".repeat(60));
 }

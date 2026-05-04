@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import 'dotenv/config';
 import { ask } from './stage-1/chat.js';
 import { runWorkflow } from './stage-2/workflow.js';
-import { analyst, extractor, synthesizer } from './stage-3/orchestrator.js';
+import { analyst, extractor, synthesizer, reflect } from './stage-3/orchestrator.js';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -103,6 +103,17 @@ app.post('/api/orchestrate/step3', async (req, res) => {
     const { transcript, report, filename = 'transcript.txt' } = req.body;
     const { classification, outputPath } = await runWorkflow(transcript, filename, report);
     res.json({ classification, outputPath });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Stage 3 — Orchestrator step 4: Reflect (run report + build-your-own template)
+app.post('/api/orchestrate/step4', async (req, res) => {
+  try {
+    const { transcript, themes, actions, report, classification } = req.body;
+    const runReport = await reflect(transcript, themes, actions, report, classification);
+    res.json({ runReport });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
