@@ -1,26 +1,30 @@
 ---
 name: module-7
-description: Use Your Live System — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Student uses all three stages through the browser interface — chat, workflow, orchestrator — in real time. The shareable "I built this" moment, now with live API calls instead of a scripted animation.
+description: Use Your Live System + The Conductor — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Student uses all three stages in the browser, then introduces the Conductor planning step — optional instruction input that decides which tools to run. The "workflow vs agent" distinction lands here. Screenshot moment.
 ---
 
-# Module 7: Use Your Live System
+# Module 7: Use Your Live System + The Conductor
 
-**Time:** ~20 minutes
-**You'll produce:** evidence you actually ran all three stages through the browser — a screenshot of the Stage 3 tab with a real report, and the confidence that every endpoint behind that UI is yours.
+**Time:** ~30 minutes
+**You'll produce:** evidence you ran the full system, and a first-hand feel for what makes the Conductor an agent rather than a workflow — the same pipeline, now steerable by a sentence.
 
 ## Coach Instructions
 
-This is the celebration module. The student already built the system in Module 6 — now they get to *use* it through the browser they've had open since Module 3. The visualization is no longer an animation — it's a live interface backed by the code they wrote. Make that landing explicit.
+Two acts. Act 1 (~10 min): tour all three stages in the browser — fast, confirmatory, celebratory. Act 2 (~20 min): introduce the instruction input, read the Conductor prompt inline, and land the workflow/agent distinction. The screenshot happens at the end of Act 1. The teaching moment happens in Act 2. Don't conflate the two — Act 1 is celebration, Act 2 is the conceptual peak.
 
-## Step 1: Set the frame (2 min)
+---
+
+## Act 1: Use the System You Built (~10 min)
+
+### Step 1: Set the frame (1 min)
 
 Say:
 
-> "Module 7. Everything you've built — the chat assistant, the workflow, the orchestrator — is sitting behind a server you started in Module 3. The browser you've been using since then isn't just showing you a diagram. It's actually running your code.
+> "Module 7. Everything you've built — the chat assistant, the workflow, the orchestrator — is sitting behind a server you started in Module 3. The browser isn't showing you a diagram. It's running your code.
 >
-> Today you use all three stages in sequence, see the architecture and the live execution side by side, and take a screenshot to prove you built this."
+> First: let's use all three stages. Then I want to show you something that changes the way the orchestrator works."
 
-## Step 2: Confirm the server is running (1 min)
+### Step 2: Confirm the server is running (1 min)
 
 If the server is still running from Module 3 or 6, skip this. If not:
 
@@ -32,91 +36,156 @@ npm run server
 
 Open **http://localhost:3000**.
 
-## Step 3: Stage 1 tab — chat with your assistant (4 min)
+### Step 3: Stage 1 — chat with your assistant (3 min)
 
-Click the **Stage 1** tab. Load the sample transcript (click "Load standup"). Ask 3 questions:
+Click the **Stage 1** tab. Click **Load standup**. Ask two questions:
 
 ```
-What are the top action items?
 Who looks most blocked?
 Write a one-sentence Slack summary of this meeting.
 ```
 
-After each response:
+> "That response came from `chat.js` → `ask()` → `system.md`. Same chain you saw in Module 2, now running in a browser.
+>
+> Hit the **Show JSON** button — that's the raw request and response from Module 2, now visible here."
 
-> "That response came from your `chat.js` → the `ask()` function → the `system.md` prompt you edited in Module 3. Same chain. Now running in a browser."
+### Step 4: Stage 2 — run the workflow (2 min)
 
-Notice the **Show JSON** button that appears after the first response — click it to see the raw request and response payload. That's the same JSON from Module 2, now visible in the browser instead of the terminal.
+Click the **Stage 2** tab. Click **Load standup**. Hit **Run Workflow →**.
 
-Click the **Chat Assistant** node on the diagram. Show the inspect panel.
+> "Your `workflow.js` just fired. Classified the meeting, routed the file, sent the notification. Same pipeline from Module 4."
 
-> "The inspect panel shows the same system prompt file. The diagram isn't separate from the code — it's a window into it."
+### Step 5: Stage 3 — run the orchestrator (3 min)
 
-## Step 4: Stage 2 tab — run the workflow (3 min)
+Click the **Stage 3** tab. Click **Load standup**. Hit **Run Orchestrator →** (leave the instruction field blank for now).
 
-Click the **Stage 2** tab. Load the sample transcript. Hit **Run Workflow →**.
-
-Watch the classification result appear.
-
-> "Your `workflow.js` just fired. It classified the meeting, routed the file, sent the notification. Same pipeline you triggered with a button click in Module 4 — now you're doing it again from here."
-
-Try loading a different transcript if you have one. The classification changes.
-
-## Step 5: Stage 3 tab — run the full orchestrator (6 min)
-
-Click the **Stage 3** tab. Load the sample transcript (click "Load standup"). Hit **Run Orchestrator →**.
-
-Watch each step light up:
+Watch the steps light up:
 
 ```
-Step 1 ✓  Analyst + Extractor (parallel)  ← both running at the same time
-Step 2 ✓  Synthesizer                     ← combines both outputs
-Step 3 ✓  Router: classify + save + notify ← your runWorkflow() from Stage 2
+Step 1 ✓  Analyst + Extractor (parallel)
+Step 2 ✓  Synthesizer
+Step 3 ✓  Router: classify + save + notify
 ```
 
-The full report appears below.
+> "Every checkmark is a real API call completing. Step 1 fires both at once — that's `Promise.all` from Module 6. Step 3 is the workflow you built in Module 4. That's `orchestrator.js` running in your browser."
 
-> "Each one of those check marks is a real API call completing. Step 1 fires Analyst and Extractor simultaneously — that's the parallel dispatch from Module 6. Step 2 is Synthesizer. Step 3 is the workflow you built in Module 4. That's `orchestrator.js` executing in your browser."
+**Screenshot moment:**
 
-While the orchestrator runs: click each node on the diagram and point to the code behind it.
+> "Stage 3 tab, all three steps checked, report visible. Take a screenshot. A week ago you'd never called an API. Right now you have a working multi-agent system. That's a real artifact — send it to your team."
 
-> "Orchestrator → `stage-3/orchestrator.js`. The Analyst and Extractor nodes → `prompts/analyst.md` and `prompts/extractor.md`. The Synthesizer → `prompts/synthesizer.md`. The Router → `stage-2/workflow.js`. You touched every file behind this diagram."
+---
 
-## Step 6: Screenshot moment (2 min)
+## Act 2: The Conductor (~20 min)
 
-> "This is the share-worthy moment. Stage 3 tab, all three steps checked, report visible below. Take a screenshot."
+### Step 6: Set the frame (2 min)
 
-Have them save it somewhere accessible (Desktop, screenshots folder).
+Say:
 
-> "A week ago, you'd never called an API. Right now you have a working multi-agent system running in your browser — and you built every piece of it. That's a real artifact. Send it to your team. Drop it in the cohort Slack."
+> "Everything you just used runs the same four steps every time — Analyst + Extractor → Synthesizer → Router. Load any transcript, hit the button, full pipeline. Every time. That's a workflow.
+>
+> Now I want to show you what turns it into an agent."
 
-## Step 7: Wrap and commit (1 min)
+### Step 7: Introduce the instruction input (5 min)
+
+Point to the **Optional instruction** field below the transcript area on the Stage 3 tab.
+
+Have the student:
+1. Load the standup transcript (click **Load standup**)
+2. Type in the instruction field: `Just give me the action items`
+3. Click **Run Orchestrator →**
+
+Ask: **"What happened? How many steps ran?"**
+
+Wait for their answer. Then:
+
+> "The Conductor ran first — one planning call before anything else. It read your instruction, made a decision, and returned a plan: 'run Extractor only.' Analyst, Synthesizer, Router, and Reflect never fired.
+>
+> That's the difference between a workflow and an agent. **A workflow follows steps. An agent decides which steps to take.**"
+
+Try two more with the student driving:
+- Clear the instruction, click **Run Orchestrator →** → full pipeline (Conductor defaults to all tools)
+- Type `Just route this` → Router only
+
+> "Same tools, same code — three completely different executions based on what you asked for. The routing decision is the agent's job."
+
+### Step 8: Read the Conductor prompt (6 min)
+
+Say:
+
+> "Here's the thing: the Conductor is just another system prompt. Same pattern you've seen all sprint. Let me show you."
+
+**Coach:** Read `student-output/prompts/conductor.md` via Read tool and print the full contents inline:
+
+> "Here's `prompts/conductor.md`:"
+
+**[Coach: Read `student-output/prompts/conductor.md` and print full contents here]**
+
+Walk through the key sections:
+
+> "Look at the tools list at the top. The Conductor knows about five tools and what each one does — that's its 'menu.' Notice the dependency rules: synthesizer requires analyst AND extractor first; reflect requires synthesizer first. The Conductor knows the sequence constraints.
+>
+> Then the routing logic: 'just route this' → router only. 'What are the action items?' → extractor only. 'No instruction' → full pipeline.
+>
+> And the output rule at the bottom: return ONLY valid JSON with a `tools` array and a `reasoning` field. The orchestrator parses that JSON and uses it to decide what to dispatch.
+>
+> Three things to see here:"
+
+1. **It's a system prompt** — same as `analyst.md`, `system.md`, `classifier.md`. The pattern doesn't change.
+2. **The output format is machine-readable** — it returns JSON because the orchestrator code parses it, not a human. The extractor does the same thing for action items.
+3. **The routing logic is the agent's judgment** — when the instruction doesn't match a specific rule, it uses 'judgment for anything else — pick the minimum set of tools that satisfies the instruction.' That's an LLM making a decision, not a switch statement.
+
+Ask: **"What would happen if you gave it an instruction the routing rules don't explicitly cover — like 'give me a risk assessment'?"**
+
+Wait for their answer. The answer: it falls through to the judgment rule and the LLM decides. This is the "agentic" part — the system prompt can't enumerate every possible instruction, so it reasons.
+
+### Step 9: The takeaway (2 min)
+
+Say:
+
+> "Everything in this sprint has been the same pattern: a system prompt shapes what Claude does. The chat assistant in Module 3, the classifier in Module 4, the specialists in Module 5 — they're all just prompts.
+>
+> The Conductor is the same thing. Except its job isn't to analyze a transcript — it's to reason about which other agents to dispatch. It's an agent whose output is a plan for other agents.
+>
+> That's what makes it agentic: it decides. The workflow in Module 4 didn't decide anything — it just executed a fixed sequence. The Conductor reads context and makes a choice."
+
+## Step 10: Wrap and commit (1 min)
 
 What you've built so far:
 
 ```
-┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │
-│  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
-│  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
-└────────────┘   └────────────┘   │            ↓ [Synthesizer]            │
-                                  │            ↓ [Router]                 │
-                                  └──────────────────────────────────────┘
+┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────────────┐
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System                     │
+│  chat.js   │   │workflow.js │ → │  orchestrator.js                              │
+│  ask()     │   │runWorkflow │   │  [Conductor — reads instruction, plans tools] │
+└────────────┘   └────────────┘   │  [Analyst ‖ Extractor] (parallel, if called) │
+                                  │            ↓ [Synthesizer] (if called)        │
+                                  │            ↓ [Router] (if called)             │
+                                  │            ↓ [Reflect] (if called)            │
+                                  └──────────────────────────────────────────────┘
 ```
 
-**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+**Coach:** Do all of the following automatically — do not ask the student to run terminal commands:
 
-1. Run `git add -A && git commit -m "Complete Module 7: Use Your Live System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+1. Run `git add -A && git commit -m "Complete Module 7: Use Your Live System + The Conductor"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 7:` to `- [x] Module 7:` via Edit tool.
 
 3. **Run `/compact`** — type `/compact` to clear context before Module 8.
 4. Hand off:
 
-> "One module to go. The agent works on meeting transcripts — but what if it worked on *your* thing? Module 8 is where you make it yours. Type `module-8` when you're ready."
+> "One module left. The system works. In Module 8 we're going to talk about where this goes from here — how you'd personalize it, how you'd extend it, and how you'd use Claude Code to build the next one yourself. Type `module-8` when you're ready."
 
 ## Coach Guardrails
 
-- **This is a celebration module** — don't rush toward Module 8. Let the student take a moment with what they built.
-- **The interface IS live** — every button click is a real API call. When the student asks "is this actually running my code?" the answer is yes. Point them to the terminal logs from the server if they want proof.
-- **Encourage the screenshot** — it's a real, shareable artifact. Treat Step 6 as a genuine milestone, not a formality.
-- **Learning objective check before wrap** — before committing, ask the student to point to one step in the Stage 3 orchestrator panel and name the file behind it. If they can't, walk through Step 5 again for that step.
+- **Act 1 is fast — don't over-explain** — they've seen all three stages before. The goal is confirmation and celebration, not re-teaching. Keep each stage to its allocated time.
+- **The screenshot is a real milestone** — treat it as one. "Take a screenshot" is not a formality.
+- **Wait for the student's answer in Step 7** — "What happened? How many steps ran?" — wait for their actual observation before explaining. They just saw the Conductor in action; their description of what they saw is the learning.
+- **Read conductor.md inline** — never ask the student to open the file. Use the Read tool and print full contents in chat.
+- **The judgment rule is the key teaching beat in Step 8** — an LLM routing at runtime is different from a switch statement. Make that distinction explicit.
+- **The "workflow vs agent" distinction is the conceptual peak** — it lives here now, not in Module 8. Make sure it lands before moving on.
+
+## Optional deeper reading
+
+Just ask me: *"Read concepts/what-is-an-orchestrator.md and walk me through it."*
+
+- `concepts/what-is-an-orchestrator.md` — orchestration patterns, parallel vs. sequential dispatch
+- `concepts/what-is-an-agent.md` — re-read now that you've seen all three levels

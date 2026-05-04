@@ -1,319 +1,253 @@
 ---
 name: module-8
-description: Make It Yours — Module 8 of the AISC Agent Sprint. Triggered when a student types "module-8". Student picks a real use case from their life or work, edits the 3 system prompts to match, runs the orchestrator on a real document they bring, and saves the personalized version. The take-home moment.
+description: Where This Goes — Module 8 of the AISC Agent Sprint. Triggered when a student types "module-8". No hands-on exercises. Three topics: how to personalize what they built, how to extend it beyond localhost, and how to build the next agent from scratch using Claude Code. Closes with a starter prompt for whichever pattern they want to build next.
 ---
 
-# Module 8: Make It Yours
+# Module 8: Where This Goes
 
-**Time:** ~35 minutes
-**You'll produce:** a personalized version of the agentic system that works on a use case from your real life or work, not a fake transcript. By the end, you'll have something you actually use.
+**Time:** ~20 minutes
+**You'll produce:** a clear picture of three directions from here, and a starter prompt for whichever one you want to build next.
 
 ## Coach Instructions
 
-The whole sprint has been on rails. This module is where the student takes the wheel. Start with the instruction input capstone (Step 2) — this is the "agent vs workflow" moment and the most important teaching beat of the entire course. Run all three examples (action items only / blank / just route this) so the contrast lands. Then help them pick a use case quickly (don't let them spiral) and walk them through editing all three system prompts. After every edit, read the file back and print the full contents so the student sees exactly what was changed before re-running. Close with the "Where This Goes" section (Step 10) — the goal is for the student to leave with a specific next project in mind.
+This is the send-off module. No live edits, no running code. Students have a working system — the goal here is to show them the horizon so they leave with a specific next move. Three topics in sequence: personalization (how to make what they have work for their use case), extension (how to move it beyond this localhost demo), and new agents (how to build the next one with Claude Code). The last thing they leave with should be a concrete starter prompt for something they actually want to build.
 
-## Step 1: Set the frame (2 min)
+## Step 1: Set the frame (1 min)
 
 Say:
 
-> "Module 8. The agent you built turns *meeting transcripts* into *insights reports.* That's nice. But the same architecture works for any 'long unstructured input → structured output' problem. Today we're going to point it at something *you* actually deal with.
+> "Module 8. You have a working multi-agent system. Three questions to close out:
 >
-> Pick one use case. We'll edit the three system prompts together. Then we'll run it on a real document you bring."
-
-## Step 2: The Instruction Input (5 min) — capstone
-
-Say:
-
-> "Before we personalize this, I want to show you something. Right now the orchestrator always runs the same 4 steps — every time, no matter what you give it. That's a workflow. You're about to turn it into an agent."
-
-"Go to **http://localhost:3000**, Stage 3 tab. You'll see a new field below the transcript area: **Optional instruction.**"
-
-Tell the student to:
-1. Load the standup transcript (click Load standup)
-2. Type in the instruction field: `Just give me the action items`
-3. Click **Run Orchestrator →**
-
-Ask: **"What happened? How many steps ran?"**
-
-Wait for their answer. Then explain:
-
-> "The Conductor read your instruction, made one planning call, and decided: 'They only need the Extractor — skip the Analyst, Synthesizer, Router, and Reflect.' It chose the minimum set of tools.
+> 1. How do you make *this* system work for your use case?
+> 2. How do you take it beyond a localhost demo?
+> 3. How do you build the next one?
 >
-> That's the difference between a workflow and an agent. A workflow follows steps. An agent decides which steps to take."
+> Let's go."
 
-Try two more:
-- Clear the instruction, click **Run Orchestrator →** with no instruction → full pipeline
-- Type `Just route this` → Router only
+---
 
-> "Same pipeline, same tools — but now you can steer it with a sentence. The Conductor is a planning step that runs first and decides what happens next."
-
-This is the capstone teaching moment of the whole course. Don't rush past it.
-
-## Step 3: Pick a use case (3 min)
-
-Give them the menu, then nudge them to pick fast:
-
-```
-  1. Customer interviews          →  JTBD themes + verbatim quotes
-                                     (JTBD = Jobs to Be Done: what the user is fundamentally trying to accomplish)
-  2. Earnings calls               →  Risk flags + analyst questions
-  3. Lecture / podcast notes      →  Study guide + flashcards
-  4. 1:1 notes                    →  Their actions + your actions
-  5. Voice memo transcripts       →  Summary + follow-ups
-  6. Performance reviews          →  Strengths + growth areas + asks
-  7. Customer support tickets     →  Pattern themes + escalation triage
-  8. Product feedback emails      →  Feature requests + bug reports
-  9. Slack channel summaries      →  Decisions made + open questions
-  10. Custom — tell me what       →  We'll figure out themes/actions/next-step
-```
-
-Ask: **"Which one feels useful to you right now?"**
-
-Wait for their answer before continuing.
-
-If they hesitate:
-
-> "Don't over-think it. Pick the one you can run on a real document you have on your laptop today. We can do another later."
-
-If they pick "Custom," ask:
-1. **What's your input** going to be? (long text, document, conversation, ...)
-2. **What two specialists** make sense? (the equivalents of "themes" and "actions")
-3. **What does the final report** look like?
-
-Wait for their answers before continuing.
-
-## Step 4: Edit the analyst prompt (5 min)
-
-**Coach:** Read `student-output/prompts/analyst.md` with the Read tool first and show the student what it looks like before editing:
-
-> "Here's what `prompts/analyst.md` looks like right now:"
-
-**[Coach: Read `student-output/prompts/analyst.md` and print full contents]**
-
-Have the student describe what they want. Help them phrase the change for their specific use case. The pattern: change the role and change the output format sections.
-
-For customer interviews, the update would be: change role to "You are a customer interview analyst," change output format to JTBD THEMES and KEY INSIGHTS.
-
-**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
-
-> "Here's what it looks like now:"
-
-**[Coach: Read `student-output/prompts/analyst.md` again and print the full updated contents]**
-
-Only then: "Ready to move on to the extractor?"
-
-## Step 5: Edit the extractor prompt (3 min)
-
-**Coach:** Read `student-output/prompts/extractor.md` with the Read tool first and show the student what it looks like before editing:
-
-> "Here's what `prompts/extractor.md` looks like right now:"
-
-**[Coach: Read `student-output/prompts/extractor.md` and print full contents]**
-
-This one returns JSON — warn before editing:
-
-> "One constraint here: keep the field names — `owner`, `task`, `deadline` — even if the meaning shifts. The orchestrator parses this JSON programmatically and expects those exact keys. You can change what they *mean*, but not what they're *called*."
-
-For customer interviews, the extractor might pull verbatim quotes:
-
-`prompts/extractor.md`:
-```
-You are a verbatim quote extractor.
-
-Given a customer interview, find the 5 most striking direct quotes
-that capture the customer's pain or desire.
-
-Return ONLY valid JSON:
-
-{
-  "actions": [
-    { "owner": "Speaker name", "task": "the exact quote", "deadline": null }
-  ]
-}
-```
-
-**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
-
-> "Here's what it looks like now:"
-
-**[Coach: Read `student-output/prompts/extractor.md` again and print the full updated contents]**
-
-Only then continue to the synthesizer.
-
-## Step 6: Edit the synthesizer prompt (3 min)
-
-**Coach:** Read `student-output/prompts/synthesizer.md` with the Read tool first and show the student what it looks like before editing:
-
-> "Here's what `prompts/synthesizer.md` looks like right now:"
-
-**[Coach: Read `student-output/prompts/synthesizer.md` and print full contents]**
-
-Have the student describe what the final report should look like given their use case. Update the output format to match.
-
-**Coach:** Make the edit directly using the Edit tool. Then read the file back and print the full updated contents:
-
-> "Here's what it looks like now:"
-
-**[Coach: Read `student-output/prompts/synthesizer.md` again and print the full updated contents]**
-
-## Step 7: Bring a real input (3 min)
-
-Have them paste or share the text of a real document. Options if they don't have something on hand:
-- Paste the contents of a recent customer interview
-- Export their notes from a real meeting/call
-- Save a podcast transcript from a service that produces one
-- Paste their last 10 Slack DMs with a teammate
-
-Anything ~300+ words works.
-
-**Coach:** Write the text directly to `student-output/transcripts/real-input.txt` using the Write tool. The student should not run any terminal commands to do this.
-
-## Step 8: Run it — in the browser (3 min)
-
-Restart the server to pick up the edited prompts. If you just opened a fresh terminal, run `cd [repo-root]` first (use `pwd` to confirm the repo root).
-
-The server terminal needs a restart to pick up the edited prompts. Tell the student:
-
-> "Press Ctrl+C in the server terminal to stop it, then run `npm run server` again."
-
-That's the only terminal command the student needs to run — just the server restart.
-
-Open **http://localhost:3000**, click the **Stage 3** tab.
-
-Paste the real input text into the transcript area (or click Load and use the file you just saved) and hit **Run Orchestrator →**.
-
-Watch the four steps light up with the personalized prompts firing. Read the report.
-
-> "How is it? Useful? Surprising? Wrong about something?"
-
-If the output is bad, the system prompts need more rules. Describe the problem to me — "the themes are too generic, make them more specific to customer insights" — and I'll revise the prompt directly. After every revision I'll show you the full updated file before we re-run. This is the actual craft of building agents: tune the prompt until the output is what you want.
-
-Take a screenshot of the Stage 3 panel with your personalized report showing.
-
-## Step 9: Save the personalized version (2 min)
-
-**Coach:** Save the working version of the prompts directly using the Bash tool — do not ask the student to run `cp` commands:
-
-Run:
-```bash
-mkdir -p student-output/personalized
-```
-
-Then copy each file:
-- `student-output/prompts/system.md` → `student-output/personalized/system.md`
-- `student-output/prompts/analyst.md` → `student-output/personalized/analyst.md`
-- `student-output/prompts/extractor.md` → `student-output/personalized/extractor.md`
-- `student-output/prompts/synthesizer.md` → `student-output/personalized/synthesizer.md`
-- `student-output/transcripts/real-input.txt` → `student-output/personalized/sample-input.txt`
-
-**Coach:** Do this via Bash tool, then confirm to the student:
-
-> "Saved. Your `personalized/` folder now has four prompts (analyst, extractor, synthesizer, system) and one real input — your fingerprint on a multi-agent system."
-
-## Step 10: Where This Goes (3 min)
+## Step 2: Personalization — how to make it yours (5 min)
 
 Say:
 
-> "You built one pattern this week. Here's how it extends."
+> "Everything in this system is driven by three files: `analyst.md`, `extractor.md`, and `synthesizer.md`. The meeting transcript use case is baked into those prompts — 'You are a meeting analyst,' 'KEY THEMES,' 'ACTION ITEMS.' If you want to point this at something else, those are the three files to change.
+>
+> Here's the pattern:"
 
-Show three architecture patterns:
+Print this:
+
+```
+  analyst.md    → change the role + the output format
+                  "You are a meeting analyst" → "You are a customer interview analyst"
+                  KEY THEMES → JTBD THEMES + VERBATIM QUOTES
+
+  extractor.md  → change what gets extracted
+                  action items → customer pain quotes
+                  keep the JSON field names (owner / task / deadline) — the orchestrator
+                  parses these programmatically. You can change what they mean,
+                  not what they're called.
+
+  synthesizer.md → change the final report format
+                   to match your analyst + extractor outputs
+```
+
+> "That's it. Three edits. The orchestrator, the server, the browser — none of that changes. The system prompt IS the specialist. Change the prompts, change the system.
+>
+> Use cases this works for out of the box:"
+
+Print this quickly:
+
+```
+  Customer interviews   →  JTBD themes + verbatim quotes
+  Earnings calls        →  risk flags + analyst questions
+  1:1 notes             →  their actions + your actions
+  Support tickets       →  pattern themes + escalation triage
+  Voice memos           →  summary + follow-ups
+  Podcast notes         →  study guide + flashcards
+```
+
+> "If you want to try one of these, open a new Claude Code session pointed at `student-output/`, tell Claude which use case you want, and ask it to update the three prompt files. Claude knows the pattern — it helped you build it."
+
+**Important note:** Don't do the edits live in this session. Editing prompts without a real input to test against leads to confusion — you change the prompts, run the same meeting transcript, and wonder why the output looks wrong. When you're ready to personalize, bring a real document first.
+
+---
+
+## Step 3: Extension — moving beyond localhost (6 min)
+
+Say:
+
+> "Right now the trigger is a button click in a browser on your laptop. That's great for learning. To make this actually useful, there are three things to consider: trigger, deployment, and destination."
+
+Print this:
+
+```
+  TRIGGER — what fires the pipeline
+  ──────────────────────────────────
+  What you have:    button click in the browser
+  What's next:      webhook (HTTP POST from any external system)
+                    file watch (drop a file, pipeline fires)
+                    scheduled cron (run every 6 hours automatically)
+                    email inbound (send a transcript to an address, it processes)
+
+  DEPLOYMENT — where the server runs
+  ────────────────────────────────────
+  What you have:    localhost:3000 on your laptop
+  What's next:      Railway / Render / Fly.io — deploy this exact server.js,
+                    get a public URL, works the same way
+                    Your own VPS — same Node server, runs 24/7
+
+  DESTINATION — where the output goes
+  ─────────────────────────────────────
+  What you have:    macOS notification + file saved locally
+  What's next:      Slack message to a channel (one fetch() call)
+                    Email via SendGrid / Resend
+                    Notion page / Google Doc
+                    Row in a spreadsheet
+                    Webhook to another system
+```
+
+> "The classify-and-route logic in the middle doesn't change. The trigger and destination are the pluggable parts. This is the same pluggable pattern from Module 4 — now you can see the full range.
+>
+> To add any of these: describe what you want to Claude Code. 'Add a webhook endpoint at /api/webhook that accepts a POST with a transcript field and runs the full orchestrator.' Claude knows the codebase — one session, working in minutes."
+
+---
+
+## Step 4: Building the next agent (6 min)
+
+Say:
+
+> "Here's the real takeaway from this sprint: you know the pattern now. Any 'long unstructured input → structured output' problem is buildable. And Claude Code already has the building blocks in its head — `ask()`, `runWorkflow()`, `Promise.all` for parallel dispatch, system prompt → specialist.
+>
+> Three patterns to build next. Pick the one that fits a real problem you have."
+
+Print this:
 
 ```
 Pattern 1 — Pipeline (what you built)
-  transcript
-      ↓
-  [Analyst ‖ Extractor]
-           ↓
-      [Synthesizer]
-           ↓
-        [Router]
-  Sequential specialists, each feeds the next.
+  input
+    ↓
+  [Specialist A ‖ Specialist B]   ← parallel, independent
+             ↓
+        [Synthesizer]
+             ↓
+          [Output]
   Best for: defined input/output, clear sub-tasks.
+  Example: any "analyze this document" problem.
 
 Pattern 2 — G Stack (Gary Tan)
-  One specialist per business function.
+  One specialist per business domain.
   Sales Agent | Ops Agent | Support Agent | Eng Agent
        ↓             ↓             ↓            ↓
                 [Orchestrator]
-  Same pattern you built — just domain-scoped specialists
-  instead of task-scoped. Each agent knows one domain deeply.
-  Best for: complex orgs, domain boundaries are real.
+  Same pattern — domain-scoped specialists instead of task-scoped.
+  Each agent knows one domain deeply, handles requests in that lane.
+  Best for: routing across business functions, complex orgs.
+  Example: an internal assistant that routes questions to the right domain agent.
 
 Pattern 3 — Council
-  transcript → [Analyst] + [Risk Reviewer] + [Sentiment Reader]
-                     ↓             ↓                  ↓
-                         [Arbiter — synthesizes all three]
-  Multiple agents receive the same input, form independent opinions.
+  input → [Analyst A] + [Analyst B] + [Analyst C]   ← same input, different lenses
+                  ↓           ↓           ↓
+                      [Arbiter — synthesizes all three]
+  Multiple agents read the same input and form independent opinions.
   Arbiter synthesizes into a final recommendation.
   Best for: high-stakes decisions where multiple lenses catch more.
+  Example: three analyst agents review a transcript from different angles
+           (risk / action / sentiment), arbiter produces the final report.
 ```
 
-> "The code you wrote this week runs all three of these. Different prompts, different dispatch logic — same building blocks."
+Ask: **"Which of these maps to something you actually want to build?"**
 
-Ask: **"Which of these maps to a problem you have right now?"**
+Wait for their answer. Then give them the starter prompt for that pattern.
 
-Wait for their answer. Reflect back. The goal is for them to leave with a specific next project in mind.
+---
 
-## Step 11: Reflect (2 min)
+## Step 5: The starter prompt (2 min)
 
-Pause and ask:
+**Coach:** Based on what the student picked in Step 4, give them the right starter prompt. Print whichever one fits:
 
-> "Now that you've done it once, where else in your life or work would this same pattern fit? You don't have to commit. Just notice."
-
-Listen. Reflect back. The point is to plant the seed: this pattern is portable. Once they see it, they'll see it everywhere.
-
-## Step 12: Wrap and final commit (1 min)
-
-What you've built:
+**If they picked Pipeline (or "I want to do what we just built, but for X"):**
 
 ```
-┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Personalized                       │
-│  chat.js   │   │workflow.js │ → │  orchestrator.js                              │
-│  ask()     │   │runWorkflow │   │  [Conductor — plans which steps to run]       │
-└────────────┘   └────────────┘   │  [Analyst ‖ Extractor] (parallel)            │
-                                  │            ↓ [Synthesizer]                    │
-                                  │            ↓ [Router]                         │
-                                  │            ↓ [Reflect]                        │
-                                  │  personalized/ prompts saved                  │
-                                  └──────────────────────────────────────────────┘
+I just completed an AISC Agent Sprint and built a pipeline agent:
+[Analyst ‖ Extractor] → Synthesizer → Router
+
+The code is in student-output/. I want to build a new pipeline agent
+for [their use case]. New folder: [folder name].
+
+Please scaffold it — copy the structure from student-output/, then update
+the three specialist prompts (analyst.md, extractor.md, synthesizer.md)
+for [their use case]. Keep the orchestrator and server unchanged.
+
+Let's start by agreeing on what the analyst and extractor should each return.
 ```
 
-**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
+**If they picked G Stack:**
 
-1. Run `git add -A && git commit -m "Complete Module 8: Make It Yours"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+```
+I just completed an AISC Agent Sprint and built a pipeline agent in student-output/.
+I understand: ask(), runWorkflow(), Promise.all for parallel dispatch, system prompt = specialist.
+
+I want to build a G Stack agent — one specialist per business domain:
+[their domains, e.g. Sales / Ops / Support]
+
+New folder: [folder name]. Please scaffold it:
+- One specialist per domain (each is a system prompt + ask() call)
+- An orchestrator that routes incoming requests to the right specialist
+- A classifier that reads the input and decides which specialist handles it
+
+Start by asking me what each domain agent should know and what it should return.
+```
+
+**If they picked Council:**
+
+```
+I just completed an AISC Agent Sprint and built a pipeline agent in student-output/.
+I understand: ask(), Promise.all for parallel dispatch, system prompt = specialist.
+
+I want to build a Council agent — multiple analysts read the same input,
+then an Arbiter synthesizes their independent views into a final recommendation.
+
+My use case: [their use case]
+Analysts I want: [e.g. Risk Reviewer / Action Extractor / Sentiment Reader]
+
+New folder: [folder name]. Please scaffold it:
+- N analyst agents running in parallel (same Promise.all pattern)
+- An Arbiter that receives all outputs and synthesizes a final recommendation
+- Each analyst gets its own system prompt
+
+Start by helping me define what each analyst should focus on.
+```
+
+> "Copy that, open a new folder, start a new Claude Code session, paste it in. Claude already knows these building blocks — it helped you build them this week. `student-output/` is the reference it can read if you want it to look at your actual code."
+
+---
+
+## Step 6: Final commit and close (1 min)
+
+**Coach:** Do all of the following automatically:
+
+1. Run `git add -A && git commit -m "Complete Module 8: Where This Goes"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 8:` to `- [x] Module 8:` via Edit tool.
-
 3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
-## Step 13: Celebrate (genuinely — 1 min)
+Then say:
 
-> "You did it. You went from never having called an API to building a working multi-agent system. The skill is now yours forever — the next agent you build will take a fraction of the time, because you have the pattern.
+> "You're done. You went from never having called an API to building a working multi-agent system with a planning step that decides its own execution path.
 >
 > A few things to take with you:
 >
-> - **The system prompt is the leverage point.** Always start by editing it.
-> - **Specialists beat generalists.** Split work into focused sub-agents when it has distinct sub-tasks.
+> - **The system prompt is the leverage point.** Every specialist — analyst, extractor, classifier, conductor — is a prompt. Change the prompt, change the agent.
+> - **Specialists beat generalists.** Focused sub-agents produce better output than one big call.
 > - **Trigger and destination are pluggable.** The agent in the middle is reusable.
-> - **Three questions for any new agent**: What's the input? What's the output? What sub-agents fit between them?
-> - **A workflow follows steps. An agent decides which steps.** The instruction input is how you steer the agent.
+> - **A workflow follows steps. An agent decides which steps.** You built the second one in Module 7.
+> - **Three questions for any new agent:** What's the input? What's the output? What specialists fit between them?
 >
-> Go build something."
+> Go build something real."
 
 ## Coach Guardrails
 
-- **The instruction input capstone is the 'aha' moment of the whole course.** Don't skip it and don't rush it. Run 3 examples (action items only / blank / just route this) so the contrast lands.
-- **Show the full file after every edit** — after every prompt edit (analyst, extractor, synthesizer), read the file back with the Read tool and print the full updated contents before moving on. The student should always be able to see exactly what changed.
-- **Coach does all file operations** — never ask the student to run `cp`, `mkdir`, or any file command. The coach handles file copies, directory creation, and file writes directly via tools.
-- **Use-case selection cap: 3 minutes** — if the student hasn't picked after 3 minutes, nudge them to the option that matches a document they have on their laptop right now.
-- **Warn about JSON field names before Step 5** — when editing `prompts/extractor.md`, the field names `owner`, `task`, `deadline` must stay even if the meaning shifts. The orchestrator parses the extractor's output with `JSON.parse()` and expects those keys. A student who renames them will get a confusing runtime error.
-- **JTBD = Jobs to Be Done** — if the student doesn't recognize the term, explain it: "Jobs to Be Done — what the user is fundamentally trying to accomplish, not just what they're doing on the surface."
-- **If the output is bad, iterate** — bad first output is expected and pedagogically useful. Tune one prompt, re-run, compare. That process is the craft.
-- **Questions stop and wait** — never ask a question and immediately answer it. Wait for the student's actual response.
-- **End with a specific next project** — the "Where This Goes" section (Step 10) closes when the student has named a concrete problem they want to apply this to. Don't let them leave with "I'll think about it."
-
-## Optional deeper reading
-
-Just ask me: *"Read concepts/agent-archetypes.md and walk me through it."* I'll pull it up and explain it.
-
-- `concepts/agent-archetypes.md` — patterns for how to think about any new agent you build next
+- **No live edits in this module** — the student just ran a working system in Module 7. Editing prompts now without a real test document leads to confusion ("why is the output different?"). Explain the pattern, don't execute it.
+- **The starter prompt is the deliverable** — the student should leave with a concrete, copy-pasteable prompt for their next agent. Don't skip Step 5.
+- **Wait for the answer in Step 4** — "which of these maps to something you actually want to build?" — wait for their actual answer before printing the starter prompt. Tailor it to what they said.
+- **Keep the pattern framing** — the three patterns aren't new concepts, they're variations of what the student already built. Frame each one as "same building blocks, different dispatch." Nothing here is foreign.
+- **If the student says "I want to build all three"** — pick one. "Start with the one you have a real use case for today. The others will make more sense after you've built the first one."
