@@ -71,26 +71,44 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     terminal: false,
   });
 
-  const prompt = () =>
-    rl.question("> ", async (raw) => {
-      const line = raw.trim();
-      if (!line) return prompt();
-      if (line === "exit") { rl.close(); return; }
+  let buffer = [];
 
-      messages.push({ role: "user", content: line });
+  const showPrompt = () => {
+    process.stdout.write("> ");
+    buffer = [];
+  };
 
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages,
-      });
+  const submit = async () => {
+    const text = buffer.join("\n").trim();
+    buffer = [];
+    if (!text) { showPrompt(); return; }
 
-      const reply = response.content[0].text;
-      messages.push({ role: "assistant", content: reply });
-      console.log(`\nAssistant: ${reply}\n`);
-      prompt();
+    messages.push({ role: "user", content: text });
+
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
     });
 
-  prompt();
+    const reply = response.content[0].text;
+    messages.push({ role: "assistant", content: reply });
+    console.log(`\nAssistant: ${reply}\n`);
+    showPrompt();
+  };
+
+  rl.on("line", (raw) => {
+    if (raw.trim() === "exit") { rl.close(); return; }
+    if (raw === "") {
+      submit();
+    } else {
+      buffer.push(raw);
+    }
+  });
+
+  if (!preloadedTranscript) {
+    console.log("   Press Enter twice to send.\n");
+  }
+  showPrompt();
 }
