@@ -131,21 +131,27 @@ ls transcripts/team-standup/
 
 There's the routed transcript. Drop a few more via `npm run drop-test` to show the pattern repeating.
 
-## Step 6: See it in the frontend (4 min)
+## Step 6: Trigger it from the browser (4 min)
 
-Open `frontend/index.html` (if not already open) and click the **Stage 2 tab**:
+If the server isn't running, start it:
 
 ```bash
-open frontend/index.html
+npm run server
 ```
 
-> "Look at the Stage 2 visualization. You can see the pipeline as nodes: incoming folder → Classifier → team-standup / client-call / planning-session → Notification.
->
-> This is a sequence — not a conversation. Each node does one thing and passes results to the next. That's what makes it a workflow."
+Open **http://localhost:3000** and click the **Stage 2** tab.
 
-Click each node. Show the inspect panels — what each step does.
+On the right side, click **Load sample transcript**, then hit **Run Workflow →**.
 
-Hit **Run Agent** and watch the Stage 2 animation step through the pipeline.
+Watch the classification result appear: a badge showing `team-standup` (or whatever type it detected) and the routed path.
+
+> "Same pipeline — this time triggered from the browser. The `runWorkflow()` function doesn't care where the transcript came from. The server just hands it the text and it does its job."
+
+Click each node on the diagram. Show the inspect panels — what each step does.
+
+Hit **Run Agent** to watch the Stage 2 architecture animation.
+
+> "The animation shows the architecture. The live panel shows the actual execution. Both are useful — the diagram gives you the mental model, the live interface gives you the proof."
 
 ## Step 7: Stop the watcher cleanly (1 min)
 

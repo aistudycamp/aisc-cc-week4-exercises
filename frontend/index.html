@@ -662,6 +662,178 @@
     margin-top: 4px;
   }
 
+  /* INTERACTIVE LIVE PANELS */
+  .server-banner {
+    margin: 14px 22px 0;
+    padding: 12px 14px;
+    background: #FEF3C7;
+    border: 1px solid #F59E0B;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #92400E;
+    line-height: 1.5;
+  }
+  .server-banner code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(0,0,0,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .live-panel {
+    padding: 14px 22px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .panel-eyebrow {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--orch);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .panel-textarea {
+    width: 100%;
+    min-height: 80px;
+    max-height: 130px;
+    padding: 9px 11px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--panel-soft);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .panel-textarea:focus {
+    border-color: var(--orch);
+    box-shadow: 0 0 0 3px var(--orch-glow);
+  }
+  .panel-input {
+    width: 100%;
+    padding: 8px 11px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--panel-soft);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .panel-input:focus {
+    border-color: var(--orch);
+    box-shadow: 0 0 0 3px var(--orch-glow);
+  }
+  .panel-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .panel-sample-btn {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-2);
+    background: var(--panel-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .panel-sample-btn:hover { color: var(--ink); background: #F0EDE6; }
+  .panel-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--panel);
+    background: var(--orch);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .panel-btn:hover:not(:disabled) { background: var(--sub); }
+  .panel-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .panel-chat { display: flex; flex-direction: column; gap: 8px; }
+  .chat-bubble {
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    animation: outIn 0.3s ease;
+  }
+  .chat-bubble.user {
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 11px;
+    align-self: flex-end;
+    max-width: 90%;
+  }
+  .chat-bubble.assistant {
+    background: var(--orch-soft);
+    color: var(--ink);
+    font-family: var(--sans);
+    white-space: pre-wrap;
+  }
+
+  .panel-result { font-size: 13px; line-height: 1.5; animation: outIn 0.35s ease; }
+  .class-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 5px;
+    color: var(--orch);
+    background: var(--orch-soft);
+    margin-bottom: 5px;
+  }
+  .result-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+  .result-report {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    white-space: pre-wrap;
+    padding: 12px;
+    background: var(--panel-soft);
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    margin-top: 10px;
+  }
+
+  .orch-steps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .orch-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    transition: all 0.3s;
+  }
+  .orch-step.running { color: var(--orch); border-color: var(--orch-soft); background: var(--orch-soft); }
+  .orch-step.done { color: var(--ink); border-color: var(--line); background: var(--panel-soft); }
+  .step-check { font-size: 13px; flex-shrink: 0; width: 16px; text-align: center; }
+
   /* INSPECT MODE */
   .inspect { display: none; }
   .inspect.visible { display: block; animation: outIn 0.4s ease; }
@@ -1090,6 +1262,52 @@
       <div class="right-body" id="rightBody">
 
         <div id="defaultView">
+
+          <!-- Server offline banner -->
+          <div class="server-banner" id="serverBanner" style="display:none">
+            Start the server to use the live interface — run <code>npm run server</code> in <code>student-output/</code>, then reload the page.
+          </div>
+
+          <!-- Stage 1: Chat Assistant panel -->
+          <div class="live-panel" id="panel1" style="display:none">
+            <div class="panel-eyebrow">Try it live — Chat Assistant</div>
+            <textarea class="panel-textarea" id="chatTranscript" placeholder="Paste a transcript here…"></textarea>
+            <div class="panel-row">
+              <button class="panel-sample-btn" id="chatSampleBtn">Load sample transcript</button>
+            </div>
+            <input class="panel-input" id="chatQuestion" placeholder="Ask a question about this transcript…" />
+            <button class="panel-btn" id="chatSubmit">Ask →</button>
+            <div class="panel-chat" id="chatOutput"></div>
+          </div>
+
+          <!-- Stage 2: Workflow panel -->
+          <div class="live-panel" id="panel2" style="display:none">
+            <div class="panel-eyebrow">Try it live — Workflow Pipeline</div>
+            <textarea class="panel-textarea" id="workflowTranscript" placeholder="Paste a transcript here…"></textarea>
+            <div class="panel-row">
+              <button class="panel-sample-btn" id="workflowSampleBtn">Load sample transcript</button>
+            </div>
+            <button class="panel-btn" id="workflowSubmit">Run Workflow →</button>
+            <div class="panel-result" id="workflowResult"></div>
+          </div>
+
+          <!-- Stage 3: Orchestrator panel -->
+          <div class="live-panel" id="panel3" style="display:none">
+            <div class="panel-eyebrow">Try it live — Agentic System</div>
+            <textarea class="panel-textarea" id="orchTranscript" placeholder="Paste a transcript here…"></textarea>
+            <div class="panel-row">
+              <button class="panel-sample-btn" id="orchSampleBtn">Load sample transcript</button>
+            </div>
+            <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
+            <div class="orch-steps" id="orchSteps">
+              <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Chat assistant: executive summary</span></div>
+              <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Chat assistant: action items</span></div>
+              <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Workflow: classify + route</span></div>
+              <div class="orch-step" id="orchStep4"><span class="step-check">○</span><span>Step 4 — Synthesize final report</span></div>
+            </div>
+            <div class="panel-result" id="orchResult"></div>
+          </div>
+
           <div class="live-section" id="feed">
             <div class="feed-empty" id="feedEmpty">Press <em>Run Agent</em> to begin.</div>
             <div class="feed-hint">
@@ -1648,6 +1866,7 @@ Return ONLY a JSON object:
     exitInspect();
     fullReset();
     pathRefs = buildConnections();
+    updatePanelForStage(currentStage);
   }
 
   // ============ ANIMATION ============
@@ -1843,6 +2062,181 @@ Return ONLY a JSON object:
       if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('3');
     }
   });
+
+  // ============ INTERACTIVE PANELS ============
+  let serverOnline = false;
+
+  async function checkServer() {
+    try {
+      const r = await fetch('/api/health', { signal: AbortSignal.timeout(1500) });
+      if (r.ok) {
+        serverOnline = true;
+        $('serverBanner').style.display = 'none';
+        updatePanelForStage(currentStage);
+      } else {
+        showOfflineBanner();
+      }
+    } catch {
+      showOfflineBanner();
+    }
+  }
+
+  function showOfflineBanner() {
+    serverOnline = false;
+    $('serverBanner').style.display = 'block';
+    ['panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
+  }
+
+  function updatePanelForStage(s) {
+    ['panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
+    if (serverOnline) $('panel' + s).style.display = 'block';
+  }
+
+  async function loadSample(targetId) {
+    try {
+      const r = await fetch('/api/sample-transcript');
+      $(targetId).value = await r.text();
+    } catch {}
+  }
+
+  // ── Stage 1: Chat ──
+  $('chatSampleBtn').addEventListener('click', () => loadSample('chatTranscript'));
+
+  $('chatSubmit').addEventListener('click', async () => {
+    const question = $('chatQuestion').value.trim();
+    const context = $('chatTranscript').value.trim();
+    if (!question) return;
+    const chatOut = $('chatOutput');
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble user';
+    userBubble.textContent = question;
+    chatOut.appendChild(userBubble);
+    $('chatQuestion').value = '';
+    $('chatSubmit').disabled = true;
+    $('chatSubmit').textContent = 'Thinking…';
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, context }),
+      });
+      const { response } = await r.json();
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'chat-bubble assistant';
+      aiBubble.textContent = response;
+      chatOut.appendChild(aiBubble);
+      $('rightBody').scrollTop = $('rightBody').scrollHeight;
+    } catch (err) {
+      const errBubble = document.createElement('div');
+      errBubble.className = 'chat-bubble assistant';
+      errBubble.textContent = 'Error: ' + err.message;
+      chatOut.appendChild(errBubble);
+    } finally {
+      $('chatSubmit').disabled = false;
+      $('chatSubmit').textContent = 'Ask →';
+    }
+  });
+
+  $('chatQuestion').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSubmit').click(); }
+  });
+
+  // ── Stage 2: Workflow ──
+  $('workflowSampleBtn').addEventListener('click', () => loadSample('workflowTranscript'));
+
+  $('workflowSubmit').addEventListener('click', async () => {
+    const transcript = $('workflowTranscript').value.trim();
+    if (!transcript) return;
+    $('workflowSubmit').disabled = true;
+    $('workflowSubmit').textContent = 'Running…';
+    $('workflowResult').innerHTML = '';
+    try {
+      const r = await fetch('/api/workflow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      });
+      const { classification, outputPath, error } = await r.json();
+      if (error) throw new Error(error);
+      const routed = outputPath ? outputPath.split('/').slice(-2).join('/') : '—';
+      $('workflowResult').innerHTML = `
+        <span class="class-badge">${classification}</span>
+        <div class="result-meta">Routed → transcripts/${routed}</div>
+      `;
+    } catch (err) {
+      $('workflowResult').textContent = 'Error: ' + err.message;
+    } finally {
+      $('workflowSubmit').disabled = false;
+      $('workflowSubmit').textContent = 'Run Workflow →';
+    }
+  });
+
+  // ── Stage 3: Orchestrator ──
+  $('orchSampleBtn').addEventListener('click', () => loadSample('orchTranscript'));
+
+  function setStep(stepId, state) {
+    const el = $(stepId);
+    el.classList.remove('running', 'done');
+    const check = el.querySelector('.step-check');
+    if (state === 'running') { el.classList.add('running'); check.textContent = '◌'; }
+    else if (state === 'done') { el.classList.add('done'); check.textContent = '✓'; }
+    else { check.textContent = '○'; }
+  }
+
+  $('orchSubmit').addEventListener('click', async () => {
+    const transcript = $('orchTranscript').value.trim();
+    if (!transcript) return;
+    $('orchSubmit').disabled = true;
+    $('orchSubmit').textContent = 'Running…';
+    $('orchResult').innerHTML = '';
+    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+    try {
+      setStep('orchStep1', 'running');
+      const r1 = await fetch('/api/orchestrate/step1', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      });
+      const { summary } = await r1.json();
+      setStep('orchStep1', 'done');
+
+      setStep('orchStep2', 'running');
+      const r2 = await fetch('/api/orchestrate/step2', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      });
+      const { actions } = await r2.json();
+      setStep('orchStep2', 'done');
+
+      setStep('orchStep3', 'running');
+      const r3 = await fetch('/api/orchestrate/step3', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      });
+      const { classification } = await r3.json();
+      setStep('orchStep3', 'done');
+
+      setStep('orchStep4', 'running');
+      const r4 = await fetch('/api/orchestrate/step4', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ summary, actions, classification }),
+      });
+      const { report } = await r4.json();
+      setStep('orchStep4', 'done');
+
+      const safe = report.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      $('orchResult').innerHTML = `<div class="result-report">${safe}</div>`;
+      $('rightBody').scrollTop = $('rightBody').scrollHeight;
+    } catch (err) {
+      $('orchResult').textContent = 'Error: ' + err.message;
+      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+    } finally {
+      $('orchSubmit').disabled = false;
+      $('orchSubmit').textContent = 'Run Orchestrator →';
+    }
+  });
+
+  // Check server on load
+  checkServer();
 
   // initial build
   pathRefs = buildConnections();

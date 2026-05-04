@@ -102,7 +102,17 @@ npm run drop-test
 
 If the new step doesn't fire: tell Claude what went wrong. "The summary file isn't appearing — can you check workflow.js?" That's the vibe-coding feedback loop.
 
-## Step 5: The big idea (2 min)
+## Step 5: Verify it in the browser (2 min)
+
+Now confirm the new step fires through the live interface. Switch to **http://localhost:3000**, click the **Stage 2 tab**, load the sample transcript, and hit **Run Workflow**.
+
+> "You should see the same classification result you got in the terminal. The new step you added — does it also fire? Check the terminal logs while you click Run Workflow in the browser."
+
+If something's off, describe it to Claude. "The workflow ran but the summary file didn't appear" — Claude can diagnose from that.
+
+> "This is the full loop: describe → Claude writes → terminal confirms → browser confirms. You extended a running system and verified it without touching a line of code."
+
+## Step 6: The big idea (2 min)
 
 > "Look at what you just did. You extended a running automated system by describing what you wanted. No file paths. No syntax. No 'which line do I put this on?' You just said what you needed and Claude wrote it.
 >
@@ -114,13 +124,13 @@ If the new step doesn't fire: tell Claude what went wrong. "The summary file isn
 >
 > Each step adds capability. The trigger doesn't change. The classification doesn't change. The rest of the pipeline stays exactly the same. **You composed a new behavior without touching what was already working.**"
 
-## Step 6: The handoff (30 seconds)
+## Step 7: The handoff (30 seconds)
 
 > "Stage 2 complete. You built a pipeline that fires without you, makes an AI decision, routes files, and outputs to multiple destinations.
 >
 > Stage 3 is a different scale. Instead of a fixed sequence of steps, the orchestrator runs *three specialists in sequence* — each one handing its result back before the next one starts. And here's the payoff you've been set up for: two of those three specialists are the things you already built. Type `module-6` when you're ready."
 
-## Step 7: Wrap and commit (1 min)
+## Step 8: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 5:` to `- [x] Module 5:`
 2. **Commit:**

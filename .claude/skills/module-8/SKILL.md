@@ -120,17 +120,19 @@ If they don't have something on their laptop, give them options:
 
 Anything ~300+ words works.
 
-## Step 6: Run it (3 min)
+## Step 6: Run it — in the browser (3 min)
 
-```bash
-npm run stage-3 -- transcripts/real-input.txt
-```
+Open **http://localhost:3000**, click the **Stage 3** tab.
 
-Watch the trace. Read the output together.
+Paste the real input text into the transcript area and hit **Run Orchestrator →**.
+
+Watch the four steps light up with the personalized prompts firing. Read the report.
 
 > "How is it? Useful? Surprising? Wrong about something?"
 
-If the output is bad, the system prompts need more rules. Iterate together — change one rule, re-run, compare. This is the actual craft of building agents: tune the prompt until the output is what you want.
+If the output is bad, the system prompts need more rules. Describe the problem to Claude — "the themes are too generic, make them more specific to customer insights" — and let Claude revise the prompt. Re-run in the browser. Compare. This is the actual craft of building agents: tune the prompt until the output is what you want.
+
+Take a screenshot of the Stage 3 panel with your personalized report showing.
 
 ## Step 7: Save the result (2 min)
 
@@ -144,10 +146,9 @@ cp prompts/system.md student-output/personalized/system.md
 cp prompts/summarizer.md student-output/personalized/summarizer.md
 cp prompts/action_extractor.md student-output/personalized/action_extractor.md
 cp transcripts/real-input.txt student-output/personalized/sample-input.txt
-cp outputs/*.md student-output/personalized/sample-output.md 2>/dev/null || true
 ```
 
-> "That `personalized/` folder is your take-home. Three prompts, one input, one output — your fingerprint on a multi-agent system."
+> "That `personalized/` folder is your take-home. Three prompts, one real input, one real output — your fingerprint on a multi-agent system."
 
 ## Step 8: Reflect (2 min)
 

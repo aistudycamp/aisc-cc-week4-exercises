@@ -128,21 +128,26 @@ Ask one question at the prompt, then exit.
 > When would you use Stage 2? Automated classification and routing — when you want a file to land in the right place without lifting a finger.
 > When would you use Stage 3? When you need all of the above — summary, actions, routing, and notification — all from one trigger."
 
-## Step 6: See the full hierarchy in the frontend (3 min)
+## Step 6: Run it through the browser (3 min)
 
-Open `frontend/index.html` and click the **Stage 3 tab**:
+Open **http://localhost:3000** and click the **Stage 3 tab**.
 
-```bash
-open frontend/index.html
-```
+Click **Load sample transcript**, then hit **Run Orchestrator →**.
 
-> "Look at this. The orchestrator coordinates three specialists. You can see the ask() calls — those are Stage 1. You can see the workflow box — that's Stage 2. You built every one of those boxes.
->
-> The orchestrator is just the thing that sequences them."
+Watch each step light up as it completes:
 
-Click into each node. Show the inspect panels.
+- Step 1 ✓ — Chat assistant: executive summary
+- Step 2 ✓ — Chat assistant: action items
+- Step 3 ✓ — Workflow: classify + route
+- Step 4 ✓ — Synthesize final report
 
-> "You didn't just learn about agentic systems — you built one. Every node in this diagram is code you ran."
+The full report appears below.
+
+> "That's the same sequence from `orchestrator.js` — you're watching your four-step pipeline execute in real time. Each light-up is a real API call returning. Same code as the terminal run in Step 4, now with a visual."
+
+Click into each node on the diagram. Show the inspect panels.
+
+> "You didn't just learn about agentic systems — you built one. Every node in this diagram is code you ran. Every endpoint behind this UI is yours."
 
 ## Step 7: Wrap and commit (2 min)
 

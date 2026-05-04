@@ -125,19 +125,40 @@ cp prompts/system.md prompts/system-custom.md
 
 Then restore.
 
-## Step 6: See it in the frontend (2 min)
+## Step 6: Use it in the browser (4 min)
 
-Open `frontend/index.html`:
+Start the server — this runs until the student is done with the course:
 
 ```bash
-open frontend/index.html
+npm run server
 ```
 
-Click the **Stage 1 tab**. Three nodes: `[A transcript] → [Chat Assistant] → [A report]`. That's exactly what they just ran.
+You'll see:
 
-Click the **Chat Assistant** node. Show them the inspect panel — system prompt, description, connections. Hit **Run Agent** to watch the animation.
+```
+🚀 Server running at http://localhost:3000
+```
 
-> "That's your Stage 1 assistant visualized. One specialist. One system prompt. In Module 4 you'll see it become *one step* in a larger automated pipeline."
+Open **http://localhost:3000** in the browser. Make sure the **Stage 1** tab is active.
+
+On the right side you'll see the live interface. Click **Load sample transcript**, then ask the same 4 questions they asked in the terminal:
+
+```
+What are the top 3 action items?
+Who looks most blocked right now?
+What should I bring to next week's standup?
+Write a one-sentence summary I can put in Slack.
+```
+
+> "That's your `chat.js` — same code, same system prompt, now running through a browser. The `ask()` function doesn't know or care whether the question came from the terminal or a web request."
+
+Try this: have them change `prompts/system.md` via Claude (same as Step 5), then ask a question in the browser *without restarting the server*. The new prompt appears immediately.
+
+> "The server reads `system.md` each time it starts. If you want live prompt changes, restart the server with `Ctrl+C` then `npm run server` again."
+
+Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code they wrote. Hit **Run Agent** to watch the architecture animation alongside the live interface.
+
+> "Leave the server running — you'll use it in Module 4 too."
 
 ## Step 7: Wrap and commit (1 min)
 

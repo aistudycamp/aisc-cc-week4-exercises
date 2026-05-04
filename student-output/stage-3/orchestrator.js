@@ -1,81 +1,39 @@
 // Stage 3 — Agentic System
-// An orchestrator that examines input and dynamically picks which tools to use.
-// The planner (an LLM call) decides; the orchestrator dispatches; tools are
-// the chat assistant (Stage 1) and the workflow pipeline (Stage 2) plus
-// specialist sub-agents for deeper extraction.
+// An orchestrator that coordinates multiple specialists in sequence.
+// Each specialist does one job, hands its result back, and the next one starts.
+// At the end, a synthesizer combines everything into the final report.
 //
-// Usage:  node stage-3/orchestrator.js transcripts/sample-transcript.txt
+// The orchestrator uses the things you built in Stage 1 and Stage 2:
+//   ask()          ← Stage 1 building block (chat assistant)
+//   runWorkflow()  ← Stage 2 building block (classify, route, notify)
+//
+// Usage:  npm run stage-3 -- transcripts/sample-transcript.txt
 
 import Anthropic from "@anthropic-ai/sdk";
 import fs from "node:fs";
 import path from "node:path";
 import "dotenv/config";
-import { ask } from "../stage-1/chat.js";          // ← Stage 1 building block
+import { ask } from "../stage-1/chat.js";           // ← Stage 1 building block
 import { runWorkflow } from "../stage-2/workflow.js"; // ← Stage 2 building block
 
 const ROOT = path.join(import.meta.dirname, "..");
 const client = new Anthropic();
 
-const promptSummarizer = fs.readFileSync(path.join(ROOT, "prompts", "summarizer.md"), "utf-8");
-const promptExtractor  = fs.readFileSync(path.join(ROOT, "prompts", "action_extractor.md"), "utf-8");
-const promptRouter     = fs.readFileSync(path.join(ROOT, "prompts", "router.md"), "utf-8");
+const systemPrompt = fs.readFileSync(
+  path.join(ROOT, "prompts", "system.md"),
+  "utf-8"
+);
 
-// ─── Helper: strip markdown fences from JSON responses ────────────────────
-function parseJson(text) {
-  const cleaned = text.trim()
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/```\s*$/, "")
-    .trim();
-  return JSON.parse(cleaned);
-}
-
-// ─── Specialist sub-agents ────────────────────────────────────────────────
-async function summarize(transcript) {
-  console.log("  📋 Summarizer: reading transcript...");
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 512,
-    system: promptSummarizer,
-    messages: [{ role: "user", content: transcript }],
-  });
-  const result = parseJson(response.content[0].text);
-  console.log(`  ✓ Summarizer returned ${result.themes.length} themes`);
-  return result;
-}
-
-async function extractActions(transcript) {
-  console.log("  ✅ Extractor: scanning for action items...");
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 768,
-    system: promptExtractor,
-    messages: [{ role: "user", content: transcript }],
-  });
-  const result = parseJson(response.content[0].text);
-  console.log(`  ✓ Extractor returned ${result.actions.length} actions`);
-  return result;
-}
-
-// ─── Planner: decide which tools to invoke ────────────────────────────────
-// Returns an object like: { tools: ["summarize", "extract"] }
-async function planner(transcript) {
-  console.log("🗺️  Planner: deciding which tools to invoke...");
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 256,
-    system: promptRouter,
-    messages: [{ role: "user", content: transcript.slice(0, 800) }],
-  });
-  const plan = parseJson(response.content[0].text);
-  console.log(`  ✓ Plan: ${plan.tools.join(", ")}`);
-  return plan;
-}
-
-// ─── Synthesis: combine specialist outputs into the final report ──────────
+// ─── Synthesizer: combine all specialist results into a final report ───────
 async function synthesize(results) {
   console.log("  🧠 Synthesizing final report...");
-  const systemPrompt = fs.readFileSync(path.join(ROOT, "prompts", "system.md"), "utf-8");
-  const userMessage = `Here's the structured input from my specialists.\n\n${JSON.stringify(results, null, 2)}\n\nCompose the final insights report following the format in your system prompt.`;
+  const userMessage = [
+    "Here are the results from each specialist:\n",
+    `EXECUTIVE SUMMARY:\n${results.summary}\n`,
+    `ACTION ITEMS:\n${results.actions}\n`,
+    `CLASSIFICATION: ${results.classification}\n`,
+    "Combine these into the final insights report following your system prompt format.",
+  ].join("\n");
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-6",
@@ -86,47 +44,48 @@ async function synthesize(results) {
   return response.content[0].text;
 }
 
-// ─── Orchestrator: the main entry point ───────────────────────────────────
-export async function orchestrator(transcript) {
-  // Step 1: planner decides which tools to use
-  const plan = await planner(transcript);
-
-  // Step 2: dispatch based on plan
+// ─── Orchestrator: coordinates the full sequence ───────────────────────────
+export async function orchestrator(transcript, sourceFilename = "transcript.txt") {
   const results = {};
 
-  if (plan.tools.includes("chat")) {
-    console.log("  💬 Chat: running quick summary...");
-    results.chat = await ask("Give me a one-paragraph executive summary of this meeting.", transcript);
-  }
+  // Step 1: ask() — get an executive summary  [Stage 1 building block]
+  console.log("  💬 Step 1: Chat assistant — getting executive summary...");
+  results.summary = await ask(
+    "Give me a one-paragraph executive summary of this meeting.",
+    transcript
+  );
+  console.log("  ✓ Summary complete.");
 
-  if (plan.tools.includes("workflow")) {
-    console.log("  ⚙️  Workflow: running full pipeline...");
-    const outPath = await runWorkflow(transcript, "orchestrated.txt");
-    results.workflow = `Saved to ${outPath}`;
-  }
+  // Step 2: ask() — extract action items  [Stage 1 building block]
+  console.log("  💬 Step 2: Chat assistant — extracting action items...");
+  results.actions = await ask(
+    "List every action item from this meeting. For each one: who owns it, what they need to do, and the deadline if mentioned.",
+    transcript
+  );
+  console.log("  ✓ Action items extracted.");
 
-  if (plan.tools.includes("summarize")) {
-    results.themes = (await summarize(transcript)).themes;
-  }
+  // Step 3: runWorkflow() — classify, route, notify  [Stage 2 building block]
+  console.log("  ⚙️  Step 3: Workflow — classifying and routing transcript...");
+  const { classification } = await runWorkflow(transcript, sourceFilename);
+  results.classification = classification;
+  console.log("  ✓ Workflow complete.");
 
-  if (plan.tools.includes("extract")) {
-    results.actions = (await extractActions(transcript)).actions;
-  }
-
-  // Step 3: synthesize all results
+  // Step 4: synthesize everything into the final report
   const finalReport = await synthesize(results);
   console.log("✓ Orchestration complete.\n");
   return finalReport;
 }
 
-// ─── CLI entry point (only runs when invoked directly) ────────────────────
+// ─── CLI entry point ───────────────────────────────────────────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
   const transcriptPath = process.argv[2] || "transcripts/sample-transcript.txt";
-
   const transcript = fs.readFileSync(transcriptPath, "utf-8");
-  console.log(`📄 Input: ${transcriptPath} (${transcript.split(/\s+/).length} words)\n`);
+  const filename = path.basename(transcriptPath);
 
-  const report = await orchestrator(transcript);
+  console.log(`📄 Input: ${transcriptPath} (${transcript.split(/\s+/).length} words)\n`);
+  console.log("🤖 Orchestrator starting — 3 specialists, then synthesis.\n");
+
+  const report = await orchestrator(transcript, filename);
 
   console.log("─".repeat(60));
   console.log(report);

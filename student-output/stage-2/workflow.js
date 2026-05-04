@@ -1,79 +1,102 @@
 // Stage 2 — Workflow
-// A fixed multi-step pipeline triggered by a file-drop event.
-// The LLM is one step in the pipeline — not the whole thing.
+// An automated pipeline triggered by dropping a file into transcripts/incoming/.
+// The AI is one step in the pipeline — it classifies the meeting and decides
+// where the file goes. The workflow handles the rest automatically.
 //
-// Also exports runWorkflow() so Stage 3 can use it as a building block.
+// Run it:  npm run stage-2
+//   Then run in a second terminal:  npm run drop-test
+//   Watch the file get classified, routed, and a notification fire.
 //
-// Run it:  node stage-2/workflow.js
-//   Then drop any .txt file into transcripts/ — the pipeline fires automatically.
-//
-// Import it as a building block:
+// Import as a building block:
 //   import { runWorkflow } from '../stage-2/workflow.js';
 
+import Anthropic from "@anthropic-ai/sdk";
 import chokidar from "chokidar";
 import fs from "node:fs";
 import path from "node:path";
+import { exec } from "node:child_process";
 import "dotenv/config";
-import { ask } from "../stage-1/chat.js"; // ← Stage 1 is one step in this pipeline
 
+const client = new Anthropic();
 const ROOT = path.join(import.meta.dirname, "..");
-const TRANSCRIPTS_DIR = path.join(ROOT, "transcripts");
-const OUTPUTS_DIR = path.join(ROOT, "outputs");
+const INCOMING_DIR = path.join(ROOT, "transcripts", "incoming");
+const promptClassifier = fs.readFileSync(
+  path.join(ROOT, "prompts", "classifier.md"),
+  "utf-8"
+);
 
-// ─── Building block: the full pipeline for one transcript ─────────────────
-// Step 1: (caller reads the file and passes it in)
-// Step 2: Call the chat assistant with a fixed prompt
-// Step 3: Format as markdown
-// Step 4: Save to outputs/
-// Step 5: Return the saved path (notify)
-export async function runWorkflow(transcript, sourceFilename = "transcript.txt") {
-  // Step 2 — call the Stage 1 chat assistant
-  const reportText = await ask(
-    "Generate the standard insights report for this transcript.",
-    transcript
+// ─── Helper: classify a transcript ────────────────────────────────────────
+async function classify(transcript) {
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 256,
+    system: promptClassifier,
+    messages: [{ role: "user", content: transcript.slice(0, 1200) }],
+  });
+  return JSON.parse(response.content[0].text.trim());
+}
+
+// ─── Helper: macOS notification ───────────────────────────────────────────
+function notify(title, message) {
+  exec(
+    `osascript -e 'display notification "${message}" with title "${title}"'`
   );
+}
 
-  // Step 3 — format as markdown
-  const ts = new Date().toISOString().slice(0, 16).replace("T", "-").replace(":", "");
-  const stem = path.basename(sourceFilename, ".txt");
-  const body = `# Insights Report\n\nSource: \`${sourceFilename}\`\nGenerated: ${new Date().toISOString()}\n\n---\n\n${reportText}\n`;
+// ─── Building block: run the full pipeline for one transcript ─────────────
+// Step 1: AI classifies the meeting type
+// Step 2: Route the file to the right folder
+// Step 3: Send a notification
+// Returns: { classification, outputPath }
+export async function runWorkflow(transcript, sourceFilename = "transcript.txt") {
+  // Step 1 — classify
+  console.log("  🔍 Classifying meeting type...");
+  const result = await classify(transcript);
+  console.log(`  ✓ Classified as: ${result.type}`);
 
-  // Step 4 — save to outputs/
-  fs.mkdirSync(OUTPUTS_DIR, { recursive: true });
-  const outPath = path.join(OUTPUTS_DIR, `${ts}-${stem}.md`);
-  fs.writeFileSync(outPath, body, "utf-8");
+  // Step 2 — route to the right folder
+  const destDir = path.join(ROOT, "transcripts", result.type);
+  fs.mkdirSync(destDir, { recursive: true });
+  const outputPath = path.join(destDir, result.suggested_filename);
+  fs.writeFileSync(outputPath, transcript, "utf-8");
+  console.log(`  ✓ Routed → transcripts/${result.type}/${result.suggested_filename}`);
 
-  // Step 5 — return saved path
-  return outPath;
+  // Step 3 — notify
+  notify("Agent Sprint Workflow", `Routed to: ${result.type}`);
+
+  return { classification: result.type, outputPath };
 }
 
 // ─── Folder watcher (only runs when invoked directly) ─────────────────────
-// Stage 3 imports runWorkflow() above — it never reaches this code.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  fs.mkdirSync(OUTPUTS_DIR, { recursive: true });
+  fs.mkdirSync(INCOMING_DIR, { recursive: true });
 
   console.log("⚙️  Workflow — Transcript Pipeline");
-  console.log(`👀 Watching ${TRANSCRIPTS_DIR} for new .txt files...`);
-  console.log("    Drop a transcript into that folder to run the pipeline.\n");
+  console.log(`👀 Watching transcripts/incoming/ for new files...`);
+  console.log("    Run 'npm run drop-test' in another terminal to trigger it.\n");
 
-  const watcher = chokidar.watch(`${TRANSCRIPTS_DIR}/*.txt`, {
+  const watcher = chokidar.watch(INCOMING_DIR, {
     persistent: true,
     ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
   });
 
   watcher.on("add", async (filepath) => {
+    const ext = path.extname(filepath).toLowerCase();
+    if (ext !== ".txt" && ext !== ".md") return;
+
     const filename = path.basename(filepath);
-    console.log(`📄 New file detected: ${filename}`);
+    console.log(`📄 New file: ${filename}`);
+    console.log("⚡️ Running pipeline...\n");
 
     try {
-      // Step 1 — read
       const transcript = fs.readFileSync(filepath, "utf-8");
-      console.log("⚡️ Running pipeline...");
-
-      const outPath = await runWorkflow(transcript, filename);
-      console.log(`✓ Workflow complete → ${path.relative(ROOT, outPath)}\n`);
+      const { classification, outputPath } = await runWorkflow(transcript, filename);
+      console.log(`\n✓ Pipeline complete.`);
+      console.log(`  Type:    ${classification}`);
+      console.log(`  Saved:   ${path.relative(ROOT, outputPath)}\n`);
     } catch (err) {
-      console.error(`✗ Pipeline failed on ${filename}:`, err.message);
+      console.error(`✗ Pipeline failed:`, err.message);
     }
   });
 

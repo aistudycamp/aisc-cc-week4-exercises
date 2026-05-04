@@ -1,101 +1,98 @@
 ---
 name: module-7
-description: See the System — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Student opens frontend/index.html in browser, hits Run Agent, watches the animated flow, clicks each node to see the actual system prompt and config inside. The shareable "I built this" moment.
+description: Use Your Live System — Module 7 of the AISC Agent Sprint. Triggered when a student types "module-7". Student uses all three stages through the browser interface — chat, workflow, orchestrator — in real time. The shareable "I built this" moment, now with live API calls instead of a scripted animation.
 ---
 
-# Module 7: See the System
+# Module 7: Use Your Live System
 
 **Time:** ~20 minutes
-**You'll produce:** the ability to point to every node in the diagram and name the file or function behind it, plus a screenshot of the running visualization to share.
+**You'll produce:** evidence you actually ran all three stages through the browser — a screenshot of the Stage 3 tab with a real report, and the confidence that every endpoint behind that UI is yours.
 
 ## Coach Instructions
 
-This is the celebration module. The student already built the system in Module 6 — now they get to *see* it. Take a moment of pride before pushing forward to Module 8.
+This is the celebration module. The student already built the system in Module 6 — now they get to *use* it through the browser they've had open since Module 3. The visualization is no longer an animation — it's a live interface backed by the code they wrote. Make that landing explicit.
 
 ## Step 1: Set the frame (2 min)
 
 Say:
 
-> "Module 7. You already did the hard work in Module 6 — you built the multi-agent system. Today is about *seeing* what you built. Open the visualization, watch it run, and click into each piece to confirm: yes, that's the prompt I edited in Module 3. Yes, that's the function I read in Module 6. The diagram is just a window into the actual files on your machine."
+> "Module 7. Everything you've built — the chat assistant, the workflow, the orchestrator — is sitting behind a server you started in Module 3. The browser you've been using since then isn't just showing you a diagram. It's actually running your code.
+>
+> Today you use all three stages in sequence, see the architecture and the live execution side by side, and take a screenshot to prove you built this."
 
-## Step 2: Open the frontend and switch to Stage 3 (1 min)
+## Step 2: Confirm the server is running (1 min)
+
+If the server is still running from Module 3 or 6, skip this. If not:
 
 ```bash
-open frontend/index.html        # Mac
-# or just double-click it in your file explorer
+npm run server
 ```
 
-It opens in the browser. **Click the "agentic system" tab** at the top (or press `3`). The canvas swaps from the simple Stage 1/2 chain to the full 5-node multi-agent diagram.
+Open **http://localhost:3000**.
 
-## Step 3: Tour the canvas (4 min)
+## Step 3: Stage 1 tab — chat with your assistant (4 min)
 
-Walk them through what they're looking at:
+Click the **Stage 1** tab. Load the sample transcript. Ask 3 questions:
 
-> "Look at the layout. Top row, left to right: **A transcript → The Conductor → A report.** That's the main flow. Data goes in on the left, the orchestrator processes it, the report comes out on the right.
->
-> Below the orchestrator: **The Summarizer** and **The Extractor.** Those are sub-agents — helpers the orchestrator calls. Notice the dashed lines connecting them upward to the orchestrator? That's because they're 'internal calls' — the orchestrator dispatches down to them, gets answers back. The user never sees those.
->
-> Five nodes. Four connections. Same architecture you built in Module 6."
+```
+What are the top action items?
+Who looks most blocked?
+Write a one-sentence Slack summary of this meeting.
+```
 
-Quick contrast moment — have them click the Stage 1 tab, then Stage 2, then back to Stage 3:
+After each response:
 
-> "Look at this evolution. Stage 1 had 3 nodes: input, agent, output. Stage 2 had the same 3 nodes but with an automated trigger. Stage 3 keeps the same input and output, but the *agent in the middle* exploded into an orchestrator plus two sub-agents. That's the whole arc you just built — and you can see it visually here."
+> "That response came from your `chat.js` → the `ask()` function → the `system.md` prompt you edited in Module 3. Same chain. Now running in a browser."
 
-## Step 4: Inspect each node (8 min)
+Click the **Chat Assistant** node on the diagram. Show the inspect panel.
 
-This is the killer move. Click each node and walk through what's inside.
+> "The inspect panel shows the same system prompt file. The diagram isn't separate from the code — it's a window into it."
 
-### Click "A transcript" (input)
+## Step 4: Stage 2 tab — run the workflow (3 min)
 
-> "What this is: the starting point. Whenever a new file lands, the agent wakes up.
->
-> **The 'recent files' section?** Those would be your real transcripts in real life. Right now it's mocked. After Module 8, when you start dropping your actual files in, this list becomes real history."
+Click the **Stage 2** tab. Load the sample transcript. Hit **Run Workflow →**.
 
-### Click "The Conductor" (orchestrator)
+Watch the classification result appear.
 
-> "The big one. Look at 'Its instructions (system prompt).' **That's the actual content of `prompts/system.md` on your disk.** The same file you edited in Module 3. The same file `orchestrator.js` reads at runtime. Code reads the file. Frontend reads the file. One source of truth.
->
-> Look at 'Connects to.' Four arrows: it reads from the transcript, dispatches to both sub-agents, writes to the report. Same architecture as the JS code."
+> "Your `workflow.js` just fired. It classified the meeting, routed the file, sent the notification. Same pipeline you triggered with `npm run drop-test` in Module 4 — now triggered by a button click."
 
-### Click "The Summarizer"
+Try dropping a different transcript if you have one. The classification changes.
 
-> "Same idea. Its instructions are in `prompts/summarizer.md` — and they're shown right here. Notice this prompt is *different* from the orchestrator's. It tells Claude to return JSON, not prose. Different job, different prompt."
+## Step 5: Stage 3 tab — run the full orchestrator (6 min)
 
-### Click "The Extractor"
+Click the **Stage 3** tab. Load the sample transcript. Hit **Run Orchestrator →**.
 
-> "Same. Different prompt. Different focused job. Returns its own JSON."
+Watch each step light up:
 
-### Click "A report" (output)
+```
+Step 1 ✓  Chat assistant: executive summary     (your ask() from Stage 1)
+Step 2 ✓  Chat assistant: action items          (your ask() from Stage 1)
+Step 3 ✓  Workflow: classify + route            (your runWorkflow() from Stage 2)
+Step 4 ✓  Synthesize final report               (final assembly)
+```
 
-> "End of the line. Where the synthesized report lands. Same `outputs/` folder Module 4's watcher writes to."
+The full report appears below.
 
-## Step 5: Run the animation (2 min)
+> "Each one of those check marks is a real API call completing. You can see the order: the chat assistant runs twice, then the workflow runs, then synthesis. That's `orchestrator.js` executing in your browser."
 
-Have them hit the **"Run Agent"** button.
+While the orchestrator runs: click each node on the diagram and point to the code behind it.
 
-Watch the animated flow play out — each specialist fires in sequence:
-1. Transcript arrives → Conductor activates
-2. Step 1: ask() for executive summary → returns to Conductor
-3. Step 2: ask() for action items → returns to Conductor
-4. Step 3: runWorkflow() → classify, route, notify → returns to Conductor
-5. Step 4: Synthesizer combines results → final report appears
-
-> "That animation matches the sequence of API calls in your `orchestrator.js` — three specialists in order, then synthesis. The output panel shows what your real agent produced for the sample transcript."
+> "Orchestrator → `stage-3/orchestrator.js`. The ask() nodes → `stage-1/chat.js`. The workflow node → `stage-2/workflow.js`. You wrote every file behind this diagram."
 
 ## Step 6: Screenshot moment (2 min)
 
-> "This is the share-worthy moment. Take a screenshot of the running canvas — full diagram, animated mid-flow, output panel populated. Save it.
->
-> A week ago, you'd never built an agent. Right now you have a working multi-agent system you understand line-by-line *and* a clean visualization of how it's wired. That's a real artifact. Send it to your team. Drop it in the cohort Slack."
+> "This is the share-worthy moment. Stage 3 tab, all four steps checked, report visible below. Take a screenshot."
 
-Have them save the screenshot somewhere accessible (Desktop, screenshots folder).
+Have them save it somewhere accessible (Desktop, screenshots folder).
+
+> "A week ago, you'd never called an API. Right now you have a working multi-agent system running in your browser — and you built every piece of it. That's a real artifact. Send it to your team. Drop it in the cohort Slack."
 
 ## Step 7: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: change `- [ ] Module 7:` to `- [x] Module 7:`
 2. **Commit:**
    ```bash
-   git add -A && git commit -m "Complete Module 7: See the System"
+   git add -A && git commit -m "Complete Module 7: Use Your Live System"
    ```
 3. Hand off:
 
@@ -104,6 +101,6 @@ Have them save the screenshot somewhere accessible (Desktop, screenshots folder)
 ## Coach Guardrails
 
 - **This is a celebration module** — don't rush toward Module 8. Let the student take a moment with what they built.
-- **The animation is scripted timing, not a live wire** — it plays even when the orchestrator isn't running. Don't claim it's live. Say it "matches the sequence of API calls in `orchestrator.js`."
+- **The interface IS live** — every button click is a real API call. When the student asks "is this actually running my code?" the answer is yes. Point them to the terminal logs from the server if they want proof.
 - **Encourage the screenshot** — it's a real, shareable artifact. Treat Step 6 as a genuine milestone, not a formality.
-- **Learning objective check before wrap** — before committing, ask the student to point to one node and say what file or function it represents. If they can't, walk through Step 4 again for that node.
+- **Learning objective check before wrap** — before committing, ask the student to point to one step in the Stage 3 orchestrator panel and name the file behind it. If they can't, walk through Step 5 again for that step.
