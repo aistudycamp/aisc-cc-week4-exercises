@@ -856,6 +856,28 @@
     font-family: var(--mono); font-size: 11px; line-height: 1.5;
     border-radius: 6px; overflow-x: auto; white-space: pre-wrap;
   }
+  .chat-context-status {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--orch); margin-bottom: 8px; min-height: 16px;
+  }
+  .chat-history {
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 100px; max-height: 280px; overflow-y: auto;
+    margin-bottom: 10px; padding: 2px 0;
+  }
+  .chat-input-row {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 0;
+  }
+  .chat-input-row .panel-input { margin-bottom: 0; flex: 1; }
+  .chat-send-btn {
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    color: var(--panel); background: var(--orch);
+    border: none; border-radius: 8px; padding: 9px 16px;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .chat-send-btn:hover:not(:disabled) { background: var(--sub); }
+  .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .class-badge {
     display: inline-block;
     font-family: var(--mono);
@@ -1075,7 +1097,7 @@
   }
 </style>
 </head>
-<body data-stage="1">
+<body data-stage="0">
 
 <div class="app">
 
@@ -1088,7 +1110,8 @@
         <div class="brand-sub">Agent Sprint · Visualization</div>
       </div>
       <div class="top-tabs" id="topTabs">
-        <span class="top-tab active" data-tab="1"><span class="num">01</span>chat assistant</span>
+        <span class="top-tab active" data-tab="0"><span class="num">00</span>chat</span>
+        <span class="top-tab" data-tab="1"><span class="num">01</span>chat assistant</span>
         <span class="top-tab" data-tab="2"><span class="num">02</span>workflow</span>
         <span class="top-tab" data-tab="3"><span class="num">03</span>agentic system</span>
       </div>
@@ -1405,6 +1428,25 @@
           <!-- Server offline banner -->
           <div class="server-banner" id="serverBanner" style="display:none">
             Start the server to use the live interface — run <code>npm run server</code> in <code>student-output/</code>, then reload the page.
+          </div>
+
+          <!-- Chat tab (Module 2 teaching UI) -->
+          <div class="live-panel" id="panel0" style="display:none">
+            <div class="panel-eyebrow">Chat — try it live</div>
+            <div class="panel-row">
+              <button class="panel-sample-btn" id="chatTabStandup">Load standup</button>
+              <button class="panel-sample-btn" id="chatTabClient">Load client call</button>
+            </div>
+            <div class="chat-context-status" id="chatTabContextStatus"></div>
+            <div class="chat-history" id="chatTabMessages"></div>
+            <div class="chat-input-row">
+              <input class="panel-input" id="chatTabInput" placeholder="Ask a follow-up question…" />
+              <button class="chat-send-btn" id="chatTabSend">Send</button>
+            </div>
+            <div class="json-toggle-row" id="chatTabJsonRow" style="display:none">
+              <button class="json-toggle-btn" id="chatTabJsonBtn">Show JSON ▼</button>
+              <pre class="json-block" id="chatTabJsonBlock" style="display:none"></pre>
+            </div>
           </div>
 
           <!-- Stage 1: Chat Assistant panel -->
@@ -1983,7 +2025,7 @@ Return ONLY a JSON object:
   // ============ DOM HELPERS ============
   const $ = (id) => document.getElementById(id);
 
-  let currentStage = '1';
+  let currentStage = '0';
   let pathRefs = {};
 
   // ============ INSPECT RENDERING ============
@@ -2054,9 +2096,9 @@ Return ONLY a JSON object:
     document.querySelectorAll('.top-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.tab === currentStage);
     });
-    const labels = { '1': '1 · chat assistant', '2': '2 · workflow pipeline', '3': '3 · agentic system' };
-    const titles = { '1': 'What\'s <em>happening?</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
-    const nodeCounts = { '1': '3', '2': '6', '3': '7' };
+    const labels = { '0': '0 · chat', '1': '1 · chat assistant', '2': '2 · workflow pipeline', '3': '3 · agentic system' };
+    const titles = { '0': 'What\'s <em>happening?</em>', '1': 'What\'s <em>happening?</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
+    const nodeCounts = { '0': '—', '1': '3', '2': '6', '3': '7' };
     $('metaStage').textContent = labels[currentStage];
     $('metaNodes').textContent = nodeCounts[currentStage];
     $('rhTitle').innerHTML = titles[currentStage];
@@ -2285,11 +2327,11 @@ Return ONLY a JSON object:
   function showOfflineBanner() {
     serverOnline = false;
     $('serverBanner').style.display = 'block';
-    ['panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
+    ['panel0','panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
   }
 
   function updatePanelForStage(s) {
-    ['panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
+    ['panel0','panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
     if (serverOnline) $('panel' + s).style.display = 'block';
   }
 
@@ -2403,6 +2445,108 @@ Return ONLY a JSON object:
 
   $('chatQuestion').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSubmit').click(); }
+  });
+
+  // ── Chat tab (Module 2) ──
+  let chatTabContext = '';
+  let chatTabLastRequest = null;
+  let chatTabLastResponse = null;
+
+  async function loadChatTabContext(filename) {
+    try {
+      const url = filename ? `/api/sample-transcript/${filename}` : '/api/sample-transcript';
+      const r = await fetch(url);
+      chatTabContext = await r.text();
+      const label = filename === 'sample-client-call.txt' ? 'sample-client-call.txt' : 'sample-transcript.txt';
+      $('chatTabContextStatus').textContent = `Context: ${label} ✓`;
+    } catch { $('chatTabContextStatus').textContent = 'Failed to load transcript'; }
+  }
+
+  async function sendChatTabMessage() {
+    const question = $('chatTabInput').value.trim();
+    if (!question || !chatTabContext) return;
+    const msgs = $('chatTabMessages');
+
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble user';
+    userBubble.textContent = question;
+    msgs.appendChild(userBubble);
+    $('chatTabInput').value = '';
+    $('chatTabSend').disabled = true;
+    $('chatTabSend').textContent = '…';
+
+    const thinkingEl = document.createElement('div');
+    thinkingEl.className = 'chat-thinking';
+    thinkingEl.innerHTML = '<div class="thinking-dot"></div>Thinking…';
+    msgs.appendChild(thinkingEl);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    const callStart = performance.now();
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, context: chatTabContext }),
+      });
+      const elapsed = ((performance.now() - callStart) / 1000).toFixed(2);
+      const data = await r.json();
+      const { response, usage } = data;
+      thinkingEl.remove();
+
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'chat-bubble assistant';
+      aiBubble.textContent = response;
+      msgs.appendChild(aiBubble);
+
+      const logStrip = document.createElement('div');
+      logStrip.className = 'chat-log-strip';
+      if (usage && usage.input_tokens != null) {
+        const total = (usage.input_tokens || 0) + (usage.output_tokens || 0);
+        logStrip.textContent = `[~${total} tokens · ${elapsed}s]`;
+      } else {
+        logStrip.textContent = `[${elapsed}s]`;
+      }
+      msgs.appendChild(logStrip);
+      msgs.scrollTop = msgs.scrollHeight;
+
+      chatTabLastRequest = {
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        system: 'You are a meeting analyst… [see student-output/prompts/system.md]',
+        messages: [{ role: 'user', content: question + '\n\n' + chatTabContext.slice(0, 120) + '…' }],
+      };
+      chatTabLastResponse = {
+        content: [{ text: response.slice(0, 300) + (response.length > 300 ? '…' : '') }],
+        usage: usage || {},
+      };
+      $('chatTabJsonBlock').textContent = 'REQUEST\n' + JSON.stringify(chatTabLastRequest, null, 2) + '\n\nRESPONSE\n' + JSON.stringify(chatTabLastResponse, null, 2);
+      $('chatTabJsonRow').style.display = 'block';
+    } catch (err) {
+      thinkingEl.remove();
+      const errBubble = document.createElement('div');
+      errBubble.className = 'chat-bubble assistant';
+      errBubble.textContent = 'Error: ' + err.message;
+      msgs.appendChild(errBubble);
+    } finally {
+      $('chatTabSend').disabled = false;
+      $('chatTabSend').textContent = 'Send';
+    }
+  }
+
+  $('chatTabStandup').addEventListener('click', () => loadChatTabContext('sample-transcript.txt'));
+  $('chatTabClient').addEventListener('click', () => loadChatTabContext('sample-client-call.txt'));
+
+  $('chatTabSend').addEventListener('click', sendChatTabMessage);
+  $('chatTabInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatTabMessage(); }
+  });
+
+  $('chatTabJsonBtn').addEventListener('click', () => {
+    const block = $('chatTabJsonBlock');
+    const btn = $('chatTabJsonBtn');
+    const visible = block.style.display !== 'none';
+    block.style.display = visible ? 'none' : 'block';
+    btn.textContent = visible ? 'Show JSON ▼' : 'Hide JSON ▲';
   });
 
   // ── Stage 2: Workflow ──

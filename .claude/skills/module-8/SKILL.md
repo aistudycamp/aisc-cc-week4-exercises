@@ -6,7 +6,9 @@ description: Where This Goes — Module 8 of the AISC Agent Sprint. Triggered wh
 # Module 8: Where This Goes
 
 **Time:** ~20 minutes
-**You'll produce:** a clear picture of three directions from here, and a starter prompt for whichever one you want to build next.
+
+**What we're building**
+By the end: a clear picture of three directions from here — how to personalize what you built, how to extend it beyond localhost, and how to build the next agent from scratch. You'll leave with a concrete starter prompt.
 
 ## Coach Instructions
 
@@ -266,6 +268,12 @@ Start by helping me define what each advisor's thinking style should be.
 > "Copy that, open a new folder, start a new Claude Code session, paste it in. Claude already knows these building blocks — it helped you build them this week. `student-output/` is the reference it can read if you want it to look at your actual code."
 
 ---
+
+## Key takeaways
+
+- The system prompt is the leverage point — change the prompts, change the system
+- Trigger and destination are pluggable — the agent in the middle is reusable
+- Three questions for any new agent: What's the input? What's the output? What specialists fit between them?
 
 ## Step 6: Final commit and close (1 min)
 

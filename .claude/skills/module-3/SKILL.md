@@ -6,7 +6,9 @@ description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Trigg
 # Module 3: Run the Chat Assistant
 
 **Time:** ~25 minutes
-**You'll produce:** a working multi-turn conversation with the chat assistant, and a first-hand feel for how the system prompt controls everything about the output. You'll run it, talk to it, break it, restore it.
+
+**What we're building**
+By the end: you'll have had a real conversation with your chat assistant, edited its system prompt to change its personality entirely, and understood why the system prompt is the leverage point of the whole system.
 
 ## Coach Instructions
 
@@ -42,25 +44,15 @@ Read `prompts/system.md` via Read tool and print the full contents inline:
 
 ## Step 4: Start the server (1 min)
 
-This is the only terminal command in this module. In your terminal (from `[repo-root]/student-output/` — if you just opened a fresh terminal, run `cd [repo-root]/student-output` first using the repo root established in Stage 1 Intro):
+The server should still be running from Module 2. If you've restarted your terminal, run `npm run server` again from `[repo-root]/student-output`. Open **http://localhost:3000** — the Chat tab should be there. Default port is 3000 — if something else is running there, check your terminal for the actual URL.
 
-```bash
-npm run server
-```
-
-You'll see:
-
-```
-🚀 Server running at http://localhost:3000
-```
-
-Leave this running for the rest of the module (and the rest of the course).
+Leave the server running for the rest of the module (and the rest of the course).
 
 ## Step 5: Use it in the browser (8 min)
 
-Open **http://localhost:3000** in the browser. Make sure the **Stage 1** tab is active.
+Open **http://localhost:3000** in the browser. The Chat tab should be active by default.
 
-On the right side you'll see the live interface. Click **Load standup** to pre-load the sample transcript.
+Click **Load standup** to pre-load the sample transcript.
 
 Ask these 4 questions in the browser chat interface:
 
@@ -79,11 +71,11 @@ Click the **Chat Assistant** node on the diagram. Show the inspect panel — thi
 
 Two quick edits. **Tell Claude to make each one** — you should not touch the file directly.
 
-### Edit A: Change the role
+### Edit A: Change the role — Shakespeare
 
 Say to Claude:
 
-> "Update `prompts/system.md` — change the first line to: You are a sarcastic meeting analyst who has seen too many standups."
+> "Update `prompts/system.md` — change the first line from `You are a meeting analyst...` to: `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`"
 
 After Claude edits it, read the file back and print the full updated contents inline:
 
@@ -95,7 +87,7 @@ Then restart the server so the new prompt takes effect. In your terminal: press 
 npm run server
 ```
 
-Go back to **http://localhost:3000**, reload the page, click **Load standup**, and ask one question. Watch the voice change — same structure, different personality.
+Go back to **http://localhost:3000**, reload the page, click **Load standup**, and ask: `Who looks most blocked?` — the response should be visibly, obviously different. The Shakespeare prompt makes the personality change unmistakable.
 
 ### Edit B: Change the output format
 
@@ -122,6 +114,12 @@ Read `prompts/system-original.md` via Read tool. Write those contents to `prompt
 Restart the server (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask one question to confirm the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format is back.
 
 If they want to keep a custom prompt, save it first — write their current modified version to `prompts/system-custom.md` before restoring.
+
+## Key takeaways
+
+- The system prompt is the leverage point — change it, change everything the agent does
+- Same `ask()` function, same API call — only the prompt changes
+- Always restore `system-original.md` before moving on — every module from here depends on the baseline prompt
 
 ## Step 7: Wrap and commit (1 min)
 

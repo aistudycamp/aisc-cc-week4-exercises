@@ -33,13 +33,13 @@ You don't need to know JavaScript. Claude writes the code — you describe what 
 
 ## The 3-Stage Arc
 
-Each stage is a different type of AI system — and each one uses the previous as a building block:
+Each stage is a different type of AI system — and each one uses the previous as a building block. A **workflow** is a deterministic pipeline — you set the structure; the AI makes one decision (classify, route, extract) inside it. An **agentic system** is an orchestrator that coordinates multiple specialists and decides which steps to take. You don't pre-define the execution path.
 
 | Stage | What you build | Key idea |
 |-------|---------------|----------|
 | **Stage 1** | A **chat assistant** — interactive, back-and-forth conversation | You ask, it answers |
-| **Stage 2** | A **workflow** — automated pipeline triggered by a file drop | Runs without you |
-| **Stage 3** | An **agentic system** — orchestrator that coordinates multiple specialists | Decides what to run |
+| **Stage 2** | A **workflow** — deterministic pipeline, AI makes one decision, pipeline handles the rest | Runs without back-and-forth |
+| **Stage 3** | An **agentic system** — orchestrator coordinates specialists and decides what to run | Agent decides the steps |
 
 By the end of Stage 3, you'll have built every box in the diagram — and you'll import each one into the next.
 

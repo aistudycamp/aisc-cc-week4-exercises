@@ -6,7 +6,9 @@ description: Build the Workflow — Module 4 of the AISC Agent Sprint. Triggered
 # Module 4: Build the Workflow
 
 **Time:** ~25 minutes
-**You'll produce:** a working automated workflow. Load a transcript in the browser, click a button, and the pipeline fires automatically — reading the file, classifying the meeting type, routing it to the right folder, and sending you a notification. No typing required.
+
+**What we're building**
+By the end: a working automated workflow. Load a transcript in the browser, click a button, and the pipeline fires — AI classifies the meeting type, routes the file to the right folder, sends you a macOS notification. You never typed a follow-up question.
 
 ## Coach Instructions
 
@@ -18,9 +20,7 @@ Say:
 
 > "In Stage 1 you built a chat assistant. You paste something in, it responds, you paste more. It's interactive.
 >
-> Stage 2 is different. It's a **workflow** — and a workflow doesn't wait for you. An event triggers it. In our case: a button click triggers it. The pipeline wakes up automatically, the AI makes a decision, the file gets routed to the right place, you get a notification. You never typed anything.
->
-> In production, this could be a file drop, a webhook, or a cron. We're triggering it with a button. A workflow runs without you — an event triggers it. The chat assistant waits for you to type. That's the difference."
+> Stage 2 is different. It's a **workflow** — a deterministic sequence. You trigger it (in our case with a button; in production it could be a file drop, a webhook, a timer). Once it starts, it runs to completion. The AI makes one decision — classify the meeting type — and the pipeline handles the rest automatically. You're not in a conversation. There's no back-and-forth."
 
 ## Step 2: What this workflow does (2 min)
 
@@ -39,7 +39,7 @@ transcripts/incoming/[transcript text]
     Send macOS notification: "Routed to: team-standup"
 ```
 
-> "Four steps. The AI does step 2 (classification). The workflow does everything else — reading, routing, notifying. The AI is one smart step inside a larger automated sequence. That's what a workflow is."
+> "Four steps. The AI does step 2 (classification). The workflow does everything else — reading, routing, notifying. The AI makes one decision inside a larger automated sequence. That's what a workflow is."
 
 Ask before walking through the code:
 
@@ -134,6 +134,12 @@ Print this:
 ```
 
 > "Chat assistants are great for back-and-forth. Workflows are great for automated, event-triggered processing. Once you see this pattern, you start seeing it everywhere — any 'something happens → AI decides → something else happens' problem is a workflow."
+
+## Key takeaways
+
+- A workflow is a deterministic sequence — AI makes one decision, the pipeline handles the rest
+- Trigger and destination are pluggable — the classify-and-route logic in the middle stays the same
+- `runWorkflow()` is now a building block — Stage 3 imports it directly
 
 ## Step 7: Wrap and commit (2 min)
 

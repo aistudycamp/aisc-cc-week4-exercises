@@ -6,7 +6,9 @@ description: Specialists & Prompts — Module 5 of the AISC Agent Sprint. Trigge
 # Module 5: Specialists & Prompts
 
 **Time:** ~20 minutes
-**You'll produce:** a deep understanding of how one function call + three different system prompts creates three distinct specialist agents — the building blocks Stage 3 depends on.
+
+**What we're building**
+By the end: you'll understand how one function call with three different system prompts creates three completely different specialists — the analyst, extractor, and synthesizer that Stage 3 depends on. You won't write these prompts — they're pre-written. The lesson is reading them and seeing the pattern.
 
 ## Coach Instructions
 
@@ -39,6 +41,13 @@ Show them the extension options without dwelling on them:
 ## Act 2: How Specialists Are Made (~15 min)
 
 ### Step 2: Set the frame (2 min)
+
+Before we look at each prompt, here's the structure. Stage 3 needs three specialists to produce one report. Each specialist is a separate `ask()` call with a different system prompt:
+- Analyst — finds themes and decisions
+- Extractor — pulls every action item as structured JSON
+- Synthesizer — receives both outputs and combines them into the final report
+
+They're pre-written in `student-output/prompts/`. Your job here is to read them and understand what makes each one different.
 
 Say:
 
@@ -100,14 +109,23 @@ Stop and say:
 
 > "Here's the thing to hold onto:
 >
-> - Stage 1: one system prompt (`system.md`) → one meeting analyst
+> - Stage 1: `system.md` → one meeting analyst
+> - Stage 2: `classifier.md` → one classifier agent
 > - Stage 3: three system prompts → three specialists
+>
+> Every AI decision step in this sprint is a system prompt. That's consistent across all three stages.
 >
 > The `ask()` function doesn't change. The Anthropic API call doesn't change. Only the system prompt changes. And that changes everything about what the agent does.
 >
-> In Stage 1 you felt that: you edited `system.md` and watched the output personality change completely. Same principle here — but now we're using three different prompts to create three different specialists that each do one focused job.
->
 > This is the whole pattern of building agents: **every specialist is a system prompt.**"
+
+Module 5 closes Stage 2. Modules 4 and 5 are both Stage 2 — Stage 2 is wider than one module. Stage 3 starts with Module 6.
+
+## Key takeaways
+
+- Every specialist is a system prompt — `ask()` doesn't change, only the prompt changes
+- The output format in the prompt is load-bearing — the orchestrator parses extractor's JSON programmatically
+- Stage 2 is complete — Stage 3 is just wiring these specialists together with an orchestrator
 
 ## Step 6: Wrap and commit (1 min)
 

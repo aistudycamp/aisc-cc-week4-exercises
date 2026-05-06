@@ -6,75 +6,17 @@ description: Tour the System — Module 1 of the AISC Agent Sprint. Triggered wh
 # Module 1: Tour the System
 
 **Time:** ~15 minutes
-**You'll produce:** a mental model for how agents are architected — orchestrator, specialists, system prompts, and the data flow between them.
+
+**What we're building**
+By the end: you'll have a mental model of the full 3-stage arc — what each stage builds, why it exists, and how they connect. No code. Just the shape of what you're about to build.
 
 ## Coach Instructions
 
 The point of this module: students *see* how an agentic system is structured before they build one. Keep it conversational. Use the ASCII diagrams. Ask them questions along the way.
 
-## Step 1: Set the frame (1 min)
+## Step 1: The 3-stage roadmap (2 min)
 
-Say:
-
-> "Module 1. Before we touch any code, let's look at what an agent actually *is*. Most people hear 'agent' and picture a chatbot that does things on its own. That's only half the picture. An agent is really a *system* of pieces working together. Today you'll see those pieces laid out. By the end of this module, when someone says 'orchestrator' or 'specialist', you'll know exactly what they mean and where they live."
-
-## Step 2: Show the big picture (3 min)
-
-Print this ASCII:
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Stage 3 — Agentic System                                           │
-│                                                                      │
-│  transcript                                                          │
-│      ↓                                                               │
-│  [Analyst ‖ Extractor]   ← parallel specialists (Promise.all)       │
-│           ↓                                                          │
-│      [Synthesizer]        ← combines themes + actions into report    │
-│           ↓                                                          │
-│        [Router]           ← Stage 2 reused: classify + save + notify│
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-Then explain:
-
-> "Read this top-to-bottom. The transcript comes in. Two specialists — Analyst and Extractor — read it at the same time in parallel. The Analyst finds key themes and decisions. The Extractor pulls every action item. They run simultaneously — same input, different specialists, different jobs, done at the same time.
->
-> Then Synthesizer takes both results and combines them into the final structured report. Finally, Router — which is just Stage 2 reused — classifies the meeting, saves the file, and sends a notification.
->
-> That's the whole shape of every agentic system you'll ever build. Different inputs, different outputs, different specialists — but always: **input → parallel specialists → synthesize → output.**"
-
-## Step 3: Walk through the example (4 min)
-
-Read the example file and show them its contents. Use the Read tool on `examples/example-transcripts-insights.md` and print the relevant sections inline.
-
-Point out:
-1. **The actual report output** — show them what the agent produces. Key themes, action items, recommended next step. This is what they're working toward.
-2. **The specialists** — the themes came from the Analyst, the action items came from the Extractor, the classification from the Router.
-
-Ask:
-
-> "Notice something? This report is more structured than you'd get from one ChatGPT message. Why do you think splitting it into specialists produces better output?"
-
-Wait for their answer.
-
-If they're stuck, prompt:
-
-> "Three reasons. First — **parallel = faster.** Both Analyst and Extractor work at the same time, not one after the other. Second — **focus = better output.** Each prompt is laser-focused on one job. The Analyst isn't distracted by action items; the Extractor isn't guessing at themes. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
-
-## Step 4: The three principles (3 min)
-
-Tell them:
-
-> "Three principles to hold onto. They'll make every design decision easier from here on:"
-
-1. **Separation of concerns.** Each piece does one thing well. The orchestrator coordinates. The specialists specialize. Don't mix them up.
-2. **Each agent gets its own prompt.** The system prompt IS the agent. Three specialists = three prompts = three jobs.
-3. **Compose; don't conflate.** Build small pieces, then chain them. A bigger agent isn't always a better agent.
-
-## Step 5: Where you're headed (2 min)
-
-Print the staircase:
+Before anything else, show them the full arc:
 
 ```
        Stage 1                Stage 2                 Stage 3
@@ -100,6 +42,66 @@ Print the staircase:
 >
 > One stage at a time."
 
+## Step 2: Set the frame (1 min)
+
+Say:
+
+> "Module 1. Before we touch any code, let's look at what an agent actually *is*. Most people hear 'agent' and picture a chatbot that does things on its own. That's only half the picture. An agent is really a *system* of pieces working together. Today you'll see those pieces laid out. By the end of this module, when someone says 'orchestrator' or 'specialist', you'll know exactly what they mean and where they live."
+
+## Step 3: Show the big picture (3 min)
+
+Print this ASCII:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Stage 3 — Agentic System                                           │
+│                                                                      │
+│  transcript                                                          │
+│      ↓                                                               │
+│  [Analyst ‖ Extractor]   ← parallel specialists (Promise.all)       │
+│           ↓                                                          │
+│      [Synthesizer]        ← combines themes + actions into report    │
+│           ↓                                                          │
+│        [Router]           ← Stage 2 reused: classify + save + notify│
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+Then explain:
+
+> "Read this top-to-bottom. The transcript comes in. Two specialists — Analyst and Extractor — read it at the same time in parallel. The Analyst finds key themes and decisions. The Extractor pulls every action item. They run simultaneously — same input, different specialists, different jobs, done at the same time.
+>
+> Then Synthesizer takes both results and combines them into the final structured report. Finally, Router — which is just Stage 2 reused — classifies the meeting, saves the file, and sends a notification.
+>
+> That's the shape of what you'll build this sprint. It's one powerful pattern. Real agentic systems take many forms — but this one teaches you the core building blocks: a system prompt to shape behavior, parallel dispatch to run specialists simultaneously, and a synthesizer to combine results."
+
+## Step 4: Walk through the example (4 min)
+
+Read the example file and show them its contents. Use the Read tool on `examples/example-transcripts-insights.md` and print the relevant sections inline.
+
+Point out:
+1. **The actual report output** — show them what the agent produces. Key themes, action items, recommended next step. This is what they're working toward.
+2. **The specialists** — the themes came from the Analyst, the action items came from the Extractor, the classification from the Router.
+
+Ask:
+
+> "Notice something? This report is more structured than you'd get from one ChatGPT message. Why do you think splitting it into specialists produces better output?"
+
+Wait for their answer.
+
+If they're stuck, prompt:
+
+> "Three reasons. First — **parallel = faster.** Both Analyst and Extractor work at the same time, not one after the other. Second — **focus = better output.** Each prompt is laser-focused on one job. The Analyst isn't distracted by action items; the Extractor isn't guessing at themes. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
+
+## Step 5: The three principles (3 min)
+
+Tell them:
+
+> "Three principles to hold onto. They'll make every design decision easier from here on:"
+
+1. **Separation of concerns.** Each piece does one thing well. The orchestrator coordinates. The specialists specialize. Don't mix them up.
+2. **Each agent gets its own prompt.** The system prompt shapes what the agent does — it defines its role, its output format, its rules. Change the prompt, change the agent. Three specialists = three prompts = three jobs.
+3. **Compose; don't conflate.** Build small pieces, then chain them. A bigger agent isn't always a better agent.
+
 ## Step 6: The specialists in the example (2 min)
 
 Look back at the KEY THEMES section in the example output shown earlier. Point out:
@@ -117,6 +119,12 @@ Say:
 > - What specialists would I need in between?
 >
 > Three questions. The whole pattern."
+
+## Key takeaways
+
+- Three stages, each uses the previous as a building block: chat → workflow → agentic system
+- Every specialist is a system prompt — that's the whole pattern of building agents
+- Stage 3 is Stage 1 and Stage 2 wired together
 
 ## Step 8: Wrap and commit (1 min)
 

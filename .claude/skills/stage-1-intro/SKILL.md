@@ -6,7 +6,9 @@ description: Stage 1 Intro — orientation for the AISC Agent Sprint. Triggered 
 # Stage 1 Intro: Set Up & Orient
 
 **Time:** ~10–15 minutes
-**You'll produce:** a working project folder, an Anthropic API key in `.env`, dependencies installed, and a clear picture of the 3-stage arc.
+
+**What we're building**
+By the end: your project folder is scaffolded, your Anthropic API key is in `.env`, and Node dependencies are installed. Everything in `student-output/` is yours for the rest of the sprint.
 
 ## Coach Instructions
 
@@ -39,6 +41,10 @@ Print this:
 > "Same use case the whole way through — turning meeting transcripts into clean insight reports. Each stage adds one new idea on top of the last. You won't write code yourself — you'll describe what you want and let Claude build it.
 >
 > **Second — what AI products actually are.** Spoiler: they're not magic. By the end of Module 2, you'll have called the Claude API yourself and seen the JSON come back. Once you've seen that, AI stops being a black box and becomes 'JSON in, JSON out, with a clever system prompt in the middle.' That moment is the whole point of Stage 1."
+
+## Step 1b: VS Code setup (recommended)
+
+> "Best setup for the sprint: open VS Code, File → Open Folder → select `student-output/`. You'll have the file explorer on the left showing every file you'll touch. Keep your terminal alongside."
 
 ## Step 2: Establish the repo root anchor
 
@@ -140,9 +146,17 @@ Now add the API key. Run this command in your terminal, replacing `sk-ant-your-k
 echo "ANTHROPIC_API_KEY=sk-ant-your-key-here" > .env
 ```
 
-After they run it, verify via Read tool that `.env` exists and starts with `ANTHROPIC_API_KEY=sk-ant-` (do **not** print the key value inline — just confirm it's real). If it still shows the placeholder:
+After they run it, open `student-output/.env` in VS Code and confirm your key is there — it should start with `sk-ant-`. That's where it lives for the rest of the sprint. Don't commit this file — it's in `.gitignore`.
+
+Verify via Read tool that `.env` exists and starts with `ANTHROPIC_API_KEY=sk-ant-` (do **not** print the key value inline — just confirm it's real). If it still shows the placeholder:
 
 > "That's still a placeholder. Re-run the echo command with your actual key from console.anthropic.com."
+
+## Key takeaways
+
+- Every piece you'll touch is in `student-output/`
+- Your API key lives in `student-output/.env` — that file never gets committed
+- Any time you open a fresh terminal, `cd` into `student-output/` before running commands
 
 ## Step 7: Read the API concept doc (2 min)
 

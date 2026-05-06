@@ -37,7 +37,7 @@ export async function ask(question, context) {
     system: systemPrompt,
     messages: [{ role: "user", content }],
   });
-  return response.content[0].text;
+  return { text: response.content[0].text, usage: response.usage };
 }
 
 // ─── Interactive loop (only runs when invoked directly) ───────────────────

@@ -6,7 +6,9 @@ description: Use Your Live System + The Conductor — Module 7 of the AISC Agent
 # Module 7: Use Your Live System + The Conductor
 
 **Time:** ~30 minutes
-**You'll produce:** evidence you ran the full system, and a first-hand feel for what makes the Conductor an agent rather than a workflow — the same pipeline, now steerable by a sentence.
+
+**What we're building**
+By the end: you'll have used all three stages in the browser and understood the Conductor — the planning step that turns the orchestrator from a workflow into an agent. One new idea: the agent decides which steps to take.
 
 ## Coach Instructions
 
@@ -71,7 +73,7 @@ Step 3 ✓  Router: classify + save + notify
 
 **Screenshot moment:**
 
-> "Stage 3 tab, all three steps checked, report visible. Take a screenshot. A week ago you'd never called an API. Right now you have a working multi-agent system. That's a real artifact — send it to your team."
+> "Stage 3 tab, all three steps checked, report visible. Take a screenshot. A few hours ago, you hadn't built any of this. Right now you have a working multi-agent system. That's a real artifact — send it to your team."
 
 ---
 
@@ -147,6 +149,12 @@ Say:
 > The Conductor is the same thing. Except its job isn't to analyze a transcript — it's to reason about which other agents to dispatch. It's an agent whose output is a plan for other agents.
 >
 > That's what makes it agentic: it decides. The workflow in Module 4 didn't decide anything — it just executed a fixed sequence. The Conductor reads context and makes a choice."
+
+## Key takeaways
+
+- A workflow follows steps. An agent decides which steps to take.
+- The Conductor is just another system prompt — its job is to reason about which other agents to dispatch
+- Every specialist in this sprint is a prompt: analyst, extractor, classifier, conductor — same pattern, different job
 
 ## Step 10: Wrap and commit (1 min)
 

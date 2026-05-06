@@ -6,7 +6,9 @@ description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered
 # Module 6: The Agentic System
 
 **Time:** ~30 minutes
-**You'll produce:** a working agentic system — an orchestrator that runs two specialists in parallel, then synthesizes their results, then routes the final report.
+
+**What we're building**
+By the end: a working agentic orchestrator. Analyst and Extractor run in parallel, their outputs are combined by Synthesizer, and the result is routed by the workflow you built in Module 4. Stage 3 is live.
 
 ## Coach Instructions
 
@@ -194,6 +196,12 @@ Claude Code (orchestrator)
 > "Claude Code is an orchestrator. It takes your request, dispatches tools in parallel (reading files, searching code), synthesizes what it found, and produces the output. Same pattern you just built.
 >
 > When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every agent you'll ever build is some version of this: input → parallel specialists → synthesis → output.**"
+
+## Key takeaways
+
+- `Promise.all` runs specialists in parallel — both start at once, you wait for both to finish
+- The orchestrator doesn't add intelligence — it coordinates. The specialists do the work.
+- Stage 3 builds on everything: `ask()` from Stage 1, `runWorkflow()` from Stage 2, parallel dispatch from this module
 
 ## Step 8: Wrap and commit (2 min)
 
