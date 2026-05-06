@@ -56,7 +56,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 
 ### Stage 2 — Workflow
 - [x] Module 4: Automate the Trigger
-- [ ] Module 5: Output Destinations
+- [x] Module 5: Output Destinations
 
 ### Stage 3 — Agentic System
 - [ ] Module 6: The Orchestrator Pattern
