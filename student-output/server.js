@@ -44,8 +44,8 @@ app.get('/api/prompts/:name', (req, res) => {
 app.post('/api/chat', async (req, res) => {
   try {
     const { question, context } = req.body;
-    const { text, usage } = await ask(question, context);
-    res.json({ response: text, usage });
+    const response = await ask(question, context);
+    res.json({ response });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
