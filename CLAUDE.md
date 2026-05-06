@@ -60,7 +60,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 
 ### Stage 3 — Agentic System
 - [x] Module 6: The Orchestrator Pattern
-- [ ] Module 7: See the System
+- [x] Module 7: See the System
 - [ ] Module 8: Make It Yours
 
 Update this checklist as the student completes each module. Check the box by changing `- [ ]` to `- [x]`.
