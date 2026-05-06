@@ -50,7 +50,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 - [x] Stage 1 Intro: Setup + API Key
 
 ### Stage 1 — Chat Assistant
-- [ ] Module 1: Tour the System
+- [x] Module 1: Tour the System
 - [ ] Module 2: Your First API Call
 - [ ] Module 3: Chat Assistant + System Prompt
 
