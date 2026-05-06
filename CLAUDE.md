@@ -59,7 +59,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 - [x] Module 5: Output Destinations
 
 ### Stage 3 — Agentic System
-- [ ] Module 6: The Orchestrator Pattern
+- [x] Module 6: The Orchestrator Pattern
 - [ ] Module 7: See the System
 - [ ] Module 8: Make It Yours
 
