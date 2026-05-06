@@ -55,7 +55,7 @@ If the progress checklist below shows completed modules, welcome them back and p
 - [x] Module 3: Chat Assistant + System Prompt
 
 ### Stage 2 — Workflow
-- [ ] Module 4: Automate the Trigger
+- [x] Module 4: Automate the Trigger
 - [ ] Module 5: Output Destinations
 
 ### Stage 3 — Agentic System

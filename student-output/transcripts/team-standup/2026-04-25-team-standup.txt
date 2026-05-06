@@ -1,0 +1,40 @@
+Product Standup — Tuesday, April 25th
+Attendees: Alex (PM), Jordan (Design), Sam (Eng Lead), Taylor (Eng), Riley (CX)
+
+Alex: Okay, let's do the round. Sam, you start.
+
+Sam: Quick one. The API rate limiter rewrite is taking longer than I thought. There's a deadlock in the connection pool I haven't traced yet. Realistically, I'm not unblocked until end of day Thursday. That puts the Q2 ship date at risk if anyone else's work depends on it.
+
+Alex: That's a real concern. Anyone downstream of Sam?
+
+Taylor: Me — but I can work on the new billing dashboard in parallel. I'll only get blocked on Sam's piece if it slips past Friday.
+
+Alex: Okay. Sam, can you post status in Slack by Thursday EOD so we know if Q2 is still real? Even just "still blocked" is useful.
+
+Sam: Yeah, I'll do that.
+
+Alex: Riley, what's on your side?
+
+Riley: Customer support backlog is bad. We have 12 open Tier-1 bugs as of this morning. That's the highest it's been since launch. A few are clustering around the auth flow — same thing Stopa flagged last week. I want to triage and prioritize them before Friday standup so we can decide what to fix and what to push.
+
+Alex: Good call. Riley owns Tier-1 triage by Friday. Jordan, design side?
+
+Jordan: The handoff process is killing me. Eng is shipping the new dashboard differently than what we mocked. Spacing is off, the typography swap didn't happen, the empty states aren't there. I think we need a checklist that engineering signs off on before merge. I can draft something.
+
+Alex: Yes — let's do that. Jordan, can you and Taylor draft a design-handoff checklist together by Monday?
+
+Taylor: Yeah, I'm in. Jordan, ping me after this.
+
+Alex: Cool. Anything else?
+
+Sam: One more thing — Taylor, when the rate limiter is fixed, we should probably do an architecture sync on the new billing path. There are some assumptions in the dashboard that won't hold once the limiter changes how requests are throttled.
+
+Taylor: Good catch. Alex, can we get 30 minutes on the calendar sometime next week?
+
+Alex: Taylor, you set it up. I'll come if I can.
+
+Alex: Alright, that's it. Quick recap — Sam unblocking the API by Thursday and posting status, Riley triaging Tier-1 bugs by Friday, Jordan and Taylor drafting the handoff checklist by Monday, and Taylor scheduling the arch sync. Anything I missed?
+
+Riley: Nope.
+
+Alex: Cool. Back to it.
