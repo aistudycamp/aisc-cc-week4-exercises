@@ -2,3 +2,14 @@
 node_modules/
 outputs/*.md
 !outputs/.gitkeep
+
+# Routing destinations — students fill these as they run the workflow.
+# Sample transcripts at the top level (sample-*.txt) stay tracked.
+transcripts/incoming/*
+!transcripts/incoming/.gitkeep
+transcripts/client-call/*
+!transcripts/client-call/.gitkeep
+transcripts/planning-session/*
+!transcripts/planning-session/.gitkeep
+transcripts/team-standup/*
+!transcripts/team-standup/.gitkeep
