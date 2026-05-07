@@ -41,8 +41,8 @@ your machine                          Anthropic
                                        response
                                           │
   text answer          ←── HTTP ──        ▼
-  (printed to
-   your terminal)
+  (shown in
+   your browser)
 ```
 
 > "That's the whole loop. You send three things over the wire — a system prompt, a transcript, and a question. Claude reads them, generates a reply, sends the text back. Your code prints it. The JSON we're about to look at is just *what's inside the arrow*."
