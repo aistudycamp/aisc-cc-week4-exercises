@@ -123,7 +123,7 @@ Say:
 ## Key takeaways
 
 - Three stages, each uses the previous as a building block: chat → workflow → agentic system
-- Every specialist is a system prompt — that's the whole pattern of building agents
+- Every specialist is a system prompt — that's the spine of the pattern you're about to build
 - Stage 3 is Stage 1 and Stage 2 wired together
 
 ## Step 8: Wrap and commit (1 min)

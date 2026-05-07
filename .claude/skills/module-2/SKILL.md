@@ -52,7 +52,7 @@ Here's what `stage-1/chat.js` does — five things that happen when it runs:
 1. **Set up the Anthropic client** — `new Anthropic()` reads their API key from `.env`. Nothing fancy.
 2. **Read the system prompt from a file** — loads `prompts/system.md`. This is the personality. We'll dig into it in Module 3.
 3. **Read the transcript** — whatever file path is passed in.
-4. **Make the API call** — `client.messages.create(...)`. This is the line that reaches Anthropic's servers — where the AI thinking actually happens. One function call, one network request, one JSON response back.
+4. **Make the API call** — `client.messages.create(...)`. This is the only line that talks to Anthropic's servers. One function call, one network request, one JSON response back.
 5. **Print the response** — the actual text lives at `response.content[0].text`.
 
 Notice step 4 — `client.messages.create()`. That's the only line that talks to Anthropic. The rest is the wiring around it — reading the inputs, sending the request, handling the response. You'll touch every one of those steps before this sprint is over.

@@ -199,7 +199,7 @@ Say:
 >
 > The Conductor is the same thing. Except its job isn't to analyze a transcript — it's to reason about which other agents to dispatch. It's an agent whose output is a plan for other agents.
 >
-> That's what makes it agentic: it decides. The workflow in Module 4 didn't decide anything — it just executed a fixed sequence. The Conductor reads context and makes a choice."
+> The Conductor is what crosses the line: predefined steps become *chosen* steps. The workflow in Module 4 didn't choose anything — it just executed a fixed sequence. The Conductor reads context and picks."
 
 ## Key takeaways
 

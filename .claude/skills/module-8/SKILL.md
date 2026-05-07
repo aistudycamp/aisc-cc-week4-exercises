@@ -78,9 +78,9 @@ Ask the student exactly this:
 
 > "Two paths. Which one do you want?
 >
-> **Path A — Personalize what you built.** Take the pipeline you just shipped and re-aim it at a different domain. Customer interviews, earnings calls, 1:1 notes, whatever. Same code, three new prompts. Lowest-effort way to get a real tool running this week.
+> **Path A — Personalize what you built.** Take the pipeline you just shipped and re-aim it at a different domain. Customer interviews, earnings calls, 1:1 notes, whatever. Same code, three new prompts. We'll finish it together inside this session — you walk away with a working tool. **Recommended if you want to ship something today.**
 >
-> **Path B — Build a new one.** Brand new project, brand new architecture. Default is the Council (because most people have a high-stakes decision they could throw at it). I'll mention the Domain Stack at the end as an alternative.
+> **Path B — Starter for a new architecture.** A scaffold + a `CLAUDE.md` for a different pattern (default: a Council of advisors). I'll set up the folder and write the spec. *You'll finish the actual build on your own time*, in a fresh Claude Code session that uses the spec to write the code. The course doesn't continue — this path hands you a working starting point and turns you loose. **Pick this if you want to see another architecture and you're comfortable driving Claude on your own afterward.**
 >
 > Which one?"
 
@@ -213,9 +213,11 @@ Have the student paste a real document for the new domain into the chat tab and 
 
 ---
 
-## Step 4B: Build a new one (turnkey, ~10 min)
+## Step 4B: Scaffold a new architecture (starter, ~10 min)
 
 Use this if the student picked Path B. **Default architecture: Council.** G-Stack is mentioned at the end as an alternative.
+
+**This path is a starter — not a finished build.** What you do here: scaffold the folder, drop in a CLAUDE.md spec, hand the student the prompt that kicks off the new Claude session. You will *not* try to finish the actual code in this session — that's the student's job afterward, and the CLAUDE.md is what guides the new Claude. Be explicit with the student about this so they don't expect a working Council in 10 minutes.
 
 ### Step 4B.1: Pick the use case (2 min)
 
@@ -340,20 +342,13 @@ prompts first.
 
 Tell them:
 
-> "That new Claude Code session has the CLAUDE.md you and I just wrote. It will scaffold the rest. Pause before each step — review what it produced, push back, iterate. Don't accept the first draft of any of the advisor prompts. The prompt IS the advisor."
+> "That new Claude Code session has the CLAUDE.md you and I just wrote. It will scaffold the rest *on your own time*, after this sprint ends. The way to drive it: pause before each step, review what it produced, push back, iterate. Don't accept the first draft of any of the advisor prompts — the prompt IS the advisor. When you're stuck, paste what's failing back into the chat and ask Claude to fix it. You're its product manager now.
+>
+> This sprint doesn't continue from here. You have everything you need: a working folder, a clear spec, and three hours of practice working with Claude. Go finish the build whenever you have time — could be tonight, could be next weekend."
 
-### Step 4B.5: Smoke test (1 min)
+### Step 4B.5: How you'll know it works (1 min)
 
-Once the new Claude has shipped a working `council.js` and `server.js`:
-
-```bash
-npm run server
-curl -X POST http://localhost:3000/api/council \
-  -H 'Content-Type: application/json' \
-  -d '{"decision":"<their decision>"}'
-```
-
-> "If a verdict comes back, you have a working Council. If you want a frontend, that's a separate session."
+> "When you've got a working `council.js` and `server.js`, the smoke test is: run `npm run server`, hit the endpoint with a decision, see if a verdict comes back. The new Claude session can write the smoke-test command for you when you're ready — just ask: 'Give me the smoke test command for this server.'"
 
 ### Step 4B.6: G-Stack alternative (1 min, optional)
 
@@ -385,7 +380,7 @@ If their project is still in `student-output/`, walk them through `cp -R student
 
 Then say:
 
-> "You're done with the sprint. You went from never having called an API to building a working multi-agent system *and* shipping a personalized version of it (or a brand-new Council) in your own project folder.
+> "You're done with the sprint. You went from a tour of the system in Module 1 to a working multi-agent system you can run, plus a personalized version of it (or a brand-new Council scaffold) in your own project folder.
 >
 > A few things to take with you:
 >

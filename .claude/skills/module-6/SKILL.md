@@ -195,9 +195,19 @@ Claude Code (orchestrator)
 
 > "Claude Code is an orchestrator. It takes your request, dispatches tools in parallel (reading files, searching code), synthesizes what it found, and produces the output. Same pattern you just built.
 >
-> But Claude Code doesn't just dispatch once. It *loops*: dispatches sub-agents and tools, reads what came back, verifies the result, then decides what's next. Loop, until done. The Conductor you'll meet in Module 7 is one step of that loop. Production agents are that loop running on autopilot.
+> But here's the part you haven't built yet — the **loop**:"
+
+```
+plan → act → observe → decide → repeat
+   ↑                              │
+   └──────────────────────────────┘
+```
+
+> "Claude Code doesn't just dispatch once. It plans (reads your message, picks tools), acts (calls them), observes (reads what came back), decides (am I done? do I need more?), and repeats until the task is finished. The orchestrator you just built runs the loop *once* and stops. A real agent runs it as long as it needs to.
 >
-> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every multi-specialist system you'll build is some flavor of: dispatch → run specialists → combine → route.** The pattern you just built is one common shape (parallelization with synthesis). Other shapes exist — routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop on environmental feedback. Read `concepts/what-is-an-agent.md` for the broader taxonomy."
+> The Conductor you'll meet in Module 7 is one step of that loop — the planning step. Production agents are that loop running on autopilot.
+>
+> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every multi-specialist system you'll work with is some flavor of: dispatch → run specialists → combine → route**, often inside a loop. The pattern you just built is one common shape (parallelization with synthesis). Other shapes exist — routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop on environmental feedback. Read `concepts/what-is-an-agent.md` for the broader taxonomy."
 
 ## Key takeaways
 
@@ -211,7 +221,7 @@ What you've built so far:
 
 ```
 ┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │  ← you built this
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │  ← you designed this
 │  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
 │  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
 └────────────┘   └────────────┘   │            ↓                          │
@@ -228,7 +238,7 @@ What you've built so far:
 
 3. Hand off:
 
-> "You just built a multi-agent agentic system. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
+> "You just designed a multi-agent system end-to-end. You read every prompt, you specified every step, you watched it run. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
 
 ## Coach Guardrails
 
