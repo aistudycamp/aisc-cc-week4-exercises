@@ -1,0 +1,49 @@
+Client Call — Quarterly Review
+Date: May 4, 2026
+Participants: Sarah Chen (Account Manager), Marcus Webb (Client, VP Operations), Dana Torres (Client, Head of Logistics)
+
+Sarah: Thanks for making time today, Marcus, Dana. I wanted to walk through the Q1 results and align on what we're prioritizing for Q2.
+
+Marcus: Absolutely. We've been pretty happy overall, but I want to flag some concerns before we get into the numbers.
+
+Sarah: Please, go ahead.
+
+Marcus: The delivery windows in March were inconsistent. Three shipments arrived outside the agreed window — one was four hours late, two were early by more than two hours. That created real headaches on our warehouse side.
+
+Dana: We had to bring in extra staff twice because of unexpected early arrivals. That's cost we weren't planning for.
+
+Sarah: I hear you — that's not acceptable. I'll pull those three shipments and do a root cause review. Can I get the shipment IDs from you after this call?
+
+Marcus: Dana has them.
+
+Dana: I'll send them over today.
+
+Sarah: On the Q1 numbers: we handled 47 shipments for your account. On-time delivery rate was 89%. I know that's below your 95% target, and the March issues are a big part of that.
+
+Marcus: What's your plan to get us back to 95?
+
+Sarah: Two things. First, I'm flagging your account for priority carrier allocation starting next week — that reduces variability. Second, we're piloting tighter confirmation windows where we re-confirm 24 hours before pickup. I'd like to include you in that pilot.
+
+Marcus: That sounds reasonable. What does it require from us?
+
+Sarah: Just a contact who can respond to a same-day confirmation message. Email or text.
+
+Dana: I can be that contact.
+
+Sarah: Perfect. I'll set that up this week. One more thing — your Q2 volume estimate was 60 shipments. Is that still accurate?
+
+Marcus: Closer to 70 now. We have a new product launch in June.
+
+Sarah: Good to know. I'll update our capacity planning. We should have no issue covering that.
+
+Marcus: One more ask — can we get monthly reporting instead of quarterly? The quarterly view makes it hard to catch problems early.
+
+Sarah: Yes. I'll set up a monthly summary to go to both of you starting after May closes.
+
+Marcus: Great. I think that covers it.
+
+Sarah: I'll send a follow-up email today with the pilot enrollment, the root cause timeline, and the updated volume. Anything else before we wrap up?
+
+Dana: Nothing from me.
+
+Marcus: We're good. Thanks Sarah.

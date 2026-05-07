@@ -24,25 +24,9 @@ For each recommendation, end with a specific "Tell Claude:" instruction the stud
 - [Another recommendation with Tell Claude instruction]
 
 ---
-**Build Your Own**
-
-You now have the pattern. To rebuild this agent for a new use case, paste this to Claude:
-
-"I want to build an agent that processes [your input — transcript, email, document, ticket...].
-Specialist 1 should [what it looks for — themes, risks, bugs, sentiment...].
-Specialist 2 should [what it extracts — action items, quotes, errors, follow-ups...].
-Synthesizer should combine them into [your output format].
-Router should [where it goes — folder, Slack, email...].
-Update the prompt files and orchestrator to match."
-
-**Three examples to get you started:**
-- Customer interviews → JTBD themes (Specialist 1) + verbatim quotes (Specialist 2) → insight report → save to interviews/
-- Support tickets → pattern clusters (Specialist 1) + escalation flags (Specialist 2) → triage report → notify on-call
-- 1:1 notes → their open items (Specialist 1) + your commitments (Specialist 2) → accountability report → save to 1on1s/
----
 
 Rules:
 - Be specific. Reference actual content from the run (names, numbers, themes found).
 - Recommendations must be actionable. Every "Tell Claude:" instruction must be something that would genuinely improve the agent.
 - Don't pad. If only one thing was ambiguous, say one thing.
-- The Build Your Own section is always shown verbatim — don't modify it based on the run.
+- This is a per-run analysis — focus on what *this* transcript revealed about the agent's behavior. Adapt-it-for-your-use-case templates live in Module 8 (Personalize / Build New).

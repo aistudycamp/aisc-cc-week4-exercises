@@ -1,63 +1,106 @@
 ---
 name: module-8
-description: Where This Goes — Module 8 of the AISC Agent Sprint. Triggered when a student types "module-8". No hands-on exercises. Three topics: how to personalize what they built, how to extend it beyond localhost, and how to build the next agent from scratch using Claude Code. Closes with a starter prompt for whichever pattern they want to build next.
+description: Where This Goes — Module 8 of the AISC Agent Sprint. Triggered when a student types "module-8". The send-off module. Light overview of three agent patterns (Pipeline, Domain Stack, Council). Then two turnkey paths the student picks between — Personalize what they built, OR Build a new one (Council recommended, G-Stack alt). Finishes with a relocation step so the new project lives outside the exercise repo.
 ---
 
 # Module 8: Where This Goes
 
-**Time:** ~20 minutes
+**Time:** ~25 minutes
 
 **What we're building**
-By the end: a clear picture of three directions from here — how to personalize what you built, how to extend it beyond localhost, and how to build the next agent from scratch. You'll leave with a concrete starter prompt.
+By the end: you've picked one of two turnkey paths — either personalize the pipeline you already have, or build a new agent (a Council, by default) — and the project is set up in a permanent folder you can keep using after the sprint ends.
 
 ## Coach Instructions
 
-This is the send-off module. No live edits, no running code. Students have a working system — the goal here is to show them the horizon so they leave with a specific next move. Three topics in sequence: personalization (how to make what they have work for their use case), extension (how to move it beyond this localhost demo), and new agents (how to build the next one with Claude Code). The last thing they leave with should be a concrete starter prompt for something they actually want to build.
+This is the send-off. No re-teaching. Two parts:
+
+1. **Light overview of three patterns** (Pipeline / Domain Stack / Council) — one paragraph each, max. Just enough to show them options.
+2. **One turnkey path, end-to-end.** The student picks Path A (personalize) or Path B (build new — default Council). Whichever they pick, you walk them through it concretely: pre-filled `CLAUDE.md`, folder commands, relocation out of the exercise repo.
+
+The student should leave with a working project in a folder they own — not stuck in `student-output/` inside the exercise repo. That's why the **relocation step is required** for either path.
 
 ## Step 1: Set the frame (1 min)
 
 Say:
 
-> "Module 8. You have a working multi-agent system. Three questions to close out:
+> "Last module. You built one specific pattern — a pipeline — for one specific use case (transcripts → insights). Now: where does this go?
 >
-> 1. How do you make *this* system work for your use case?
-> 2. How do you take it beyond a localhost demo?
-> 3. How do you build the next one?
->
-> Let's go."
+> First, a quick tour of three agent patterns — yours plus two others — so you know the landscape. Then we'll set you up with a permanent project of your own. Two paths to pick from."
 
 ---
 
-## Step 2: Personalization — how to make it yours (5 min)
-
-Say:
-
-> "Everything in this system is driven by three files: `analyst.md`, `extractor.md`, and `synthesizer.md`. The meeting transcript use case is baked into those prompts — 'You are a meeting analyst,' 'KEY THEMES,' 'ACTION ITEMS.' If you want to point this at something else, those are the three files to change.
->
-> Here's the pattern:"
+## Step 2: The three patterns at a glance (3 min)
 
 Print this:
 
 ```
-  analyst.md    → change the role + the output format
-                  "You are a meeting analyst" → "You are a customer interview analyst"
-                  KEY THEMES → JTBD THEMES + VERBATIM QUOTES
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PATTERN 1 — PIPELINE                          (what you just built)     │
+│                                                                          │
+│  A document goes in. Specialists analyze in parallel. A synthesizer      │
+│  combines them. A router handles the result. Fixed stages every time.    │
+│  Best for: processing documents — transcripts, contracts, reports.        │
+│                                                                          │
+│  document → [Analyst ‖ Extractor] → Synthesizer → Router                 │
+└──────────────────────────────────────────────────────────────────────────┘
 
-  extractor.md  → change what gets extracted
-                  action items → customer pain quotes
-                  keep the JSON field names (owner / task / deadline) — the orchestrator
-                  parses these programmatically. You can change what they mean,
-                  not what they're called.
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PATTERN 2 — DOMAIN STACK (Garry Tan's "G-Stack")                        │
+│                                                                          │
+│  A question goes in. A classifier routes it to the one specialist that   │
+│  owns that domain — Sales, Ops, Support, Eng. One answers; the rest      │
+│  stay silent. No synthesizer. No parallel dispatch.                      │
+│  Best for: internal assistants, "route this to the right expert."         │
+│                                                                          │
+│  question → [Classifier] → [Sales] OR [Ops] OR [Support] OR [Eng]        │
+└──────────────────────────────────────────────────────────────────────────┘
 
-  synthesizer.md → change the final report format
-                   to match your analyst + extractor outputs
+┌──────────────────────────────────────────────────────────────────────────┐
+│  PATTERN 3 — COUNCIL (Ole Lehmann's "LLM Council")                        │
+│                                                                          │
+│  A decision goes in. Multiple advisors read it simultaneously, each      │
+│  forced into a different thinking style (Contrarian, First Principles,   │
+│  Expansionist, Outsider, Executor). They peer-review each other's        │
+│  reasoning anonymously. A Chairman delivers a final verdict.             │
+│  Best for: high-stakes decisions where one lens misleads.                │
+│                                                                          │
+│  decision → [5 advisors in parallel] → [peer review] → [Chairman]        │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-> "That's it. Three edits. The orchestrator, the server, the browser — none of that changes. The system prompt IS the specialist. Change the prompts, change the system.
->
-> Use cases this works for out of the box:"
+> "All three share the same primitives you already know — `ask()`, system prompts, `Promise.all`. The architectures differ in shape. You don't need to understand them all today. You just need to pick one and ship it."
 
-Print this quickly:
+---
+
+## Step 3: Pick a path (1 min)
+
+Ask the student exactly this:
+
+> "Two paths. Which one do you want?
+>
+> **Path A — Personalize what you built.** Take the pipeline you just shipped and re-aim it at a different domain. Customer interviews, earnings calls, 1:1 notes, whatever. Same code, three new prompts. We'll finish it together inside this session — you walk away with a working tool. **Recommended if you want to ship something today.**
+>
+> **Path B — Starter for a new architecture.** A scaffold + a `CLAUDE.md` for a different pattern (default: a Council of advisors). I'll set up the folder and write the spec. *You'll finish the actual build on your own time*, in a fresh Claude Code session that uses the spec to write the code. The course doesn't continue — this path hands you a working starting point and turns you loose. **Pick this if you want to see another architecture and you're comfortable driving Claude on your own afterward.**
+>
+> Which one?"
+
+**Coach: STOP HERE. Wait for the student's answer.** Do not start scaffolding before they pick. If they say "both," redirect: "Pick the one you have a real use case for *today*. The other one will make more sense after you've shipped the first."
+
+Once they answer, jump to **Step 4A** (Personalize) or **Step 4B** (Build new). Skip the other.
+
+---
+
+## Step 4A: Personalize what you built (turnkey, ~10 min)
+
+Use this if the student picked Path A.
+
+### Step 4A.1: Pick a domain together (2 min)
+
+Ask:
+
+> "What's the use case? A few options that work cleanly out of the box:"
+
+Print:
 
 ```
   Customer interviews   →  JTBD themes + verbatim quotes
@@ -66,241 +109,294 @@ Print this quickly:
   Support tickets       →  pattern themes + escalation triage
   Voice memos           →  summary + follow-ups
   Podcast notes         →  study guide + flashcards
+  ── or pitch your own ──
 ```
 
-> "If you want to try one of these, open a new Claude Code session pointed at `student-output/`, tell Claude which use case you want, and ask it to update the three prompt files. Claude knows the pattern — it helped you build it."
+Wait for the student to pick. Capture two things:
+- **Domain name** (e.g. `customer-interviews`)
+- **What the analyst and extractor should each return** (e.g. analyst → JTBD themes; extractor → verbatim pain quotes with speaker name)
 
-**Important note:** Don't do the edits live in this session. Editing prompts without a real input to test against leads to confusion — you change the prompts, run the same meeting transcript, and wonder why the output looks wrong. When you're ready to personalize, bring a real document first.
-
----
-
-## Step 3: Extension — moving beyond localhost (6 min)
+### Step 4A.2: Pick the new home (2 min)
 
 Say:
 
-> "Right now the trigger is a button click in a browser on your laptop. That's great for learning. To make this actually useful, there are three things to consider: trigger, deployment, and destination."
-
-Print this:
-
-```
-  TRIGGER — what fires the pipeline
-  ──────────────────────────────────
-  What you have:    button click in the browser
-  What's next:      webhook (HTTP POST from any external system)
-                    file watch (drop a file, pipeline fires)
-                    scheduled cron (run every 6 hours automatically)
-                    email inbound (send a transcript to an address, it processes)
-
-  DEPLOYMENT — where the server runs
-  ────────────────────────────────────
-  What you have:    localhost:3000 on your laptop
-  What's next:      Railway / Render / Fly.io — deploy this exact server.js,
-                    get a public URL, works the same way
-                    Your own VPS — same Node server, runs 24/7
-
-  DESTINATION — where the output goes
-  ─────────────────────────────────────
-  What you have:    macOS notification + file saved locally
-  What's next:      Slack message to a channel (one fetch() call)
-                    Email via SendGrid / Resend
-                    Notion page / Google Doc
-                    Row in a spreadsheet
-                    Webhook to another system
-```
-
-> "The classify-and-route logic in the middle doesn't change. The trigger and destination are the pluggable parts. This is the same pluggable pattern from Module 4 — now you can see the full range.
+> "We're going to copy the project out of the exercise repo so you can keep using it after this sprint ends. Where do you want it to live? Three normal answers:
 >
-> To add any of these: describe what you want to Claude Code. 'Add a webhook endpoint at /api/webhook that accepts a POST with a transcript field and runs the full orchestrator.' Claude knows the codebase — one session, working in minutes."
+> - `~/projects/[domain-name]/` — generic project folder
+> - `~/Documents/[domain-name]/` — visible in Finder
+> - inside an existing repo where this tool fits — paste the path
+>
+> What's the path?"
+
+Wait for the student's answer. Save it as `[NEW_HOME]`. If they're unsure, default to `~/projects/[domain-name]/` and say so.
+
+### Step 4A.3: Scaffold + copy (3 min)
+
+**Coach:** Run all of these via Bash tool (substituting `[NEW_HOME]` and `[domain-name]`):
+
+```bash
+mkdir -p [NEW_HOME]
+cp -R student-output/. [NEW_HOME]/
+cd [NEW_HOME] && rm -rf node_modules transcripts/incoming/*
+```
+
+Then write a fresh `CLAUDE.md` to `[NEW_HOME]/CLAUDE.md` with this exact content (substituting the domain name and the analyst/extractor descriptions):
+
+```markdown
+# [Domain Name] — built from the AISC Agent Sprint
+
+This project is a personalized version of the pipeline agent built during the
+AISC Agent Sprint. It was originally a meeting-transcript analyzer; it's now
+re-aimed at **[domain]**.
+
+## Architecture
+
+[Document] → [Analyst ‖ Extractor] (parallel) → [Synthesizer] → [Router]
+
+- `prompts/analyst.md` — [what the analyst returns for this domain]
+- `prompts/extractor.md` — [what the extractor returns for this domain]
+- `prompts/synthesizer.md` — combines analyst + extractor into the final report
+- `prompts/classifier.md` — classifies the document type (used by Router)
+- `stage-1/chat.js` — `ask()` and `chatTurn()` API helpers
+- `stage-2/workflow.js` — `runWorkflow()` (classify + route + notify)
+- `stage-3/orchestrator.js` — orchestrator + Conductor planning step
+- `server.js` — Express server, http://localhost:3000
+
+## How to use it
+
+1. `npm install`
+2. Add `.env` with `ANTHROPIC_API_KEY=sk-ant-...`
+3. `npm run server`, open http://localhost:3000
+4. Or drop a file into `transcripts/incoming/` to fire the workflow
+
+## Working on this with Claude Code
+
+The three prompts in `prompts/` are the leverage point. Change them to change
+what the system does. Don't change the orchestrator unless you're adding a new
+specialist or new step.
+
+When asking Claude to update a prompt: read the existing file first, change
+only the parts that need to change, leave the JSON output schema (where one
+exists) alone unless you want to change `orchestrator.js` too.
+```
+
+Tell the student:
+
+> "I just copied your project to `[NEW_HOME]`, dropped a fresh `CLAUDE.md`, and cleaned out the temp folders. Three things to do next."
+
+### Step 4A.4: Update the prompts (3 min)
+
+**Coach:** Open a new Claude Code session in `[NEW_HOME]` (or just `cd` there and use this session). Then update the three prompt files for the new domain. For each file:
+
+1. Read the existing file via Read tool.
+2. Edit only the role line and the output sections — keep JSON schemas (in extractor/synthesizer) intact.
+3. Print the updated file inline so the student can see it.
+
+The three changes:
+
+- **`prompts/analyst.md`** — change the role and output sections to match the new analyst job (e.g., for customer interviews: themes by JTBD category instead of meeting themes).
+- **`prompts/extractor.md`** — change *what* gets extracted; keep the JSON field names (`owner`, `task`, `deadline`) unless the student also wants to change the orchestrator. (Tell them which fields they'd need to update if they want to rename.)
+- **`prompts/synthesizer.md`** — update the final report headers to match the new analyst + extractor outputs.
+
+### Step 4A.5: Smoke test (1 min)
+
+In the new project folder:
+
+```bash
+npm install
+npm run server
+```
+
+Have the student paste a real document for the new domain into the chat tab and verify the response makes sense. If it doesn't, iterate on the prompt — that's the whole point of this folder existing.
+
+> "That's a working personalized agent in your own folder. Skip to Step 6 — the close."
 
 ---
 
-## Step 4: Building the next agent (6 min)
+## Step 4B: Scaffold a new architecture (starter, ~10 min)
+
+Use this if the student picked Path B. **Default architecture: Council.** G-Stack is mentioned at the end as an alternative.
+
+**This path is a starter — not a finished build.** What you do here: scaffold the folder, drop in a CLAUDE.md spec, hand the student the prompt that kicks off the new Claude session. You will *not* try to finish the actual code in this session — that's the student's job afterward, and the CLAUDE.md is what guides the new Claude. Be explicit with the student about this so they don't expect a working Council in 10 minutes.
+
+### Step 4B.1: Pick the use case (2 min)
+
+Ask:
+
+> "Council works best for high-stakes decisions where you don't trust a single perspective. Some real examples:"
+
+Print:
+
+```
+  - Should I take this job offer?
+  - Should we kill the X feature and double down on Y?
+  - Buy / rent / wait — for a specific city + budget
+  - Does this strategy doc actually hang together?
+  - Hire candidate A or candidate B?
+  - Is now the right time to raise?
+  ── or your own ──
+```
+
+Wait for the student to pick. Capture:
+- **Use case in one line** (e.g. "evaluating a senior hire")
+- **Five advisor styles** — default is Contrarian / First Principles / Expansionist / Outsider / Executor, but offer to swap any if they have stronger preferences.
+
+### Step 4B.2: Pick the new home (2 min)
 
 Say:
 
-> "What you built this week is one pattern — a pipeline. Document in, specialists run, report out. It's a great pattern for a specific class of problem. But there are other architectures, and the building blocks you now have — `ask()`, `Promise.all`, system prompt as specialist — apply to all of them.
+> "Where do you want this project to live? Same options as Path A:
 >
-> Here are three patterns. The first is what you built. The second two are different architectures — different shapes, different use cases. I'll show you how each one works so you can see the difference."
+> - `~/projects/council/` — generic
+> - `~/Documents/council/` — Finder-visible
+> - inside an existing repo
+>
+> What's the path?"
 
-Print this:
+Wait for an answer. Save as `[NEW_HOME]`. Default: `~/projects/council/`.
 
-```
-Pattern 1 — Pipeline (what you built)
-  A document comes in. Multiple specialists analyze it in parallel.
-  A synthesizer combines their outputs. A router handles the result.
+### Step 4B.3: Scaffold from scratch (4 min)
 
-  document in
-       ↓
-  [Analyst ‖ Extractor]   ← parallel, different tasks on the same input
-             ↓
-       [Synthesizer]       ← combines both outputs
-             ↓
-         [Router]          ← classify, save, notify
-  
-  Best for: processing a document with well-defined sub-tasks.
-  Shape: fixed stages, document-centric, always runs the same sequence.
+**Coach:** Run via Bash tool:
 
-─────────────────────────────────────────────────────────────────────
-
-Pattern 2 — Domain Stack (Garry Tan's G-Stack)
-  A question or request comes in. A classifier decides which domain owns it.
-  One specialist handles the whole thing. No pipeline, no synthesizer.
-
-  question in (e.g. "What's blocking the Q3 release?")
-       ↓
-  [Classifier]
-    ↓     ↓     ↓     ↓
-  [Sales] [Ops] [Support] [Eng]   ← one fires, rest are silent
-       ↓
-    response out
-
-  Each domain agent has a deep system prompt for its area —
-  its own knowledge, its own output format.
-  Best for: internal assistants, any "route this to the right expert" problem.
-  Shape: routing-first, sequential, interactive. Not document-centric.
-         Very different from what you built — there's no synthesizer,
-         no parallel dispatch, and the input is a question, not a file.
-
-─────────────────────────────────────────────────────────────────────
-
-Pattern 3 — Council (Ole Lehmann's LLM Council)
-  A question or decision comes in. Multiple advisors read it independently,
-  each forced into a completely different thinking style. Then a peer review
-  round. Then a chairman synthesizes a final verdict.
-
-  question in (e.g. "Should I take this job offer?")
-       ↓
-  [Contrarian] [First Principles] [Expansionist] [Outsider] [Executor]
-       ↓              ↓                 ↓             ↓          ↓
-          [Peer review — each reads all five, anonymized:
-           which is strongest? biggest blind spot? what did all miss?]
-                           ↓
-              [Chairman — final verdict + one next step]
-
-  Best for: high-stakes decisions, strategy calls, anywhere one lens misleads.
-  Shape: parallel advisors (like Promise.all), but the goal is debate, not task
-         decomposition. Second pass adds peer critique. Different from Pipeline —
-         there's no document, no synthesizer, no router.
-         The power is in the anonymized peer review round: that's what surfaces
-         the blind spots a single agent synthesis always misses.
+```bash
+mkdir -p [NEW_HOME]/prompts
+cd [NEW_HOME]
+npm init -y
+npm install @anthropic-ai/sdk dotenv express
 ```
 
-> "Pipeline is what you built. Domain Stack and Council are genuinely different shapes — they share the same primitives but the architecture is different. When you start a new session to build one of these, you're not copying `student-output/` — you're using what you learned to build something new."
+Copy the env file from the sprint:
 
-Ask: **"Which of these maps to something you actually want to build?"**
+```bash
+cp [repo-root]/student-output/.env [NEW_HOME]/.env
+```
 
-Wait for their answer. Then give them the starter prompt for that pattern.
+Then write `[NEW_HOME]/CLAUDE.md` with this exact content (substitute use case + advisors):
+
+```markdown
+# Council — built from the AISC Agent Sprint
+
+A multi-advisor decision agent inspired by Ole Lehmann's LLM Council.
+Use case: **[their use case]**
+
+## Architecture
+
+decision in
+   ↓
+[5 advisors in parallel — different thinking styles]
+   ↓
+[peer review — each advisor reads the other 4 anonymized,
+ names the strongest argument and the biggest blind spot]
+   ↓
+[Chairman — synthesizes a verdict + ONE next step]
+
+## Files Claude should create
+
+- `prompts/contrarian.md` — assumes the proposed decision is wrong; finds the strongest objection
+- `prompts/first-principles.md` — strips assumptions, reasons from physics/economics/incentives
+- `prompts/expansionist.md` — argues for the upside, the bigger version, what's possible if it works
+- `prompts/outsider.md` — pretends to know nothing about the situation; surfaces missing context
+- `prompts/executor.md` — assumes the decision is made; focuses on tradeoffs of execution
+- `prompts/peer-review.md` — reads all 5 advisors anonymized, identifies strongest + biggest blind spot
+- `prompts/chairman.md` — reads everything, delivers final verdict + next step
+- `council.js` — the orchestrator. Calls all 5 advisors via `Promise.all`, then peer-review, then chairman
+- `server.js` — Express, single endpoint POST /api/council that takes `{decision: string}` and returns the chairman's verdict
+- `package.json` script `"server": "node server.js"`
+
+## Building blocks I already know
+
+- `ask(question, system)` returns the model's reply for a single call
+- `Promise.all([advisor1(), advisor2(), ...])` runs all advisors at once
+- `client.messages.create({ model: "claude-sonnet-4-6", max_tokens: 1024, system, messages: [...] })` is the raw API call
+
+## How to build this
+
+1. Read this whole file.
+2. Write the 7 prompt files. Each advisor's system prompt should be 5–10 lines, very forceful about the thinking style — the prompt is the lens.
+3. Write `council.js` with a `runCouncil(decision)` function that does parallel advisors → peer review → chairman, returns `{verdict, nextStep}`.
+4. Write `server.js` exposing POST /api/council.
+5. Don't add a frontend yet — `curl` is fine for the first run.
+```
+
+Tell the student:
+
+> "Project scaffolded. Empty package, empty prompts folder, fresh `CLAUDE.md` that tells Claude exactly what to build."
+
+### Step 4B.4: Hand off to Claude in the new project (3 min)
+
+Have the student `cd [NEW_HOME]` and start a new Claude Code session there:
+
+```bash
+cd [NEW_HOME]
+claude
+```
+
+Their first prompt to that fresh Claude session:
+
+```
+Read CLAUDE.md and build the project it describes. Start by writing the
+five advisor prompts. Pause before writing council.js — let me see the
+prompts first.
+```
+
+Tell them:
+
+> "That new Claude Code session has the CLAUDE.md you and I just wrote. It will scaffold the rest *on your own time*, after this sprint ends. The way to drive it: pause before each step, review what it produced, push back, iterate. Don't accept the first draft of any of the advisor prompts — the prompt IS the advisor. When you're stuck, paste what's failing back into the chat and ask Claude to fix it. You're its product manager now.
+>
+> This sprint doesn't continue from here. You have everything you need: a working folder, a clear spec, and three hours of practice working with Claude. Go finish the build whenever you have time — could be tonight, could be next weekend."
+
+### Step 4B.5: How you'll know it works (1 min)
+
+> "When you've got a working `council.js` and `server.js`, the smoke test is: run `npm run server`, hit the endpoint with a decision, see if a verdict comes back. The new Claude session can write the smoke-test command for you when you're ready — just ask: 'Give me the smoke test command for this server.'"
+
+### Step 4B.6: G-Stack alternative (1 min, optional)
+
+Say:
+
+> "If Council isn't your thing, the same scaffolding flow works for the Domain Stack — replace the 5 advisors with N domain agents (Sales, Ops, Support, Eng, etc.), replace peer-review and chairman with a single classifier that picks one. The CLAUDE.md template lives in `concepts/g-stack.md` if you want it later — same shape as the Council one."
 
 ---
 
-## Step 5: The starter prompt (2 min)
+## Step 5: Relocation guard (the project must live OUTSIDE this repo)
 
-**Coach:** Based on what the student picked in Step 4, give them the right starter prompt. Print whichever one fits:
+If you skipped the "pick a home" step in 4A or 4B, do it now. **The project should NOT stay inside `student-output/` after the sprint ends.** Reasons:
 
-**If they picked Pipeline (or "I want to do what we just built, but for X"):**
+- The sprint repo is a learning artifact; their tool is a real artifact.
+- They'll want to commit it to its own git repo.
+- They'll want to share it / deploy it / extend it without dragging the sprint repo around.
 
-```
-I just completed an AISC Agent Sprint and built a pipeline agent:
-[Analyst ‖ Extractor] → Synthesizer → Router
-
-The code is in student-output/. I want to build a new pipeline agent
-for [their use case]. New folder: [folder name].
-
-Please scaffold it — copy the structure from student-output/, then update
-the three specialist prompts (analyst.md, extractor.md, synthesizer.md)
-for [their use case]. Keep the orchestrator and server unchanged.
-
-Let's start by agreeing on what the analyst and extractor should each return.
-```
-
-**If they picked Domain Stack (G-Stack):**
-
-```
-I just completed an AISC Agent Sprint. I know how to:
-- Call the Claude API using ask() with a system prompt
-- Route based on classification (I built a classifier in workflow.js)
-
-I want to build a Domain Stack — a different architecture from what I built.
-One specialist per business domain. A classifier routes any incoming question
-to the right domain agent. No pipeline, no synthesizer — the domain agent
-handles the whole request.
-
-My domains: [their domains, e.g. Sales / Ops / Support / Eng]
-My use case: [e.g. an internal assistant that answers questions across teams]
-
-New folder: [folder name]. Please design and scaffold this from scratch:
-- A classifier that reads the input and routes to the right domain
-- One specialist per domain (each is a system prompt + ask() call)
-- Each domain agent has deep context for its area and its own output format
-- A simple server endpoint that accepts a question and returns the response
-
-This is a new architecture — don't copy from my pipeline. Start by asking me
-what each domain agent should know and what a typical request looks like.
-```
-
-**If they picked Council:**
-
-```
-I just completed an AISC Agent Sprint. I know how to:
-- Call the Claude API using ask() with a system prompt
-- Dispatch multiple agents in parallel using Promise.all
-
-I want to build a Council agent — inspired by Ole Lehmann's LLM Council.
-Multiple advisors read the same question with completely different thinking
-styles. Then a peer review round (each reads all others, anonymized). Then
-a Chairman synthesizes a final verdict with one clear next step.
-
-My use case: [their use case — e.g. evaluating a job offer, reviewing a strategy]
-Advisors I want: [e.g. Contrarian / First Principles / Expansionist / Outsider / Executor]
-
-New folder: [folder name]. Please design and scaffold this from scratch:
-- N advisor agents in parallel (Promise.all) — each with its own system prompt
-  and a forced thinking style
-- A peer review pass: each advisor reads all responses (anonymized), names
-  the strongest and the biggest blind spot
-- A Chairman that synthesizes everything into one verdict + one next step
-- A simple server endpoint that accepts a question and returns the verdict
-
-This is a new architecture — the input is a question, not a document.
-Start by helping me define what each advisor's thinking style should be.
-```
-
-> "Copy that, open a new folder, start a new Claude Code session, paste it in. Claude already knows these building blocks — it helped you build them this week. `student-output/` is the reference it can read if you want it to look at your actual code."
+If their project is still in `student-output/`, walk them through `cp -R student-output/. [NEW_HOME]/` and `cd [NEW_HOME] && git init`.
 
 ---
 
-## Key takeaways
+## Step 6: Final commit and close (2 min)
 
-- The system prompt is the leverage point — change the prompts, change the system
-- Trigger and destination are pluggable — the agent in the middle is reusable
-- Three questions for any new agent: What's the input? What's the output? What specialists fit between them?
+**Coach:** In the **sprint repo** (not the new project), do all of this automatically:
 
-## Step 6: Final commit and close (1 min)
-
-**Coach:** Do all of the following automatically:
-
-1. Run `git add -A && git commit -m "Complete Module 8: Where This Goes"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
+1. Run `git add -A && git commit -m "Complete Module 8: Where This Goes"` via Bash tool from the sprint repo root and show the student the changed files.
 2. Update `CLAUDE.md`: change `- [ ] Module 8:` to `- [x] Module 8:` via Edit tool.
 3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
 Then say:
 
-> "You're done. You went from never having called an API to building a working multi-agent system with a planning step that decides its own execution path.
+> "You're done with the sprint. You went from a tour of the system in Module 1 to a working multi-agent system you can run, plus a personalized version of it (or a brand-new Council scaffold) in your own project folder.
 >
 > A few things to take with you:
 >
-> - **The system prompt is the leverage point.** Every specialist — analyst, extractor, classifier, conductor — is a prompt. Change the prompt, change the agent.
+> - **The system prompt is the leverage point.** Every specialist — analyst, extractor, classifier, conductor, advisor — is a prompt. Change the prompt, change the agent.
 > - **Specialists beat generalists.** Focused sub-agents produce better output than one big call.
 > - **Trigger and destination are pluggable.** The agent in the middle is reusable.
-> - **A workflow follows steps. An agent decides which steps.** You built the second one in Module 7.
+> - **A workflow follows steps. An agent decides which steps.**
 > - **Three questions for any new agent:** What's the input? What's the output? What specialists fit between them?
 >
-> Go build something real."
+> Your project is at `[NEW_HOME]`. Go build something real with it."
 
 ## Coach Guardrails
 
-- **No live edits in this module** — the student just ran a working system in Module 7. Editing prompts now without a real test document leads to confusion ("why is the output different?"). Explain the pattern, don't execute it.
-- **The starter prompt is the deliverable** — the student should leave with a concrete, copy-pasteable prompt for their next agent. Don't skip Step 5.
-- **Wait for the answer in Step 4** — "which of these maps to something you actually want to build?" — wait for their actual answer before printing the starter prompt. Tailor it to what they said.
-- **Don't force Pipeline onto everything** — G-Stack and Council are genuinely different architectures. G-Stack is routing-first and sequential; Council is about debate and perspective, not task decomposition. The shared primitives are `ask()` and system prompts — but the shapes are different. Say so clearly; don't pretend they're the same pattern.
-- **If the student says "I want to build all three"** — pick one. "Start with the one you have a real use case for today. The others will make more sense after you've built the first one."
+- **Pick ONE path; don't try to do both.** If the student says "I want to do both," redirect to the one they have a real use case for *today*. The other will make more sense after the first ships.
+- **Wait for the path pick in Step 3** — do not pre-scaffold before the student answers. The whole module branches off that answer.
+- **The relocation step is required** — students leave with a project in a folder they own, NOT inside `student-output/`. If they push back ("can I just keep it here?"), explain why: separate git repo, separate concerns, separate lifetime.
+- **Don't over-explain the three patterns in Step 2.** One paragraph each, then move on. The patterns aren't the point of this module — *shipping a project the student owns* is the point.
+- **If the new Claude Code session in Path B writes bad advisor prompts**, push back as the student. "These all sound like the same advisor — what makes the Contrarian different from First Principles in the actual output?" Iterate. The prompt IS the advisor.
+- **Don't generate a frontend in Path B by default.** `curl` is fine for the first run. A frontend is a separate session.

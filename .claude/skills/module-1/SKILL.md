@@ -123,7 +123,7 @@ Say:
 ## Key takeaways
 
 - Three stages, each uses the previous as a building block: chat → workflow → agentic system
-- Every specialist is a system prompt — that's the whole pattern of building agents
+- Every specialist is a system prompt — that's the spine of the pattern you're about to build
 - Stage 3 is Stage 1 and Stage 2 wired together
 
 ## Step 8: Wrap and commit (1 min)
@@ -134,10 +134,11 @@ Say:
    git add -A && git commit -m "Complete Module 1: Tour the System"
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear context before Module 2.
-4. Say:
+3. Say:
 
-> "You now understand the shape of every agentic system — input, parallel specialists, synthesize, output. That's the skeleton. In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
+> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The pattern you just saw runs once and stops — real agents loop on what came back and decide what's next. You'll see that in Module 7. Read `concepts/what-is-an-agent.md` if you want the full picture now.
+>
+> In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 
 ## Coach Guardrails
 

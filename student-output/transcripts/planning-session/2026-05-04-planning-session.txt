@@ -1,0 +1,55 @@
+Planning Session — Q3 Roadmap Kickoff
+Date: May 4, 2026
+Participants: Jordan Kim (Product Lead), Priya Nair (Engineering), Tobias Reyes (Design), Rachel Osei (Data)
+
+Jordan: Okay, let's get into it. We have six weeks until Q3 starts. I want to leave today with the three things we're actually shipping — not a wishlist.
+
+Priya: Before we pick, can we acknowledge that our eng capacity is lower than last quarter? We lost two engineers to the platform team.
+
+Jordan: Yes — I was going to flag that. We're at 70% of Q2 capacity. So we have to cut scope aggressively.
+
+Tobias: I want to advocate for the dashboard refresh. It's blocking everything else visually. Users can't find the new features we shipped.
+
+Rachel: The data backs that up — engagement with the new shipment view is 12% lower than projected. We think it's a discoverability problem, not a feature problem.
+
+Jordan: Okay, dashboard refresh goes on the list. Priya, rough size?
+
+Priya: If we scope it to nav and the main shipment view — two weeks for two engineers.
+
+Jordan: That's workable. What else can't we drop?
+
+Priya: The notification system. We've deferred it twice. If we don't do it this quarter, the mobile app can't launch in Q4.
+
+Jordan: Agreed. That's the second item. Rachel — the reporting export?
+
+Rachel: It's the top support ticket. Twenty percent of our support volume is "how do I export this?" If we add a simple CSV export, we estimated a 15-point drop in that category.
+
+Jordan: That's a strong case. Priya?
+
+Priya: Small — one engineer, one week.
+
+Jordan: That's our three: dashboard refresh, notification system, CSV export. Everything else is deferred.
+
+Tobias: What about the onboarding flow? We've had three enterprise clients ask for it.
+
+Jordan: Backlog. If we hit the three items early, it moves up. Otherwise, Q4.
+
+Priya: I need a decision on the API auth refactor. It's not user-facing, but if we don't do it, we're building the notification system on top of something fragile.
+
+Jordan: Do it before notification work starts. Is that one engineer one week?
+
+Priya: More like three days.
+
+Jordan: Do it. That's four items total — API auth (dependency), then the three in parallel where possible. Tobias, can you have design specs for the dashboard by end of next week?
+
+Tobias: Yes. I'll share a draft Wednesday, final Friday.
+
+Jordan: Rachel, I need a baseline metrics doc before we start — current engagement numbers, support ticket breakdown. Can you have that by Monday?
+
+Rachel: Done.
+
+Jordan: Priya, engineering kickoff meeting Monday after Rachel sends the doc?
+
+Priya: Works for me.
+
+Jordan: Good. I'll send the decision doc and Q3 commitment today. If there are objections, flag them by EOD Thursday. Otherwise we're locked.

@@ -60,9 +60,9 @@ If you need to stop mid-module, just close your terminal. When you come back, ru
 | `module-2` | Your First API Call — demystify what the API actually is | ~20 min | A successful API call that prints Claude's response |
 | `module-3` | Build the Chat Assistant — interactive loop and system prompt | ~25 min | A working chat assistant you can have a conversation with |
 | `module-4` | Build the Workflow — pipeline that runs automatically on a file drop | ~25 min | A workflow that classifies and routes transcripts without you |
-| `module-5` | Extend the Workflow — add a new step by describing what you want | ~20 min | A workflow with one more output step you added without writing code |
-| `module-6` | The Agentic System — orchestrator that coordinates three specialists | ~30 min | A working multi-agent system: Summarizer + Extractor + Router |
-| `module-7` | See the System — visual frontend showing the full architecture | ~20 min | A screenshot of your running system's architecture |
+| `module-5` | Meet the Specialists — read the three Stage 3 prompts (analyst, extractor, synthesizer) | ~15 min | An understanding of the three specialists Stage 3 will coordinate |
+| `module-6` | The Agentic System — orchestrator that coordinates three specialists | ~30 min | A working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router |
+| `module-7` | Use the System + the Conductor — tour all three stages, then meet the planning step that turns a workflow into an agent | ~30 min | A screenshot of your live system + a Conductor that decides which specialists to run |
 | `module-8` | Make It Yours — point the system at a real use case from your life | ~25 min | A personalized version running on a real document you brought |
 
 **Total: ~3 hours.** Most students spread it across 2–3 sessions.

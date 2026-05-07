@@ -20,7 +20,9 @@ Say:
 
 > "In Stage 1 you built a chat assistant. You paste something in, it responds, you paste more. It's interactive.
 >
-> Stage 2 is different. It's a **workflow** — a deterministic sequence. You trigger it (in our case with a button; in production it could be a file drop, a webhook, a timer). Once it starts, it runs to completion. The AI makes one decision — classify the meeting type — and the pipeline handles the rest automatically. You're not in a conversation. There's no back-and-forth."
+> Stage 2 is different. It's a **workflow** — a deterministic sequence. You trigger it (in our case with a button; in production it could be a file drop, a webhook, a timer). Once it starts, it runs to completion. The AI makes one decision — classify the meeting type — and the pipeline handles the rest automatically. You're not in a conversation. There's no back-and-forth.
+>
+> Think of it as a Zapier flow where the if-statement is an AI: trigger fires, AI decides one thing, the rest of the pipeline acts on that decision. Same shape as 'when an email arrives → AI tags it → file it accordingly,' just with a transcript instead of an email."
 
 ## Step 2: What this workflow does (2 min)
 
@@ -160,8 +162,7 @@ What you've built so far:
 2. Update `CLAUDE.md`: change `- [ ] Module 4:` to `- [x] Module 4:` via Edit tool.
 3. Tell the student: *(Keep the server terminal running — you'll use it in Module 5.)*
 
-4. **Run `/compact`** — type `/compact` to clear context before Module 5.
-5. Hand off:
+4. Hand off:
 
 > "Stage 2 running. In Module 5 we'll extend the pipeline — add a new step by telling Claude what you want, not by editing code. Type `module-5` when you're ready."
 

@@ -23,9 +23,9 @@ Take it slow. Let each one land before moving to the next.
 
 Say:
 
-> "We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files. Stage 3 is a third thing — an agentic system.
+> "We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files. Stage 3 is parallel orchestration — Analyst and Extractor run at the same time, then Synthesizer combines them, then the Stage 2 router takes over.
 >
-> It's not a chat assistant, because it doesn't wait for you. It's not just a workflow, because it does more than classify. Instead, an orchestrator coordinates three specialists — two of them in parallel — then synthesizes the results, then routes everything.
+> Heads up on the vocabulary: by Anthropic's definition this is still a *workflow* — it runs predefined steps every time. In Module 7 we'll add a planning step (the Conductor) that decides which steps to take, and that's the moment it crosses into actual agent territory.
 >
 > And here's the payoff you've been set up for: the specialists you just read in Module 5, the workflow you built in Module 4 — the orchestrator is what wires them all together. You're not starting over. You're composing what you have."
 
@@ -102,7 +102,7 @@ const [themes, actions] = await Promise.all([
 
 > "This is the most important line in Stage 3. `Promise.all` fires both calls at the same time. Both send their request to Anthropic. Both wait. Both return. The `[themes, actions]` destructuring captures both results when they're both done.
 >
-> This is the first time in this course anything runs simultaneously. That's what makes it agentic — not just a fixed sequence of steps, but real parallel dispatch."
+> This is the first time in this course anything runs simultaneously. As we said in Step 1, Anthropic still calls this a workflow — it runs predefined steps every time. But it's a *parallel* workflow, and it's the direct predecessor to what becomes an agent in Module 7 when the Conductor decides which steps to take."
 
 Then the synthesis:
 
@@ -195,7 +195,19 @@ Claude Code (orchestrator)
 
 > "Claude Code is an orchestrator. It takes your request, dispatches tools in parallel (reading files, searching code), synthesizes what it found, and produces the output. Same pattern you just built.
 >
-> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every agent you'll ever build is some version of this: input → parallel specialists → synthesis → output.**"
+> But here's the part you haven't built yet — the **loop**:"
+
+```
+plan → act → observe → decide → repeat
+   ↑                              │
+   └──────────────────────────────┘
+```
+
+> "Claude Code doesn't just dispatch once. It plans (reads your message, picks tools), acts (calls them), observes (reads what came back), decides (am I done? do I need more?), and repeats until the task is finished. The orchestrator you just built runs the loop *once* and stops. A real agent runs it as long as it needs to.
+>
+> The Conductor you'll meet in Module 7 is one step of that loop — the planning step. Production agents are that loop running on autopilot.
+>
+> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every multi-specialist system you'll work with is some flavor of: dispatch → run specialists → combine → route**, often inside a loop. The pattern you just built is one common shape (parallelization with synthesis). Other shapes exist — routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop on environmental feedback. Read `concepts/what-is-an-agent.md` for the broader taxonomy."
 
 ## Key takeaways
 
@@ -209,7 +221,7 @@ What you've built so far:
 
 ```
 ┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │  ← you built this
+│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │  ← you designed this
 │  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
 │  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
 └────────────┘   └────────────┘   │            ↓                          │
@@ -224,10 +236,9 @@ What you've built so far:
 1. Run `git add -A && git commit -m "Complete Module 6: The Agentic System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 6:` to `- [x] Module 6:` via Edit tool.
 
-3. **Run `/compact`** — type `/compact` to clear context before Module 7.
-4. Hand off:
+3. Hand off:
 
-> "You just built a multi-agent agentic system. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
+> "You just designed a multi-agent system end-to-end. You read every prompt, you specified every step, you watched it run. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
 
 ## Coach Guardrails
 

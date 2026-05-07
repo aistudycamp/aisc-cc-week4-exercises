@@ -28,12 +28,16 @@ Print this:
    STAGE 1                    STAGE 2                    STAGE 3
    ─────────                  ─────────                  ─────────
    CHAT ASSISTANT      →      WORKFLOW            →      AGENTIC SYSTEM
+                              (builds on Stage 1)        (builds on Stages 1+2)
 
-   You paste a                A file drops into a        An orchestrator
-   transcript, ask            folder. AI classifies      runs two specialists
-   questions, get             the meeting, routes        in parallel, then a
-   answers back.              the file, sends a          third synthesizes
-                              notification.              the final report.
+   You paste a                A file drops into a        An orchestrator runs
+   transcript, ask            folder. AI classifies      two specialists in
+   questions, get             the meeting, routes        parallel, a third
+   answers back.              the file, sends a          synthesizes the report,
+                              notification.              then it hands off to
+                              (Stage 1's chat call       the Stage 2 workflow
+                              becomes the                to classify, save, and
+                              classifier here.)          notify.
 
    ~1 hour                    ~45 min                    ~1 hour
 ```
@@ -174,8 +178,7 @@ Wrap and update progress:
    git add -A && git commit -m "Complete Stage 1 Intro: setup + API key"
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear the context window before moving to the next module. This keeps Claude focused and fast.
-4. Say:
+3. Say:
 
 > "You're set up. Project scaffolded, API key in place, dependencies installed. When you're ready, type `module-1` and we'll do the systems-thinking tour."
 
