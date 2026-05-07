@@ -5,6 +5,7 @@ Live working doc tracking ALL rounds of feedback against the current state of th
 - **Round 1 (Nicole)**: PDF feedback from Nicole's run-through. Ben addressed most of these in a first pass before this session.
 - **Round 2 (Ben's run-through)**: Ben's own end-to-end test (2026-05-06). Logged in `FEEDBACK.md` as F1–F17.
 - **Round 3 (Nicole's remaining items)**: 2026-05-07. Closed N6, N10, N21, N22, N25, N26, N28, N29, N30 — agent-vocabulary consistency pass, ASCII diagrams in M2/M3/M5/M7, M5 "why specialists" upfront, M6 reframe, M7 Act 1 recap framing, "plumbing" line rewritten. Plan: `~/.claude-personal/plans/golden-churning-crystal.md`.
+- **Round 4 (Ben's second run-through, frontend)**: 2026-05-07. Logged below as F18-F21. Triggered by Stage 1 browser test of the Round 2 frontend rewrite.
 
 This doc reconciles all rounds. Use it to track what's done, what's partial, and what's still open. When an item is fully resolved AND verified by manual test, mark its status `verified`.
 
@@ -166,19 +167,72 @@ All 21 sub-items shipped this session. See `FEEDBACK.md` for full implementation
 
 ---
 
+## Round 4 — Ben's second run-through (Stage 1 browser test, 2026-05-07)
+
+| ID | Area | Issue | Status | Notes |
+|----|------|-------|--------|-------|
+| F18 | Chat tab layout | Chat-in-canvas is too wide. Long lines hurt readability. | ✅ | Restored the right-side panel on stage 0, repurposed it as a live JSON view (request + response). Chat history now lives on the left at a comfortable width; raw JSON is always visible on the right — no "Show last call JSON" click required. |
+| F19 | Chat tab JSON | Disclosure ("Show last call JSON ▼") added a click between the student and the JSON they were supposed to see. | ✅ | Disclosure removed entirely. JSON for every call appears in the right panel automatically (REQUEST SENT → /api/chat + RESPONSE FROM CLAUDE sections). |
+| F20 | Chat log strip | "[messages: N · ~tokens · Xs]" text below the chat was almost invisible — used `--ink-4` (#D6D3D1) on a light background. | ✅ | Bumped to `--ink-2` (#78716C), font-size 10 → 11, line-height 1 → 1.3. Now legible without straining. |
+| F21a | Load standup ack | First "Got it — I have the transcript" message was hardcoded — didn't reflect the system prompt. Pirate captain prompt produced plain-English ack. | ✅ | Removed the hardcoded ack. `loadChatTranscript()` now pushes the transcript and calls `/api/chat` with the current system prompt; Claude generates the first reply. Pirate prompt → pirate ack. |
+| F21b | Display truncation | Long messages (transcripts, long responses) were truncated mid-output with "…(truncated for display, full text sent to Claude)". | ✅ | Truncation removed in both message bubbles (renderChatMessages) and the side-panel JSON view. Full content always visible; the chat-history container scrolls. |
+| F22 | Run report tail | The run report ends with a hardcoded "Build Your Own" section (template + 3 example use cases). Feels misplaced — the report is run-specific analysis, but this is teaching content. | ✅ | Removed the Build Your Own block from `student-output/prompts/reflect.md` (and the rule that pinned it). The run report now stays focused on what THIS run revealed. Module 8 is the canonical home for "build your own" — it already has two turnkey paths (Personalize / Build New, default Council) that each produce a tailored CLAUDE.md the student can point a fresh Claude session at. |
+| F23a | Server `/api/orchestrate/step1` | Endpoint always ran both Analyst + Extractor regardless of what the Conductor asked for. "Just extract" still ran the Analyst behind the scenes. | ✅ | Endpoint now accepts a `tools` array and gates each specialist independently. Frontend passes the Conductor's plan in the request. |
+| F23b | Frontend animation timeline | `playAnimation()` for stage 3 played the full pipeline regardless of what actually ran — animation contradicted the Conductor decision shown in the panel. | ✅ | Tagged each Stage 3 sequence event with a `tools: [...]` array. `playAnimation(activeTools)` filters out events whose tools didn't run. Animation start moved to AFTER Conductor planning so it can be filtered. Untagged events (input arrival, output arrival) always play. |
+| F23c | Steps panel labels | "Step 1 — Analyst + Extractor (parallel)" was misleading when only one specialist ran (e.g. extractor-only). | ✅ | Split into 5 steps: Step 1 Analyst / Step 2 Extractor / Step 3 Synthesizer / Step 4 Router / Step 5 Conductor reflects. When both Analyst and Extractor run they fire in parallel server-side (same fetch, Promise.all on the server) but the visible markers are separate so the student can see which one actually ran. Added a small note under the steps: "When both Analyst and Extractor run, they fire in parallel — same start, same finish. Listed separately so you can see which one ran." |
+| F24 | Animation vs steps timing mismatch | Canvas animation + activity feed finished on a scripted ~11s timeline; real API calls (especially Reflect, with its huge context) took 15-25s. Result: viz "done", steps panel still ticking forward awkwardly. | ✅ | Replaced the scripted Stage 3 animation with event-driven visualization. The canvas nodes, particle flights, activity feed messages, AND step markers all advance from the same source — actual API completions. When Reflect takes 5s, the feed entry for "Run report complete" appears at 5s, not at a pre-baked 11s. Stage 1 + Stage 2 still use the original scripted animation since their single API call roughly matches scripted timing. |
+
+---
+
 ## Still open (sorted by priority)
 
 ### Out of scope
 
 1. **N13** — Video walkthrough for terminal navigation. Ben handling separately.
 
-### Pending verification (Round 2)
+---
 
-2. **All frontend items (F3, F3a, F6, F7a–d, F10, F12)** — shipped but NOT visually browser-tested. Boot the server, walk through chat → workflow → agentic system in the browser, confirm no console errors, before merging.
+## ✅ GUT CHECK — what to verify before merging `student-test-run` → `main`
 
-### Pending verification (Round 3)
+Ben's working from a different machine. To pick this up:
 
-3. **End-to-end content re-read** — read M1 → M2 → M3 → M4 → M5 → M6 → M7 → M8 in order on the `student-test-run` branch. Confirm: (a) agent vocabulary stays consistent (workflow vs agent vs LOOP), (b) M6 → M7 reveal lands cleanly (workflow → agent transition), (c) M5's new Step 2 actually answers "why three specialists" before any prompt appears, (d) every module hits the four-beat arc (What we're building / ASCII / See it in action / Summary).
+```bash
+git fetch origin
+git checkout student-test-run
+git pull origin student-test-run
+cd student-output && npm install   # only if node_modules missing
+npm run server                     # leave running
+# new terminal tab if needed; then open http://localhost:3000
+```
+
+### Section A — Frontend gut-checks (only one not yet visually confirmed)
+
+Ben browser-tested most of this in Round 4. The ones still to confirm visually:
+
+- [ ] **Stage 2 — workflow tab** — load standup → Run Workflow. Confirm: animation plays, classification result + macOS notification + toast all fire, tab cleans up when you switch away. (Round 2 changes never browser-tested for this tab specifically.)
+- [ ] **Run report has no "Build Your Own" tail** (F22 verification) — Stage 3 tab, leave instruction blank, Run Orchestrator. Scroll the run report at the bottom. It should end after **Recommendations** — no template, no example use cases, no extra section. (You ran the orchestrator with instructions earlier; this needs a clean full-pipeline run to verify.)
+
+### Section B — Module content re-reads (Round 3 wording changes)
+
+Read each module's SKILL.md as a fresh student would. Look for: stumble points, unclear sentences, vocabulary inconsistency. Each one is ~2 minutes.
+
+- [ ] **`module-1/SKILL.md` Step 8 (line ~139)** — does the new LOOP paragraph + Anthropic-shape framing flow naturally into the "type module-2" handoff, or does it cram too much in?
+- [ ] **`module-2/SKILL.md` Step 2** — does the new request/response ASCII land before the JSON walkthrough? Does the rewritten "the rest is the wiring around it" line read naturally (no AI-marketing-speak)?
+- [ ] **`module-3/SKILL.md` Step 2** — does the chat-loop ASCII ("messages[] keeps growing") add clarity or feel redundant with the three-roles explanation?
+- [ ] **`module-5/SKILL.md` Step 2 ("Why specialists") + Step 3 walkthrough scaffold** — biggest restructure. Does the three-reasons frame (focus / swappable / parallel) actually answer "why three specialists" before any prompt appears? Does the Role/Output/Rules/Why-it-differs scaffold feel useful or tedious?
+- [ ] **`module-6/SKILL.md` Step 1 frame + Step 7 Claude Code analogy** — does "Stage 3 is parallel orchestration… by Anthropic's definition still a *workflow*" set up M7 cleanly without confusing students who expected "agentic system"? Does the LOOP expansion in the Claude Code callout feel right?
+- [ ] **`module-7/SKILL.md` Step 1 + Step 6** — does "Act 1 is recap, Act 2 introduces the Conductor" land? Is the Conductor architecture ASCII at Step 6 useful or clutter? Are the "Recap callback" lines on Steps 3/4/5 useful or annoying?
+- [ ] **`module-7/SKILL.md` Step 5** — the "Watch the steps light up" example now shows 5 steps (Analyst / Extractor / Synthesizer / Router / Conductor reflects). Does the explanation that "Steps 1 and 2 fire at the exact same time — the panel splits them so you can see which one ran" land?
+- [ ] **`concepts/what-is-an-agent.md` bottom** — the Anthropic Building Effective Agents link at the end. Confirm it's there and the URL is live.
+
+### Section C — Quick correctness spot-checks (skip if no surprises in B)
+
+- [ ] **Vocabulary consistency** — read M1 → M8 in order. Does "agent" / "workflow" / "LOOP" mean the same thing across modules? Any contradictions?
+- [ ] **M5 → M6 → M7 → M8 arc** — does Stage 3 transition land? You build specialists in M5, run them as a parallel workflow in M6, learn the Conductor in M7, build your own in M8.
+
+### How to mark this done
+
+After you walk Sections A + B (and C if anything was fishy), tell me what stumbled and I fix. If everything reads clean, this branch is ready to merge to `main`. Sign off in this section by editing the checklist and committing, or just tell me "all green" and I'll do the merge.
 
 ---
 

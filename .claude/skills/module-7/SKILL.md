@@ -74,16 +74,18 @@ Click the **Stage 3** tab. Click **Load standup**. Hit **Run Orchestrator →** 
 Watch the steps light up:
 
 ```
-Step 1 ✓  Analyst + Extractor (parallel)
-Step 2 ✓  Synthesizer
-Step 3 ✓  Router: classify + save + notify
+Step 1 ✓  Analyst: find themes + decisions
+Step 2 ✓  Extractor: pull action items
+Step 3 ✓  Synthesizer: combine results
+Step 4 ✓  Router: classify + save + notify
+Step 5 ✓  Conductor reflects on the run
 ```
 
-> "Every checkmark is a real API call completing. Step 1 fires both at once — that's `Promise.all` from Module 6. Step 3 is the workflow you built in Module 4. That's `orchestrator.js` running in your browser."
+> "Every checkmark is a real API call completing. Steps 1 and 2 fire at the exact same time — that's `Promise.all` from Module 6, the parallel dispatch you just looked at. The panel splits them into two boxes so you can see which one ran (in a moment we'll do a run where only Extractor fires). Step 4 is the Stage 2 workflow. That's `orchestrator.js` running in your browser."
 
 **Screenshot moment:**
 
-> "Stage 3 tab, all three steps checked, report visible. Take a screenshot. A few hours ago, you hadn't built any of this. Right now you have a working multi-agent system. That's a real artifact — send it to your team."
+> "Stage 3 tab, all five steps checked, report visible. Take a screenshot. A few hours ago, you hadn't built any of this. Right now you have a working multi-agent system. That's a real artifact — send it to your team."
 
 ---
 

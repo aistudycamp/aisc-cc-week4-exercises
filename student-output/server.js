@@ -87,15 +87,22 @@ app.post('/api/workflow', async (req, res) => {
   }
 });
 
-// Stage 3 — Orchestrator step 1: Analyst + Extractor in parallel
+// Stage 3 — Orchestrator step 1: Analyst + Extractor in parallel.
+// Gated on the `tools` array so the Conductor's plan is actually honored:
+// "extractor only" really runs only the extractor, not both.
 app.post('/api/orchestrate/step1', async (req, res) => {
   try {
-    const { transcript } = req.body;
+    const { transcript, tools = ['analyst', 'extractor'] } = req.body;
+    const needsAnalyst = tools.includes('analyst');
+    const needsExtractor = tools.includes('extractor');
     const [themes, actions] = await Promise.all([
-      analyst(transcript),
-      extractor(transcript),
+      needsAnalyst ? analyst(transcript) : Promise.resolve(null),
+      needsExtractor ? extractor(transcript) : Promise.resolve(null),
     ]);
-    res.json({ themes, actions });
+    const result = {};
+    if (themes !== null) result.themes = themes;
+    if (actions !== null) result.actions = actions;
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

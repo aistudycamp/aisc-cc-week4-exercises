@@ -837,10 +837,40 @@
 
   .chat-log-strip {
     font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-2);
+    padding: 4px 4px 0 2px;
+    line-height: 1.3;
+  }
+
+  /* Chat JSON view — lives in the right panel on stage 0 */
+  .chat-json-view {
+    display: none;
+    padding: 16px 20px 20px 20px;
+  }
+  .chat-json-section { margin-bottom: 18px; }
+  .chat-json-section .chat-json-eyebrow {
+    font-family: var(--mono);
     font-size: 10px;
-    color: var(--ink-4);
-    padding: 3px 4px 0 2px;
-    line-height: 1;
+    color: var(--ink-2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chat-json-block {
+    background: #FBF9F4;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 360px;
+    overflow-y: auto;
+    margin: 0;
   }
 
   .panel-result { font-size: 13px; line-height: 1.5; animation: outIn 0.35s ease; }
@@ -932,7 +962,14 @@
     background: #FAF8F5;
   }
 
-  .orch-steps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .orch-steps { display: flex; flex-direction: column; gap: 5px; margin-bottom: 4px; }
+  .orch-steps-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-2);
+    line-height: 1.4;
+    padding: 0 2px 10px 2px;
+  }
   .orch-step {
     display: flex;
     align-items: center;
@@ -995,8 +1032,13 @@
   body[data-stage="0"] .canvas-meta,
   body[data-stage="0"] .canvas-controls,
   body[data-stage="0"] .stage-banner { display: none; }
-  body[data-stage="0"] .right { display: none; }
-  body[data-stage="0"] .main { grid-template-columns: 1fr; }
+  /* On stage 0, the right panel hosts the chat JSON view (request + response). */
+  body[data-stage="0"] #defaultView,
+  body[data-stage="0"] #inspectView,
+  body[data-stage="0"] .rh-block,
+  body[data-stage="0"] .rh-back { display: none !important; }
+  body[data-stage="0"] #chatJsonView { display: block; }
+  body[data-stage="0"] .right-header { border-bottom: none; padding-bottom: 0; }
 
   .chat-canvas-header {
     padding: 16px 20px 8px 20px;
@@ -1570,10 +1612,6 @@
           <input class="chat-canvas-input" id="chatCanvasInput" placeholder="Type a message…" />
           <button class="chat-canvas-send" id="chatCanvasSend">Send →</button>
         </div>
-        <div class="chat-canvas-json-row" id="chatCanvasJsonRow" style="display:none">
-          <button class="json-toggle-btn" id="chatCanvasJsonBtn">Show last call JSON ▼</button>
-          <pre class="json-block" id="chatCanvasJsonBlock" style="display:none"></pre>
-        </div>
       </div>
 
     </div>
@@ -1642,11 +1680,13 @@
               <span id="orchConductorReason" class="conductor-reason"></span>
             </div>
             <div class="orch-steps" id="orchSteps">
-              <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Analyst + Extractor (parallel)</span></div>
-              <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Synthesizer: combine results</span></div>
-              <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Router: classify + save + notify</span></div>
-              <div class="orch-step" id="orchStep4"><span class="step-check">○</span><span>Step 4 — Conductor reflects on the run</span></div>
+              <div class="orch-step" id="orchStep1"><span class="step-check">○</span><span>Step 1 — Analyst: find themes + decisions</span></div>
+              <div class="orch-step" id="orchStep2"><span class="step-check">○</span><span>Step 2 — Extractor: pull action items</span></div>
+              <div class="orch-step" id="orchStep3"><span class="step-check">○</span><span>Step 3 — Synthesizer: combine results</span></div>
+              <div class="orch-step" id="orchStep4"><span class="step-check">○</span><span>Step 4 — Router: classify + save + notify</span></div>
+              <div class="orch-step" id="orchStep5"><span class="step-check">○</span><span>Step 5 — Conductor reflects on the run</span></div>
             </div>
+            <div class="orch-steps-note">When both Analyst and Extractor run, they fire in parallel — same start, same finish. Listed separately so you can see which one ran.</div>
             <div class="panel-result" id="orchResult"></div>
             <div id="s3RunReport" class="run-report" style="display:none">
               <div class="run-report-label">Run Report</div>
@@ -1692,6 +1732,18 @@
         </div>
 
         <div class="inspect" id="inspectView"></div>
+
+        <!-- Stage 0 / Chat tab: live JSON of the last /api/chat call -->
+        <div id="chatJsonView" class="chat-json-view">
+          <div class="chat-json-section">
+            <div class="chat-json-eyebrow">Request sent → /api/chat</div>
+            <pre class="chat-json-block" id="chatJsonRequest">No requests yet. Load a transcript or send a message to see the JSON sent to /api/chat.</pre>
+          </div>
+          <div class="chat-json-section">
+            <div class="chat-json-eyebrow">Response from Claude</div>
+            <pre class="chat-json-block" id="chatJsonResponse">—</pre>
+          </div>
+        </div>
 
       </div>
 
@@ -2048,24 +2100,29 @@ Return ONLY a JSON object:
       { t: 3500, src: 'output',srcLabel: 'team-standup/',  msg: 'Path chosen: team-standup. Writing document as <code>2026-04-29-team-standup.txt</code>.', node: 's2-standup', state: 'active', complete: 's2-standup', particle: 's2-standup>s2-notify' },
       { t: 4500, src: 'output',srcLabel: 'Saved + Notified', msg: 'Document written to <code>transcripts/team-standup/</code>. macOS banner fired: "Routed to: team-standup". <em>Pipeline complete.</em>', node: 's2-notify', state: 'active', report: true, complete: 's2-notify' }
     ],
+    // Stage 3 — events tagged with `tools` so playAnimation can filter by the
+    // Conductor's plan. An event with no `tools` always shows; an event with
+    // `tools: [...]` only shows if at least one of those tools is in the active
+    // plan (e.g., "extractor only" hides Analyst events but keeps the Conductor
+    // dispatch + return path).
     3: [
       { t: 0,    src: 'input', srcLabel: 'A transcript',    msg: 'Transcript received. Sending to the Conductor.', node: 's3-input', state: 'active' },
       { t: 800,  src: 'input', srcLabel: 'A transcript',    msg: 'On its way.', particle: 's3-input>s3-agent', complete: 's3-input' },
-      { t: 1500, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Got it. Dispatching Analyst and Extractor at the same time — this is the parallel dispatch.', node: 's3-agent', state: 'active' },
-      { t: 2100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Analyst: find the key themes. Extractor: pull out every action item. Both working now.', particle: 's3-agent>s3-summ' },
-      { t: 2200, src: 'orch',  srcLabel: 'The Conductor',   msg: '', particle: 's3-agent>s3-extr' },
-      { t: 2500, src: 'sub',   srcLabel: 'The Analyst',     msg: 'Reading the transcript. Identifying key themes and decisions…', node: 's3-summ', state: 'active' },
-      { t: 2600, src: 'extr',  srcLabel: 'The Extractor',   msg: 'Reading the transcript. Pulling out every commitment, owner, and deadline.', node: 's3-extr', state: 'active' },
-      { t: 3800, src: 'sub',   srcLabel: 'The Analyst',     msg: '3 themes + 2 decisions found. Returning to Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ' },
-      { t: 4300, src: 'extr',  srcLabel: 'The Extractor',   msg: '4 action items with owners and deadlines. Returning to Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr' },
-      { t: 5100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Both back. Sending themes + actions to the Synthesizer.', particle: 's3-agent>s3-route' },
-      { t: 5900, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Got 3 themes and 4 action items. Combining into the final insights report…', node: 's3-route', state: 'active' },
-      { t: 7000, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Report complete. Returning to Conductor.', particle: 's3-route>s3-agent', complete: 's3-route' },
-      { t: 7800, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Got the report. Handing off to the Router — Stage 2\'s runWorkflow(), reused as-is.', particle: 's3-agent>s3-router' },
-      { t: 8600, src: 'orch',  srcLabel: 'The Router',      msg: 'Classifying transcript… team-standup. Saving transcript + report to typed folder. Firing macOS notification.', node: 's3-router', state: 'active' },
-      { t: 9700, src: 'orch',  srcLabel: 'The Router',      msg: 'Both files saved. Notification sent. Returning to Conductor.', particle: 's3-router>s3-agent', complete: 's3-router' },
-      { t: 10400,src: 'orch',  srcLabel: 'The Conductor',   msg: 'Done. <span class="arrow">→</span> Sending the final report.', particle: 's3-agent>s3-output', complete: 's3-agent' },
-      { t: 11100,src: 'output',srcLabel: 'Saved report',    msg: 'Saved: <code>team-standup/2026-04-29-team-standup-report.md</code>. <em>Two specialists in parallel, one Synthesizer, one Router — Stage 2 reused.</em>', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
+      { t: 1500, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Reading the instruction. Picking which tools to call.', node: 's3-agent', state: 'active' },
+      { t: 2100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Dispatching Analyst — find the key themes.', particle: 's3-agent>s3-summ', tools: ['analyst'] },
+      { t: 2200, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Dispatching Extractor — pull out every action item.', particle: 's3-agent>s3-extr', tools: ['extractor'] },
+      { t: 2500, src: 'sub',   srcLabel: 'The Analyst',     msg: 'Reading the transcript. Identifying key themes and decisions…', node: 's3-summ', state: 'active', tools: ['analyst'] },
+      { t: 2600, src: 'extr',  srcLabel: 'The Extractor',   msg: 'Reading the transcript. Pulling out every commitment, owner, and deadline.', node: 's3-extr', state: 'active', tools: ['extractor'] },
+      { t: 3800, src: 'sub',   srcLabel: 'The Analyst',     msg: '3 themes + 2 decisions found. Returning to Conductor.', particle: 's3-summ>s3-agent', complete: 's3-summ', tools: ['analyst'] },
+      { t: 4300, src: 'extr',  srcLabel: 'The Extractor',   msg: '4 action items with owners and deadlines. Returning to Conductor.', particle: 's3-extr>s3-agent', complete: 's3-extr', tools: ['extractor'] },
+      { t: 5100, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Sending themes + actions to the Synthesizer.', particle: 's3-agent>s3-route', tools: ['synthesizer'] },
+      { t: 5900, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Combining themes and action items into the final insights report…', node: 's3-route', state: 'active', tools: ['synthesizer'] },
+      { t: 7000, src: 'extr',  srcLabel: 'The Synthesizer', msg: 'Report complete. Returning to Conductor.', particle: 's3-route>s3-agent', complete: 's3-route', tools: ['synthesizer'] },
+      { t: 7800, src: 'orch',  srcLabel: 'The Conductor',   msg: 'Handing off to the Router — Stage 2\'s runWorkflow(), reused as-is.', particle: 's3-agent>s3-router', tools: ['router'] },
+      { t: 8600, src: 'orch',  srcLabel: 'The Router',      msg: 'Classifying transcript… team-standup. Saving to typed folder. Firing macOS notification.', node: 's3-router', state: 'active', tools: ['router'] },
+      { t: 9700, src: 'orch',  srcLabel: 'The Router',      msg: 'Saved. Notification sent. Returning to Conductor.', particle: 's3-router>s3-agent', complete: 's3-router', tools: ['router'] },
+      { t: 10400,src: 'orch',  srcLabel: 'The Conductor',   msg: 'Done. <span class="arrow">→</span> Sending the final result.', particle: 's3-agent>s3-output', complete: 's3-agent' },
+      { t: 11100,src: 'output',srcLabel: 'Result',          msg: 'Run complete.', node: 's3-output', state: 'active', report: true, complete: 's3-output' }
     ]
   };
 
@@ -2278,7 +2335,7 @@ Return ONLY a JSON object:
     if ($('orchInstruction')) $('orchInstruction').value = '';
     if ($('s3RunReport')) $('s3RunReport').style.display = 'none';
     if ($('orchConductorPlan')) $('orchConductorPlan').style.display = 'none';
-    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => { if ($(id)) setStep(id, 'idle'); });
+    ['orchStep1','orchStep2','orchStep3','orchStep4','orchStep5'].forEach(id => { if ($(id)) setStep(id, 'idle'); });
   }
 
   // ── Toast (in-app notification fallback) ──
@@ -2391,13 +2448,19 @@ Return ONLY a JSON object:
 
   // Plays the animation for the current stage. Called by per-panel Run buttons.
   // Runs in parallel with the API call so the visualization feels alive.
-  async function playAnimation() {
+  async function playAnimation(activeTools = null) {
     if (!sequences[currentStage]) return;
     document.querySelectorAll('.node').forEach(n => n.classList.remove('active','complete'));
     Object.keys(pathRefs).forEach(p => pathRefs[p].classList.remove('active','complete'));
     $('canvasStatus').textContent = '● running';
 
-    const sequence = sequences[currentStage];
+    // If the caller passed an active tools list (e.g., the Conductor's plan
+    // limited the run to just ['router']), drop any event whose `tools` tag
+    // doesn't intersect. Untagged events always play.
+    const allEvents = sequences[currentStage];
+    const sequence = activeTools
+      ? allEvents.filter(e => !e.tools || e.tools.some(t => activeTools.includes(t)))
+      : allEvents;
     const startTimes = {};
     const start = performance.now();
 
@@ -2535,7 +2598,6 @@ Return ONLY a JSON object:
   // whole conversation. THIS is what module-3 means by "the messages[] array."
   let chatMessages = [];
   let chatSystemPromptDefault = '';
-  let chatLastJson = null;
 
   async function initChatCanvas() {
     if (chatSystemPromptDefault) return; // only init once
@@ -2559,12 +2621,15 @@ Return ONLY a JSON object:
     chatMessages.forEach(m => {
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble ' + (m.role === 'user' ? 'user' : 'assistant');
-      // Truncate very long content (transcripts) for readability
-      const display = m.content.length > 800 ? m.content.slice(0, 800) + '\n\n…(truncated for display, full text sent to Claude)' : m.content;
-      bubble.textContent = display;
+      bubble.textContent = m.content;
       hist.appendChild(bubble);
     });
     hist.scrollTop = hist.scrollHeight;
+  }
+
+  function updateChatJsonPanel(requestBody, responseObj, status) {
+    if (requestBody) $('chatJsonRequest').textContent = JSON.stringify(requestBody, null, 2);
+    if (responseObj != null) $('chatJsonResponse').textContent = JSON.stringify({ status, body: responseObj }, null, 2);
   }
 
   function clearChatCanvas() {
@@ -2573,36 +2638,15 @@ Return ONLY a JSON object:
     $('chatCanvasContextStatus').textContent = '';
     $('chatCanvasInput').value = '';
     if (chatSystemPromptDefault) $('chatSystemPrompt').value = chatSystemPromptDefault;
+    $('chatJsonRequest').textContent = 'No requests yet. Load a transcript or send a message to see the JSON sent to /api/chat.';
+    $('chatJsonResponse').textContent = '—';
     toast('Chat cleared.');
   }
 
-  async function loadChatTranscript(filename, label) {
-    try {
-      const url = filename ? `/api/sample-transcript/${filename}` : '/api/sample-transcript';
-      const r = await fetch(url);
-      const text = await r.text();
-      // Push as the first user message so it's part of the conversation history
-      chatMessages.push({
-        role: 'user',
-        content: `Here's a transcript I want to discuss:\n\n${text}`,
-      });
-      chatMessages.push({
-        role: 'assistant',
-        content: 'Got it — I have the transcript. What would you like to know?',
-      });
-      renderChatMessages();
-      $('chatCanvasContextStatus').textContent = `loaded: ${label} (messages: ${chatMessages.length})`;
-    } catch {
-      $('chatCanvasContextStatus').textContent = 'Failed to load transcript.';
-    }
-  }
-
-  async function sendChatMessage() {
-    const text = $('chatCanvasInput').value.trim();
-    if (!text) return;
-    chatMessages.push({ role: 'user', content: text });
-    renderChatMessages();
-    $('chatCanvasInput').value = '';
+  // Shared chat-turn helper: assumes chatMessages already has the latest user
+  // message. Sends the conversation to /api/chat with the current system
+  // prompt, appends Claude's reply, updates the side-panel JSON and log strip.
+  async function runChatTurn() {
     $('chatCanvasSend').disabled = true;
     $('chatCanvasSend').textContent = '…';
 
@@ -2615,11 +2659,15 @@ Return ONLY a JSON object:
 
     const callStart = performance.now();
     const systemPrompt = $('chatSystemPrompt').value;
+    const requestBody = { messages: chatMessages, system: systemPrompt };
+    // Show the outgoing JSON in the side panel even before the response arrives
+    updateChatJsonPanel(requestBody, { pending: true }, null);
+
     try {
       const r = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMessages, system: systemPrompt }),
+        body: JSON.stringify(requestBody),
       });
       const elapsed = ((performance.now() - callStart) / 1000).toFixed(2);
       const data = await r.json();
@@ -2630,7 +2678,6 @@ Return ONLY a JSON object:
       chatMessages.push({ role: 'assistant', content: response });
       renderChatMessages();
 
-      // Log strip
       const logStrip = document.createElement('div');
       logStrip.className = 'chat-log-strip';
       if (usage && usage.input_tokens != null) {
@@ -2642,12 +2689,7 @@ Return ONLY a JSON object:
       hist.appendChild(logStrip);
       hist.scrollTop = hist.scrollHeight;
 
-      chatLastJson = {
-        request: { method: 'POST', url: '/api/chat', body: { messages: chatMessages.map(m => ({...m, content: m.content.length > 80 ? m.content.slice(0,80) + '…' : m.content})), system: systemPrompt.slice(0, 80) + (systemPrompt.length > 80 ? '…' : '') } },
-        response: { status: r.status, body: { response: response.slice(0, 300) + (response.length > 300 ? '…' : ''), usage } },
-      };
-      $('chatCanvasJsonBlock').textContent = JSON.stringify(chatLastJson, null, 2);
-      $('chatCanvasJsonRow').style.display = 'block';
+      updateChatJsonPanel(requestBody, { response, usage }, r.status);
       toast('Chat reply received.');
     } catch (err) {
       thinkingEl.remove();
@@ -2655,10 +2697,42 @@ Return ONLY a JSON object:
       errBubble.className = 'chat-bubble assistant';
       errBubble.textContent = 'Error: ' + err.message;
       hist.appendChild(errBubble);
+      updateChatJsonPanel(requestBody, { error: err.message }, null);
     } finally {
       $('chatCanvasSend').disabled = false;
       $('chatCanvasSend').textContent = 'Send →';
     }
+  }
+
+  async function loadChatTranscript(filename, label) {
+    try {
+      const url = filename ? `/api/sample-transcript/${filename}` : '/api/sample-transcript';
+      const r = await fetch(url);
+      const text = await r.text();
+      // Push the transcript as the first user message and let Claude generate
+      // the acknowledgement using the *current* system prompt. This is what
+      // makes the prompt edits in Module 3 land — the very first reply
+      // changes voice when the prompt changes.
+      chatMessages.push({
+        role: 'user',
+        content: `Here's a transcript I want to discuss:\n\n${text}`,
+      });
+      renderChatMessages();
+      $('chatCanvasContextStatus').textContent = `loaded: ${label} — asking Claude…`;
+      await runChatTurn();
+      $('chatCanvasContextStatus').textContent = `loaded: ${label}`;
+    } catch {
+      $('chatCanvasContextStatus').textContent = 'Failed to load transcript.';
+    }
+  }
+
+  async function sendChatMessage() {
+    const text = $('chatCanvasInput').value.trim();
+    if (!text) return;
+    chatMessages.push({ role: 'user', content: text });
+    renderChatMessages();
+    $('chatCanvasInput').value = '';
+    await runChatTurn();
   }
 
   $('chatLoadStandup').addEventListener('click', () => loadChatTranscript(null, 'sample-transcript.txt'));
@@ -2667,14 +2741,6 @@ Return ONLY a JSON object:
   $('chatCanvasSend').addEventListener('click', sendChatMessage);
   $('chatCanvasInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
-  });
-
-  $('chatCanvasJsonBtn').addEventListener('click', () => {
-    const block = $('chatCanvasJsonBlock');
-    const btn = $('chatCanvasJsonBtn');
-    const visible = block.style.display !== 'none';
-    block.style.display = visible ? 'none' : 'block';
-    btn.textContent = visible ? 'Show last call JSON ▼' : 'Hide last call JSON ▲';
   });
 
   // ── Stage 2: Workflow ──
@@ -2739,18 +2805,67 @@ Return ONLY a JSON object:
     $('orchSubmit').textContent = 'Running…';
     $('orchResult').innerHTML = '';
     $('s3RunReport').style.display = 'none';
-    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
-    // Canvas animation in parallel with the orchestrator API calls.
-    const animPromise = playAnimation();
+    const ALL_STEPS = ['orchStep1','orchStep2','orchStep3','orchStep4','orchStep5'];
+    ALL_STEPS.forEach(id => setStep(id, 'idle'));
+
+    // ── Live visualization helpers ──
+    // Drive the canvas animation, activity feed, and step markers from the
+    // ACTUAL API completions. Previously this stage ran a scripted ~11-second
+    // timeline alongside the real API calls, which finished out of sync —
+    // logs went fast, steps lagged. Now everything advances together.
+    document.querySelectorAll('.node').forEach(n => n.classList.remove('active','complete'));
+    Object.keys(pathRefs).forEach(p => pathRefs[p].classList.remove('active','complete'));
+    $('outEmpty').style.display = 'block';
+    $('outContent').classList.remove('visible');
+    $('canvasStatus').textContent = '● running';
+    $('canvasStatus').style.color = '';
+
+    const t0 = performance.now();
+    const now = () => performance.now() - t0;
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const startTimes = {};
+    const begin = (id) => { setNode(id, 'active'); startTimes[id] = now(); };
+    const finish = (id) => {
+      setNode(id, 'complete');
+      const elapsed = now() - (startTimes[id] || 0);
+      const tm = $(id + 'Time');
+      if (tm) tm.textContent = fmt(elapsed);
+    };
+    const fire = (from, to) => {
+      const pid = pickParticleFor(from);
+      flyParticle(pid, from, to);
+      const key = `${from}>${to}`;
+      setPath(key, 'active');
+      setTimeout(() => setPath(key, 'complete'), 1000);
+    };
+    const log = (src, label, msg) => addFeed({ t: now(), src, srcLabel: label, msg });
+
     try {
       $('orchConductorPlan').style.display = 'none';
-      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
 
       const instruction = $('orchInstruction') ? $('orchInstruction').value.trim() : '';
       let tools = ['analyst', 'extractor', 'synthesizer', 'router', 'reflect'];
 
-      // If instruction given, ask Conductor to plan
+      // Intro: transcript arrives at the Conductor.
+      // The pacing rule throughout: a particle takes ~1s to fly. After it
+      // lands we let the Conductor "dwell" before its next move so the
+      // student sees a discrete handoff (transcript arrives → think →
+      // dispatch), not a simultaneous swap.
+      const PARTICLE_MS = 1000;     // matches the setPath complete timeout in fire()
+      const DWELL_AFTER_RETURN = 700;
+      const DWELL_BEFORE_DISPATCH = 500;
+
+      begin('s3-input');
+      log('input', 'A transcript', 'Transcript received. Sending to the Conductor.');
+      await sleep(400);
+      fire('s3-input', 's3-agent');
+      finish('s3-input');
+      await sleep(PARTICLE_MS);     // wait for the particle to actually arrive
+      begin('s3-agent');
+
+      // Conductor planning (only if instruction given)
       if (instruction) {
+        log('orch', 'The Conductor', 'Reading the instruction. Picking which tools to call.');
         const rPlan = await fetch('/api/orchestrate/conductor', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ transcript, instruction }),
@@ -2761,46 +2876,66 @@ Return ONLY a JSON object:
         $('orchConductorTools').textContent = plan.tools.join(' → ');
         $('orchConductorReason').textContent = plan.reasoning;
         $('orchConductorPlan').style.display = 'block';
+        log('orch', 'The Conductor', `Plan: <code>[${plan.tools.join(', ')}]</code>. ${plan.reasoning}`);
+      } else {
+        log('orch', 'The Conductor', 'No instruction — running the full pipeline.');
+        await sleep(DWELL_BEFORE_DISPATCH);
       }
+      await sleep(DWELL_BEFORE_DISPATCH);
 
       let themes = null, actions = null, report = null, classification = null;
 
-      // Step 1: Analyst + Extractor
+      // Steps 1 + 2: Analyst + Extractor — fire in parallel server-side.
+      // Stagger the visual dispatch by ~250ms so the two outgoing balls are
+      // distinguishable rather than overlapping into one trail.
       const needsAnalyst = tools.includes('analyst');
       const needsExtractor = tools.includes('extractor');
       if (needsAnalyst || needsExtractor) {
-        setStep('orchStep1', 'running');
-        if (needsAnalyst && needsExtractor) {
-          const r1 = await fetch('/api/orchestrate/step1', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transcript }),
-          });
-          const { themes: t, actions: a, error: e1 } = await r1.json();
-          if (e1) throw new Error(e1);
-          themes = t; actions = a;
-        } else if (needsAnalyst) {
-          const r1 = await fetch('/api/orchestrate/step1', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transcript }),
-          });
-          const { themes: t, error: e1 } = await r1.json();
-          if (e1) throw new Error(e1);
-          themes = t;
-        } else {
-          const r1 = await fetch('/api/orchestrate/step1', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transcript }),
-          });
-          const { actions: a, error: e1 } = await r1.json();
-          if (e1) throw new Error(e1);
-          actions = a;
+        if (needsAnalyst) {
+          fire('s3-agent', 's3-summ');
+          begin('s3-summ');
+          log('sub', 'The Analyst', 'Reading the transcript. Identifying key themes and decisions…');
+          setStep('orchStep1', 'running');
         }
-        setStep('orchStep1', 'done');
+        if (needsExtractor) {
+          if (needsAnalyst) await sleep(250);
+          fire('s3-agent', 's3-extr');
+          begin('s3-extr');
+          log('extr', 'The Extractor', 'Reading the transcript. Pulling action items, owners, deadlines.');
+          setStep('orchStep2', 'running');
+        }
+        const r1 = await fetch('/api/orchestrate/step1', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript, tools }),
+        });
+        const { themes: t, actions: a, error: e1 } = await r1.json();
+        if (e1) throw new Error(e1);
+        if (t != null) {
+          themes = t;
+          finish('s3-summ');
+          fire('s3-summ', 's3-agent');
+          log('sub', 'The Analyst', 'Themes complete. Returning to Conductor.');
+          setStep('orchStep1', 'done');
+        }
+        if (a != null) {
+          actions = a;
+          if (t != null) await sleep(250);   // stagger the returns too
+          finish('s3-extr');
+          fire('s3-extr', 's3-agent');
+          log('extr', 'The Extractor', 'Action items complete. Returning to Conductor.');
+          setStep('orchStep2', 'done');
+        }
+        // Wait for return particles to land + a beat of Conductor dwell
+        // before firing the next dispatch.
+        await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
       }
 
-      // Step 2: Synthesizer
+      // Step 3: Synthesizer
       if (tools.includes('synthesizer') && themes && actions) {
-        setStep('orchStep2', 'running');
+        fire('s3-agent', 's3-route');
+        begin('s3-route');
+        log('extr', 'The Synthesizer', 'Combining themes + action items into the final insights report…');
+        setStep('orchStep3', 'running');
         const r2 = await fetch('/api/orchestrate/step2', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ themes, actions }),
@@ -2808,12 +2943,19 @@ Return ONLY a JSON object:
         const { report: rpt, error: e2 } = await r2.json();
         if (e2) throw new Error(e2);
         report = rpt;
-        setStep('orchStep2', 'done');
+        finish('s3-route');
+        fire('s3-route', 's3-agent');
+        log('extr', 'The Synthesizer', 'Report complete. Returning to Conductor.');
+        setStep('orchStep3', 'done');
+        await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
       }
 
-      // Step 3: Router
+      // Step 4: Router (Stage 2 reused)
       if (tools.includes('router')) {
-        setStep('orchStep3', 'running');
+        fire('s3-agent', 's3-router');
+        begin('s3-router');
+        log('orch', 'The Router', 'Stage 2\'s runWorkflow() — classifying, saving, notifying.');
+        setStep('orchStep4', 'running');
         const r3 = await fetch('/api/orchestrate/step3', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ transcript, report }),
@@ -2821,36 +2963,55 @@ Return ONLY a JSON object:
         const { classification: cls, error: e3 } = await r3.json();
         if (e3) throw new Error(e3);
         classification = cls;
-        setStep('orchStep3', 'done');
+        finish('s3-router');
+        fire('s3-router', 's3-agent');
+        log('orch', 'The Router', `Classified as <em>${cls}</em>. Saved + notified.`);
+        setStep('orchStep4', 'done');
+        await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
       }
 
-      // Step 4: Reflect
+      // Step 5: Reflect — run report
       if (tools.includes('reflect')) {
-        setStep('orchStep4', 'running');
+        log('orch', 'The Conductor', 'Reflecting on the run — what happened, what went well, what to fix…');
+        setStep('orchStep5', 'running');
         const r4 = await fetch('/api/orchestrate/step4', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ transcript, themes, actions, report, classification }),
         });
         const { runReport, error: e4 } = await r4.json();
         if (e4) throw new Error(e4);
-        setStep('orchStep4', 'done');
+        setStep('orchStep5', 'done');
         $('s3RunReportContent').textContent = runReport;
         $('s3RunReport').style.display = 'block';
+        log('orch', 'The Conductor', 'Run report complete.');
+        await sleep(DWELL_BEFORE_DISPATCH);
       }
 
+      // Outro: hand off to output
+      fire('s3-agent', 's3-output');
+      finish('s3-agent');
+      await sleep(PARTICLE_MS);
+      begin('s3-output');
+      log('output', 'Result', 'Run complete.');
+      $('outEmpty').style.display = 'none';
+      $('outContent').classList.add('visible');
+      finish('s3-output');
+      $('canvasStatus').textContent = '● complete';
+      $('canvasStatus').style.color = 'var(--sub)';
+
       // Show results
-      const resultContent = report || themes || actions || 'Done.';
+      const resultContent = report || actions || themes || 'Done.';
       const safe = resultContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       $('orchResult').innerHTML = `
         ${classification ? `<span class="class-badge">${classification}</span>` : ''}
         <div class="result-report">${safe}</div>
       `;
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
-      await animPromise;
       toast(`Orchestrator complete — ${tools.length} specialists ran${classification ? ', routed to ' + classification : ''}.`);
     } catch (err) {
       $('orchResult').textContent = 'Error: ' + err.message;
-      ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+      ALL_STEPS.forEach(id => setStep(id, 'idle'));
+      $('canvasStatus').textContent = '● error';
     } finally {
       $('orchSubmit').disabled = false;
       $('orchSubmit').textContent = 'Run Orchestrator →';
