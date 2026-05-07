@@ -55,7 +55,7 @@ Write a one-sentence Slack summary of this meeting.
 
 > "That response came from `chat.js` → `ask()` → `system.md`. Same chain you saw in Module 2, now running in a browser.
 >
-> Hit the **Show JSON** button — that's the raw request and response from Module 2, now visible here."
+> See the right panel — that's the raw request and response from Module 2, now always visible here."
 
 ### Step 4: Stage 2 — run the workflow (2 min)
 

@@ -88,7 +88,7 @@ Write a one-sentence summary I can put in Slack.
 
 > "See how each answer knows the transcript? It's all in memory. The `messages[]` array grows with every exchange — that's what 'context window' means in practice."
 
-Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code you ran in Module 2. Hit **Run Agent** to watch the architecture animation alongside the live interface.
+Click the **Chat Assistant** node on the diagram. Show the inspect panel — this is the same code you ran in Module 2. The architecture animation plays automatically as each call fires — watch the nodes light up as you ask questions.
 
 ## Step 6: Edit the system prompt (5 min)
 

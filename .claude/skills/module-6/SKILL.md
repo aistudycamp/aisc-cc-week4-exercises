@@ -102,7 +102,7 @@ const [themes, actions] = await Promise.all([
 
 > "This is the most important line in Stage 3. `Promise.all` fires both calls at the same time. Both send their request to Anthropic. Both wait. Both return. The `[themes, actions]` destructuring captures both results when they're both done.
 >
-> This is the first time in this course anything runs simultaneously. That's what makes it agentic — not just a fixed sequence of steps, but real parallel dispatch."
+> This is the first time in this course anything runs simultaneously. As we said in Step 1, Anthropic still calls this a workflow — it runs predefined steps every time. But it's a *parallel* workflow, and it's the direct predecessor to what becomes an agent in Module 7 when the Conductor decides which steps to take."
 
 Then the synthesis:
 

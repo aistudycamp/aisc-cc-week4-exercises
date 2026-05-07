@@ -122,9 +122,9 @@ Once it works, point at the output:
 
 Then add:
 
-> "The response object has more in it than just the text. The Show JSON button shows you the shape — `{ content: [{ text: '...' }], usage: { input_tokens: N, output_tokens: N } }`. Every field has a reason. None of it is mysterious."
+> "The response object has more in it than just the text. The right panel shows you the shape automatically — `{ content: [{ text: '...' }], usage: { input_tokens: N, output_tokens: N } }`. Every field has a reason. None of it is mysterious."
 
-Key fields to point out from the JSON toggle:
+Key fields to point out from the JSON panel on the right:
 
 - `model` — which Claude was called
 - `system` — the system prompt (the personality + rules)
@@ -149,7 +149,7 @@ Stop and say:
 
 - Every AI product is JSON in, JSON out — send `{ model, system, messages }`, get `{ content, usage }` back
 - Five fields: `model`, `max_tokens`, `system`, `messages`, `role/content` — that's the whole request
-- The "Show JSON" button is always there — use it any time you want to see what's going over the wire
+- The right panel always shows the full JSON — request and response, live, after every call
 
 ## Step 7: Wrap and commit (2 min)
 
