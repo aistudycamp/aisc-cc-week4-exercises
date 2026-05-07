@@ -1705,29 +1705,7 @@
           <div class="output-section">
             <div class="rh-eyebrow" style="margin-bottom: 4px;">The Final Report</div>
             <div class="output-empty" id="outEmpty">Will show up here when the agent finishes…</div>
-            <div class="output-content" id="outContent">
-              <div class="out-block">
-                <div class="out-label">Key Themes</div>
-                <ul class="out-list">
-                  <li><b>Feature timeline pressure.</b> Q2 deadline at risk.</li>
-                  <li><b>Customer bug backlog.</b> 12 tier-1 bugs open.</li>
-                  <li><b>Team handoff gap.</b> Design ↔ eng process unclear.</li>
-                </ul>
-              </div>
-              <div class="out-block">
-                <div class="out-label">Action Items</div>
-                <ul class="out-list">
-                  <li><b>Sam</b> · Unblock API rate limiter by Thu</li>
-                  <li><b>Riley</b> · Triage tier-1 bugs by Fri</li>
-                  <li><b>Alex + Jordan</b> · Handoff doc by Mon</li>
-                  <li><b>Taylor</b> · Arch sync with Sam</li>
-                </ul>
-              </div>
-              <div class="out-block">
-                <div class="out-label">Recommended Next Step</div>
-                <p class="next-step">Sam should post API blocker status by Thursday EOD.</p>
-              </div>
-            </div>
+            <div class="output-content" id="outContent"></div>
           </div>
         </div>
 
@@ -2798,6 +2776,73 @@ Return ONLY a JSON object:
     else { check.textContent = '○'; }
   }
 
+  function buildOutputHTML(themes, actions, report, classification) {
+    const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const labelMap = {
+      'KEY THEMES': 'Key Themes', 'DECISIONS': 'Decisions',
+      'KEY DECISIONS': 'Key Decisions', 'ACTION ITEMS': 'Action Items',
+      'RECOMMENDED NEXT STEP': 'Recommended Next Step',
+    };
+    let html = classification ? `<span class="class-badge">${esc(classification)}</span>` : '';
+
+    if (report) {
+      // Synthesizer output — **SECTION** bold headers, bullet/prose content, wrapped in ---
+      const lines = report.split('\n');
+      let current = null;
+      const sections = [];
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t) continue;
+        if (t === '---') { if (current) { sections.push(current); current = null; } continue; }
+        const m = t.match(/^\*\*([^*]+)\*\*\s*$/);
+        if (m) { if (current) sections.push(current); current = { label: m[1].trim(), lines: [] }; }
+        else if (current) current.lines.push(t);
+      }
+      if (current) sections.push(current);
+
+      for (const { label, lines: body } of sections) {
+        if (!body.length) continue;
+        const display = labelMap[label] || label;
+        if (label === 'RECOMMENDED NEXT STEP') {
+          html += `<div class="out-block"><div class="out-label">${display}</div><p class="next-step">${esc(body.join(' '))}</p></div>`;
+        } else if (body[0].startsWith('-')) {
+          const items = body.map(l => { const t = esc(l.replace(/^-\s*/, '')); return `<li>${t.replace(/^([^:]+):/, '<b>$1</b>:')}</li>`; }).join('');
+          html += `<div class="out-block"><div class="out-label">${display}</div><ul class="out-list">${items}</ul></div>`;
+        } else {
+          html += `<div class="out-block"><div class="out-label">${display}</div><p>${esc(body.join(' '))}</p></div>`;
+        }
+      }
+    } else if (themes || actions) {
+      if (themes) {
+        let sec = null;
+        const secMap = {};
+        for (const line of themes.split('\n')) {
+          const t = line.trim();
+          if (t === 'KEY THEMES' || t === 'KEY DECISIONS') { sec = t; secMap[sec] = []; }
+          else if (sec && t.startsWith('-')) secMap[sec].push(t.replace(/^-\s*/, ''));
+        }
+        for (const [key, items] of Object.entries(secMap)) {
+          if (!items.length) continue;
+          const listHTML = items.map(item => { const e = esc(item); return `<li>${e.replace(/^([^:]+):/, '<b>$1</b>:')}</li>`; }).join('');
+          html += `<div class="out-block"><div class="out-label">${labelMap[key] || key}</div><ul class="out-list">${listHTML}</ul></div>`;
+        }
+      }
+      if (actions) {
+        try {
+          const items = JSON.parse(actions.replace(/^```json?\n?|\n?```$/gm, '').trim());
+          const listHTML = items.map(({ owner, task, deadline }) =>
+            `<li><b>${esc(owner)}</b> · ${esc(task)}${deadline ? ` by ${esc(deadline)}` : ''}</li>`
+          ).join('');
+          html += `<div class="out-block"><div class="out-label">Action Items</div><ul class="out-list">${listHTML}</ul></div>`;
+        } catch {
+          html += `<div class="out-block"><div class="out-label">Action Items</div><pre style="font-size:12px;white-space:pre-wrap;margin:0">${esc(actions)}</pre></div>`;
+        }
+      }
+    }
+
+    return html || `<p style="color:var(--sub);font-size:13px;margin:0">Run complete — no output for this configuration.</p>`;
+  }
+
   $('orchSubmit').addEventListener('click', async () => {
     const transcript = $('orchTranscript').value.trim();
     if (!transcript) return;
@@ -3000,12 +3045,8 @@ Return ONLY a JSON object:
       $('canvasStatus').style.color = 'var(--sub)';
 
       // Show results
-      const resultContent = report || actions || themes || 'Done.';
-      const safe = resultContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      $('orchResult').innerHTML = `
-        ${classification ? `<span class="class-badge">${classification}</span>` : ''}
-        <div class="result-report">${safe}</div>
-      `;
+      $('outContent').innerHTML = buildOutputHTML(themes, actions, report, classification);
+      $('orchResult').innerHTML = '';
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
       toast(`Orchestrator complete — ${tools.length} specialists ran${classification ? ', routed to ' + classification : ''}.`);
     } catch (err) {
