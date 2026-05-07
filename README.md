@@ -18,13 +18,12 @@ You don't need to know JavaScript. Claude writes the code — you describe what 
    git clone https://github.com/aistudycamp/aisc-cc-week4-exercises.git
    ```
 
-2. **Open the folder in VS Code**
-   Drag the `aisc-cc-week4-exercises` folder into VS Code (or open it from VS Code's File menu). Then open VS Code's built-in terminal: **Terminal → New Terminal**. You'll work with the file explorer on the left and the terminal on the bottom — that way you can see the project structure as you go.
-
-   *(If you'd rather use a standalone terminal, that works too — just `cd aisc-cc-week4-exercises` to navigate in. VS Code is recommended because seeing the file tree helps when Claude is editing files.)*
+2. **Open the folder in VS Code, then open a new terminal there**
+   - In VS Code: **File → Open Folder** → pick `aisc-cc-week4-exercises`
+   - Then: **Terminal → New Terminal** (the terminal opens inside your project folder automatically)
 
 3. **Start Claude Code**
-   In the terminal (in VS Code or standalone), run:
+   In that terminal, run:
    ```
    claude
    ```
