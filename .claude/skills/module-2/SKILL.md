@@ -96,7 +96,7 @@ cd [repo-root]/student-output
 npm run server
 ```
 
-(Use the repo root path you saved in stage-1-intro.) You should see `🚀 Server running at http://localhost:3000`. Leave that tab open — the server runs there for the rest of the sprint.
+(Use the repo root path you saved in module-setup.) You should see `🚀 Server running at http://localhost:3000`. Leave that tab open — the server runs there for the rest of the sprint.
 
 Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab. Click **Load standup** — that loads the sample transcript as the first message in the conversation.
 
@@ -186,4 +186,4 @@ Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pu
 - **Don't skip the JSON walkthrough** — Steps 2 and 3 (reading the file and showing the request object) are the point of this module. Don't jump straight to running it.
 - **Diagnose errors before moving on** — if the student gets a `401`, `Cannot find module`, or `ANTHROPIC_API_KEY undefined`, fix it here. A broken setup will block every module from here forward.
 - **The "full JSON response" step is optional** — follow the student's curiosity. If they want to see the full response object, great. If not, move on without guilt.
-- **Fresh terminal recovery** — if the student just opened a new terminal, remind them: `cd [repo-root]/student-output` before running `npm run stage-1`. The repo root path is the one established in Stage 1 Intro.
+- **Fresh terminal recovery** — if the student just opened a new terminal, remind them: `cd [repo-root]/student-output` before running `npm run stage-1`. The repo root path is the one established in Module Setup.

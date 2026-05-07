@@ -193,7 +193,7 @@ What you've built so far:
 - **Print the full file after every edit** — read `prompts/system.md` back and show the full contents after Edit A, Edit B, and the restore. Don't just say "done" — show them what changed.
 - **If they want to keep a custom prompt**, save it as `prompts/system-custom.md` before restoring the original.
 - **The three roles** (system/user/assistant) should land before the edits, not after. If the student seems confused about why the prompt is in a file, revisit this explanation.
-- **Fresh terminal recovery** — if the student just opened a new terminal for the server, remind them: `cd [repo-root]/student-output` first. The repo root path is the one established in Stage 1 Intro.
+- **Fresh terminal recovery** — if the student just opened a new terminal for the server, remind them: `cd [repo-root]/student-output` first. The repo root path is the one established in Module Setup.
 
 ## Optional deeper reading
 

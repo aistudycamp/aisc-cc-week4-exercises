@@ -1,9 +1,9 @@
 ---
-name: stage-1-intro
-description: Stage 1 Intro — orientation for the AISC Agent Sprint. Triggered when a student types "stage-1-intro" or arrives without any modules completed. Walks them through the 3-stage arc, sets up Node.js + npm, gets their Anthropic API key, scaffolds their agent project from the template, and verifies everything works. Hand off to module-1 when done.
+name: module-setup
+description: Module Setup — orientation for the AISC Agent Sprint. Triggered when a student types "module-setup" or arrives without any modules completed. Walks them through the 3-stage arc, sets up Node.js + npm, gets their Anthropic API key, scaffolds their agent project from the template, and verifies everything works. Hand off to module-1 when done.
 ---
 
-# Stage 1 Intro: Set Up & Orient
+# Module Setup: Set Up & Orient
 
 **Time:** ~10–15 minutes
 
@@ -33,14 +33,15 @@ Print this:
    You paste a                A file drops into a        An orchestrator runs
    transcript, ask            folder. AI classifies      two specialists in
    questions, get             the meeting, routes        parallel, a third
-   answers back.              the file, sends a          synthesizes the report,
-                              notification.              then it hands off to
-                              (Stage 1's chat call       the Stage 2 workflow
-                              becomes the                to classify, save, and
-                              classifier here.)          notify.
+   answers back.              the file, then sends       synthesizes the report,
+                              a notification.            then hands off to the
+                                                         Stage 2 workflow to
+                                                         classify, save, notify.
 
    ~1 hour                    ~45 min                    ~1 hour
 ```
+
+Stage 2's classifier reuses Stage 1's chat call. Stage 3's orchestrator imports both Stage 1's `ask()` and Stage 2's `runWorkflow()` — same pattern, layered up.
 
 > "Same use case the whole way through — turning meeting transcripts into clean insight reports. Each stage adds one new idea on top of the last. You won't write code yourself — you'll describe what you want and let Claude build it.
 >
@@ -172,10 +173,10 @@ Explain inline (don't make them open a file):
 
 Wrap and update progress:
 
-1. **Update `CLAUDE.md`**: change `- [ ] Stage 1 Intro:` to `- [x] Stage 1 Intro:` (Edit tool)
+1. **Update `CLAUDE.md`**: change `- [ ] Module Setup:` to `- [x] Module Setup:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Stage 1 Intro: setup + API key"
+   git add -A && git commit -m "Complete Module Setup: setup + API key"
    ```
    Show the student the changed files in the commit output.
 3. Say:

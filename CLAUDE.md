@@ -42,16 +42,16 @@ When a student opens this repo for the first time — even if they just say "hel
 > - **Natural stopping points are between modules.** If you need a break, try to wrap up the current module first.
 > - **If you close your terminal,** just come back, run `claude` in this folder, and I'll pick up from where you left off using the progress checklist below.
 >
-> Ready? Type `stage-1-intro` to get started — we'll set up your Anthropic API key and project folder first."
+> Ready? Type `module-setup` to get started — we'll set up your Anthropic API key and project folder first."
 
 If the progress checklist below already shows completed modules, welcome them back and point to the next one. Example:
 
-> "Welcome back! You've completed Stage 1 Intro and Modules 1–3. You're through Stage 1. Pick up at Stage 2 with `module-4` when you're ready."
+> "Welcome back! You've completed Module Setup and Modules 1–3. You're through Stage 1. Pick up at Stage 2 with `module-4` when you're ready."
 
 ## Student Progress
 
 ### Stage 0 — Setup
-- [ ] Stage 1 Intro: Set Up & Orient
+- [ ] Module Setup: Set Up & Orient
 
 ### Stage 1 — Chat Assistant
 - [ ] Module 1: Tour the System
@@ -73,7 +73,7 @@ Update this checklist as the student completes each module. Check the box by cha
 
 ## About the Student's Work
 
-After Stage 1 Intro, the student's working folder is `student-output/` — copied from `templates/transcripts-to-insights/`. That's where they spend the rest of the sprint. All `npm run` commands happen inside `student-output/`.
+After Module Setup, the student's working folder is `student-output/` — copied from `templates/transcripts-to-insights/`. That's where they spend the rest of the sprint. All `npm run` commands happen inside `student-output/`.
 
 ## Teaching Guardrails
 
@@ -94,7 +94,7 @@ After Stage 1 Intro, the student's working folder is `student-output/` — copie
 
 | Command | Stage | Time | Topic | Artifact |
 |---------|-------|------|-------|----------|
-| `stage-1-intro` | Setup | ~10–15 min | Orient, install Node, set up API key, scaffold project | Working `student-output/` folder with API key + dependencies |
+| `module-setup` | Setup | ~10–15 min | Orient, install Node, set up API key, scaffold project | Working `student-output/` folder with API key + dependencies |
 | `module-1` | 1 | ~15 min | Systems-thinking tour (no code) | Mental model: orchestrator, specialists, system prompts, data flow |
 | `module-2` | 1 | ~20 min | First API call demystified — see the raw JSON go and come back | First successful API call from the browser; JSON request/response visible |
 | `module-3` | 1 | ~25 min | Run the chat assistant; edit the system prompt (Shakespeare → Pirate Captain) to feel the leverage | Multi-turn chat run; two distinct system-prompt edits experienced |
@@ -108,7 +108,7 @@ After Stage 1 Intro, the student's working folder is `student-output/` — copie
 
 - `concepts/` — conceptual docs students can read anytime (what is an API, what is a system prompt, what is an agent, etc.)
 - `examples/` — filled-out worked example for reference
-- `templates/transcripts-to-insights/` — starter scaffold (Stage 1 Intro copies it to `student-output/`)
+- `templates/transcripts-to-insights/` — starter scaffold (Module Setup copies it to `student-output/`)
 - `frontend/index.html` + `student-output/server.js` — visual agent viewer (used from Module 2 onward via `npm run server`)
 - `student-output/` — where the student's working agent lives
 
