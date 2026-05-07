@@ -102,3 +102,7 @@ import { runWorkflow } from '../stage-2/workflow.js'; // reuses Stage 2
 ```
 
 By the end of the sprint, you'll have built each of those boxes — and you'll understand exactly what makes them different.
+
+## Going deeper
+
+For the canonical pattern catalog, read [Anthropic's Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) — covers Augmented LLM, Prompt Chaining, Routing, Parallelization, Orchestrator-Workers, Evaluator-Optimizer, and Autonomous Agents.

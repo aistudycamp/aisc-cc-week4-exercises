@@ -32,6 +32,29 @@ Before we run anything, name the three roles in every AI conversation:
 >
 > Three roles. The system prompt is what makes this a *meeting analyst* instead of a generic AI. Change the system prompt and you change everything."
 
+Print this so the loop is visible:
+
+```
+       student types
+            │
+            ▼
+[ chat tab in browser ]
+            │
+            ▼
+[ POST /api/chat with messages[] ]
+            │
+            ▼
+[ ask() → Anthropic API ]   ← system prompt steers everything
+            │
+            ▼
+[ response back, append to messages[] ]
+            │
+            ▼
+       student types again  ← messages[] keeps growing
+```
+
+> "Read it top-to-bottom. The student's question goes in. The browser POSTs the *whole* `messages[]` array — every previous turn included. The system prompt rides along on every call. Claude's reply gets appended to `messages[]`, and the next question carries the entire conversation forward. That growing array is what makes this a back-and-forth instead of one-shot."
+
 ## Step 3: Read the system prompt (3 min)
 
 Read `prompts/system.md` via Read tool and print the full contents inline:
@@ -89,19 +112,35 @@ npm run server
 
 Go back to **http://localhost:3000**, reload the page, click **Load standup**, and ask: `Who looks most blocked?` — the response should be visibly, obviously different. The Shakespeare prompt makes the personality change unmistakable.
 
-### Edit B: Change the output format
+### Edit B: Change the role AND the output format — Pirate Captain
 
-Say to Claude:
+This time we change BOTH the personality and the structure of the output. Say to Claude:
 
-> "Update `prompts/system.md` — replace the KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format with: **TLDR** (one sentence), **WHO OWES WHAT** (bullet list of person + task), **SHOULD I CARE?** (Yes/No and why)"
+> "Update `prompts/system.md` — replace it entirely with this new system prompt:
+>
+> ```
+> You are Captain Bartholomew "Barnacle" Briggs — a salty, sea-faring pirate captain who has somehow been put in charge of analyzing modern meeting transcripts. Every response is delivered in full pirate voice: ARRR, ye scallywags, ahoy, by the seven seas, etc. Be dramatic and theatrical, but still actually useful. Never break character.
+>
+> When given a transcript, produce your report in this EXACT format:
+>
+> ## CAP'N'S VERDICT
+> One sentence summary of the meeting in pirate voice. Make it dramatic.
+>
+> ## TREASURE MAP
+> The action items, but written as map markers. Each line:
+> - **X marks the spot** for [crew member name]: [what they need to do] — by [deadline if mentioned, or 'next tide' otherwise]
+>
+> ## SCALLYWAG ALERT
+> Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
+> ```"
 
 After Claude edits it, read the file back and print the full updated contents inline:
 
 "Here's what it looks like now:" [print full file contents]
 
-Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question.
+Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question — or just send an empty message after loading to get the full report.
 
-> "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output is shaped by it."
+> "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output, AND its structure, is shaped by it. You went from a Renaissance scholar to a pirate captain by editing a single file. That's the leverage."
 
 ### Step 6c: Restore the original prompt ⚠️ (required)
 
@@ -140,7 +179,7 @@ What you've built so far:
    git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear context before Module 4.
+3. **Run `/compact`** — type `/compact` to clear context before Stage 2 (Module 4). Stage boundary cleanup keeps Claude focused for the new mental model coming next.
 4. Hand off:
 
 > "Stage 1 done. You have a working chat assistant — interactive, back-and-forth, and driven entirely by a system prompt you can change anytime. Next: Stage 2. We build something that runs *automatically* every time a file appears — no typing required. Type `module-4` when you're ready."

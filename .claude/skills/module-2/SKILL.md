@@ -26,6 +26,27 @@ Say:
 
 ## Step 2: Walk through what's happening (3 min)
 
+Before the code, here's the round trip you're about to do — what leaves your machine, what comes back:
+
+```
+your machine                          Anthropic
+────────────                          ─────────
+
+  system prompt
+   + transcript        ── HTTP ──→    Claude reads
+   + your question                    the inputs
+                                          │
+                                          ▼
+                                      generates a
+                                       response
+                                          │
+  text answer          ←── HTTP ──        ▼
+  (printed to
+   your terminal)
+```
+
+> "That's the whole loop. You send three things over the wire — a system prompt, a transcript, and a question. Claude reads them, generates a reply, sends the text back. Your code prints it. The JSON we're about to look at is just *what's inside the arrow*."
+
 Here's what `stage-1/chat.js` does — five things that happen when it runs:
 
 1. **Set up the Anthropic client** — `new Anthropic()` reads their API key from `.env`. Nothing fancy.
@@ -34,7 +55,7 @@ Here's what `stage-1/chat.js` does — five things that happen when it runs:
 4. **Make the API call** — `client.messages.create(...)`. This is the line that reaches Anthropic's servers — where the AI thinking actually happens. One function call, one network request, one JSON response back.
 5. **Print the response** — the actual text lives at `response.content[0].text`.
 
-Notice step 4 — `client.messages.create()`. That's the only line that reaches Anthropic's servers. Everything else is plumbing: reading files, setting up the client, printing the result. One function call is where all the AI thinking happens.
+Notice step 4 — `client.messages.create()`. That's the only line that talks to Anthropic. The rest is the wiring around it — reading the inputs, sending the request, handling the response. You'll touch every one of those steps before this sprint is over.
 
 ## Step 3: Look at what's getting sent (3 min)
 
@@ -66,24 +87,30 @@ Show them what the code is about to send to Anthropic — this is the JSON objec
 
 ## Step 4: Start the server and open the browser (3 min)
 
-Let's see it work. Start the server:
+Let's see it work.
+
+> **Open a NEW terminal tab** (Cmd+T in your terminal app, or "Terminal → New Tab"). The terminal we've been using has Claude Code running — we need a separate tab so the server has its own window. In the new tab, navigate to the project root (or `student-output/`) and start the server:
 
 ```bash
+cd [repo-root]/student-output
 npm run server
 ```
 
-Open **http://localhost:3000**. You'll see the Chat tab. Click **Load standup** — that loads the sample transcript as context.
+(Use the repo root path you saved in stage-1-intro.) You should see `🚀 Server running at http://localhost:3000`. Leave that tab open — the server runs there for the rest of the sprint.
+
+Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab. Click **Load standup** — that loads the sample transcript as the first message in the conversation.
 
 Now ask a question: `Who looks most blocked?`
 
 Watch the response appear. That's the API call firing — the same JSON you just saw in Step 3, going over the wire to Anthropic's servers, coming back as text.
 
-Hit **Show JSON** to see the raw request and response. That's the exact object your code sent — model, system, messages — and the exact object that came back.
+Notice the log strip below the reply: `[messages: N · ~tokens · time]`. That `messages: N` count is the size of the `messages[]` array — it grows by 2 every turn (your message, Claude's reply). That growth is what gives the chat memory across turns. We'll come back to it in Module 3.
 
 If something errors:
 - **`ANTHROPIC_API_KEY` undefined** → check `.env` is in the right folder and has the real key
 - **`Cannot find module`** → run `npm install` again
 - **`401 unauthorized`** → API key invalid or hasn't been activated yet
+- **`EADDRINUSE: port 3000 already in use`** → another server is running. Kill it: `lsof -ti:3000 | xargs kill -9`, then re-run `npm run server`
 
 ## Step 5: Read the response together (4 min)
 
@@ -142,8 +169,7 @@ What you've built so far:
    git add -A && git commit -m "Complete Module 2: First API Call"
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear context before Module 3.
-4. Hand off:
+3. Hand off:
 
 > "Big moment. You've called the API. Next up — Module 3, where we look at the system prompt that controls Claude's personality. Once you understand prompts, you understand the leverage point of the whole system. Type `module-3` when you're ready."
 

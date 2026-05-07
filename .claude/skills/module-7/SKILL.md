@@ -22,9 +22,13 @@ Two acts. Act 1 (~10 min): tour all three stages in the browser — fast, confir
 
 Say:
 
-> "Module 7. Everything you've built — the chat assistant, the workflow, the orchestrator — is sitting behind a server you started in Module 3. The browser isn't showing you a diagram. It's running your code.
+> "Module 7. Two acts.
 >
-> First: let's use all three stages. Then I want to show you something that changes the way the orchestrator works."
+> **Act 1 (next ~10 minutes) is recap** — same code you've already built, now visible together in one browser UI. Stage 1 chat, Stage 2 workflow, Stage 3 orchestrator, all running. Nothing new conceptually — you're just confirming everything works end-to-end.
+>
+> **Act 2 introduces a brand-new idea** — the Conductor, a planning step that decides which agents to call. That's the moment your orchestrator stops being a workflow and starts being a real agent.
+>
+> Everything you've built is sitting behind a server you started in Module 3. The browser isn't showing you a diagram. It's running your code."
 
 ### Step 2: Confirm the server is running (1 min)
 
@@ -40,6 +44,8 @@ Open **http://localhost:3000**.
 
 ### Step 3: Stage 1 — chat with your assistant (3 min)
 
+> "Recap callback: this is the chat assistant from Module 2 and Module 3, just running in the browser instead of the CLI."
+
 Click the **Stage 1** tab. Click **Load standup**. Ask two questions:
 
 ```
@@ -53,11 +59,15 @@ Write a one-sentence Slack summary of this meeting.
 
 ### Step 4: Stage 2 — run the workflow (2 min)
 
+> "Recap callback: this is the workflow you wired up in Module 4 — the Read → Call → Format → Save pipeline, now triggered by a button instead of a file appearing."
+
 Click the **Stage 2** tab. Click **Load standup**. Hit **Run Workflow →**.
 
 > "Your `workflow.js` just fired. Classified the meeting, routed the file, sent the notification. Same pipeline from Module 4."
 
 ### Step 5: Stage 3 — run the orchestrator (3 min)
+
+> "Recap callback: this is the orchestrator from Module 6 — Analyst and Extractor in parallel, then Synthesizer, then Router. Nothing new yet."
 
 Click the **Stage 3** tab. Click **Load standup**. Hit **Run Orchestrator →** (leave the instruction field blank for now).
 
@@ -85,30 +95,69 @@ Say:
 
 > "Everything you just used runs the same four steps every time — Analyst + Extractor → Synthesizer → Router. Load any transcript, hit the button, full pipeline. Every time. That's a workflow.
 >
-> Now I want to show you what turns it into an agent."
+> Now I want to show you what turns it into an agent. Here's the new shape:"
 
-### Step 7: Introduce the instruction input (5 min)
+```
+[ Conductor ]  ← reads instruction, returns {tools: [...]}
+     ↓
+[ Analyst ‖ Extractor ]  →  [ Synthesizer ]  →  [ Router ]  →  [ Reflect ]
+   (each step runs only if Conductor's plan includes it)
+```
+
+> "One new node at the top — the Conductor. It runs first, looks at your instruction, and decides which of the five downstream specialists to call. Same five tools you already have. New brain in front of them."
+
+### Step 7: Introduce the instruction input (8 min)
 
 Point to the **Optional instruction** field below the transcript area on the Stage 3 tab.
 
+Four runs total. Two are scripted so the student sees the Conductor making clearly different decisions. Two are free-form so they prove to themselves the routing is real.
+
+#### Run 1 (scripted): "Just give me the action items"
+
 Have the student:
-1. Load the standup transcript (click **Load standup**)
+1. Click **Load standup** to load the transcript
 2. Type in the instruction field: `Just give me the action items`
 3. Click **Run Orchestrator →**
 
-Ask: **"What happened? How many steps ran?"**
+**Coach: STOP HERE.** Ask the student exactly this:
 
-Wait for their answer. Then:
+> "Look at the Conductor plan that just appeared at the top of the result. **What does it say the Conductor chose? Which steps lit up, and which stayed dark?**"
 
-> "The Conductor ran first — one planning call before anything else. It read your instruction, made a decision, and returned a plan: 'run Extractor only.' Analyst, Synthesizer, Router, and Reflect never fired.
->
-> That's the difference between a workflow and an agent. **A workflow follows steps. An agent decides which steps to take.**"
+**Do NOT answer this yourself. Do NOT proceed to Run 2 until the student has actually responded.** If they only say "extractor" without noticing that the other steps stayed dark, gently probe: "Right — and what about Analyst, Synthesizer, Router, Reflect? Did they run?" Then wait again.
 
-Try two more with the student driving:
-- Clear the instruction, click **Run Orchestrator →** → full pipeline (Conductor defaults to all tools)
-- Type `Just route this` → Router only
+Once they confirm only Extractor fired, then explain:
 
-> "Same tools, same code — three completely different executions based on what you asked for. The routing decision is the agent's job."
+> "The Conductor ran first — one planning call before anything else. It read your instruction, returned `{tools: ['extractor'], reasoning: '...'}`, and the orchestrator dispatched only that one specialist. Four other specialists exist; the agent chose not to call them."
+
+#### Run 2 (scripted): "Just route this — skip the analysis"
+
+Have the student clear the instruction field, then type: `Just route this — skip the analysis` and click **Run Orchestrator →**.
+
+**Coach: STOP HERE again.** Ask:
+
+> "Same question. **What did the Conductor choose this time? Which steps ran?**"
+
+Wait for their answer. They should observe Router-only — no Analyst, no Extractor, no Synthesizer, no Reflect. The transcript saved to a folder, no report generated. If they don't notice that the report is missing, point at the result area: "Notice — there's no insights report this time. Why not?" The answer: synthesizer didn't run, so there's nothing to save as a report.
+
+Then:
+
+> "Two runs, two completely different sets of API calls — driven entirely by your instruction. **A workflow follows steps. An agent decides which steps to take.**"
+
+#### Runs 3 + 4 (your turn): you design two more
+
+Now hand the controls to the student:
+
+> "Now you write two of your own. Try anything — be specific or be vague. The Conductor's job is to figure out the minimum set of tools that satisfies what you asked for. Some ideas:
+> - 'Give me a full insights report but don't save it anywhere'
+> - 'What were the main themes — no action items'
+> - 'Run everything and then tell me what could be improved'
+> - Or anything else you want."
+
+For each of their two runs, **wait for the student to type the instruction and click Run** — don't predict their input. After each run, **ask them what the Conductor chose and whether it matched their intent**. If the Conductor chose something surprising (e.g., they asked for "themes" but it ran Analyst + Synthesizer), surface that: "Interesting — the Conductor decided the Synthesizer was needed too. Why might that be?" The judgment is the lesson.
+
+After Run 4:
+
+> "Same code path. Same five tools. Four totally different executions because the agent reasoned about your intent. That reasoning is the difference."
 
 ### Step 8: Read the Conductor prompt (6 min)
 
@@ -177,7 +226,7 @@ What you've built so far:
 1. Run `git add -A && git commit -m "Complete Module 7: Use Your Live System + The Conductor"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 7:` to `- [x] Module 7:` via Edit tool.
 
-3. **Run `/compact`** — type `/compact` to clear context before Module 8.
+3. **Run `/compact`** — type `/compact` to clear context before Module 8 (the final send-off). Stage boundary cleanup keeps Claude focused for what comes next.
 4. Hand off:
 
 > "One module left. The system works. In Module 8 we're going to talk about where this goes from here — how you'd personalize it, how you'd extend it, and how you'd use Claude Code to build the next one yourself. Type `module-8` when you're ready."
@@ -186,7 +235,7 @@ What you've built so far:
 
 - **Act 1 is fast — don't over-explain** — they've seen all three stages before. The goal is confirmation and celebration, not re-teaching. Keep each stage to its allocated time.
 - **The screenshot is a real milestone** — treat it as one. "Take a screenshot" is not a formality.
-- **Wait for the student's answer in Step 7** — "What happened? How many steps ran?" — wait for their actual observation before explaining. They just saw the Conductor in action; their description of what they saw is the learning.
+- **Step 7 has FOUR conductor runs and FOUR pauses** — after each run, you ask what the Conductor chose and you WAIT for the student's actual response. Do not narrate what you would have observed. Do not auto-continue to the next run. The pause is the pedagogy. If their first answer is incomplete (only names one step, doesn't notice what didn't run), probe gently and wait again.
 - **Read conductor.md inline** — never ask the student to open the file. Use the Read tool and print full contents in chat.
 - **The judgment rule is the key teaching beat in Step 8** — an LLM routing at runtime is different from a switch statement. Make that distinction explicit.
 - **The "workflow vs agent" distinction is the conceptual peak** — it lives here now, not in Module 8. Make sure it lands before moving on.

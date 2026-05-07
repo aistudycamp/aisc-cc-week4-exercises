@@ -500,13 +500,14 @@
   body[data-stage="2"] #s2-notify   { right: 30px;    top: 50%; transform: translateY(-50%); }
 
   /* POSITIONS — Stage 3 (7 nodes — orchestrator + 4 specialists + io) */
-  body[data-stage="3"] #s3-input   { left: 32px;       top: 38%; }
-  body[data-stage="3"] #s3-agent   { left: 50%;        top: 20%; transform: translateX(-50%); }
-  body[data-stage="3"] #s3-output  { right: 32px;      top: 38%; }
-  body[data-stage="3"] #s3-summ    { left: 4%;         top: 66%; }
-  body[data-stage="3"] #s3-extr    { left: 27%;        top: 66%; }
-  body[data-stage="3"] #s3-route   { left: 52%;        top: 66%; }
-  body[data-stage="3"] #s3-router  { right: 4%;        top: 66%; }
+  /* Conductor + I/O sit higher; specialists sit lower so they don't overlap on tall screens. */
+  body[data-stage="3"] #s3-input   { left: 32px;       top: 30%; }
+  body[data-stage="3"] #s3-agent   { left: 50%;        top: 8%;  transform: translateX(-50%); }
+  body[data-stage="3"] #s3-output  { right: 32px;      top: 30%; }
+  body[data-stage="3"] #s3-summ    { left: 4%;         top: 70%; }
+  body[data-stage="3"] #s3-extr    { left: 27%;        top: 70%; }
+  body[data-stage="3"] #s3-route   { left: 52%;        top: 70%; }
+  body[data-stage="3"] #s3-router  { right: 4%;        top: 70%; }
 
   /* PARTICLES */
   .particle {
@@ -977,6 +978,153 @@
   .conductor-tools { font-family: var(--mono); font-weight: 600; color: var(--ink); }
   .conductor-reason { color: #8B8074; margin-left: 8px; font-style: italic; }
 
+  /* CHAT-IN-CANVAS (stage 0 / chat tab) */
+  .chat-canvas {
+    display: none;
+    position: absolute;
+    inset: 56px 24px 24px 24px;
+    flex-direction: column;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 5;
+  }
+  body[data-stage="0"] .chat-canvas { display: flex; }
+  body[data-stage="0"] .canvas-svg,
+  body[data-stage="0"] .canvas-meta,
+  body[data-stage="0"] .canvas-controls,
+  body[data-stage="0"] .stage-banner { display: none; }
+  body[data-stage="0"] .right { display: none; }
+  body[data-stage="0"] .main { grid-template-columns: 1fr; }
+
+  .chat-canvas-header {
+    padding: 16px 20px 8px 20px;
+    border-bottom: 1px solid var(--line);
+    background: #FBF9F4;
+  }
+  .chat-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #8B8074;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chat-system-prompt {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink);
+    resize: vertical;
+    margin-bottom: 10px;
+  }
+  .chat-system-prompt:focus { outline: none; border-color: #8B8074; }
+  .chat-sample-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .chat-history-label {
+    padding: 12px 20px 4px 20px;
+  }
+  .chat-canvas-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 20px 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chat-canvas-empty {
+    color: #B5AFA1;
+    font-style: italic;
+    font-size: 13px;
+    padding: 20px 0;
+  }
+  .chat-canvas-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px 14px 20px;
+    border-top: 1px solid var(--line);
+    background: #FBF9F4;
+  }
+  .chat-canvas-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    font-family: var(--sans, inherit);
+  }
+  .chat-canvas-input:focus { outline: none; border-color: #8B8074; }
+  .chat-canvas-send {
+    padding: 0 18px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .chat-canvas-send:hover { background: #2a2a2a; }
+  .chat-canvas-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* TOAST */
+  .app-toast {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    max-width: 320px;
+    line-height: 1.4;
+  }
+  .app-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .panel-meta-help {
+    color: #8B8074;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 0 12px 0;
+  }
+
+  .chat-canvas-json-row {
+    padding: 0 20px 12px 20px;
+    background: #FBF9F4;
+    border-top: 1px solid var(--line);
+  }
+  .chat-canvas-json-row .json-toggle-btn {
+    margin-top: 8px;
+  }
+  .chat-canvas-json-row .json-block {
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
   /* INSPECT MODE */
   .inspect { display: none; }
   .inspect.visible { display: block; animation: outIn 0.4s ease; }
@@ -1110,16 +1258,14 @@
         <div class="brand-sub">Agent Sprint · Visualization</div>
       </div>
       <div class="top-tabs" id="topTabs">
-        <span class="top-tab active" data-tab="0"><span class="num">00</span>chat</span>
-        <span class="top-tab" data-tab="1"><span class="num">01</span>chat assistant</span>
+        <span class="top-tab active" data-tab="0"><span class="num">01</span>chat</span>
         <span class="top-tab" data-tab="2"><span class="num">02</span>workflow</span>
         <span class="top-tab" data-tab="3"><span class="num">03</span>agentic system</span>
       </div>
     </div>
     <div></div>
     <div class="top-actions">
-      <button class="icon-btn" title="Reset" id="resetBtn">↺</button>
-      <button class="run-btn" id="runBtn">Run Agent <span class="kbd">⌘R</span></button>
+      <button class="run-btn" id="clearBtn">Clear <span class="kbd">⌘K</span></button>
     </div>
   </div>
 
@@ -1404,7 +1550,36 @@
       <div class="particle c-output" id="p6"></div>
       <div class="particle c-orch" id="p7"></div>
 
+      <!-- Chat-in-canvas (Stage 1 / chat tab) -->
+      <div class="chat-canvas" id="chatCanvas">
+        <div class="chat-canvas-header">
+          <div class="chat-eyebrow">SYSTEM PROMPT (editable)</div>
+          <textarea class="chat-system-prompt" id="chatSystemPrompt" rows="6" placeholder="Loading system prompt…"></textarea>
+          <div class="chat-sample-row">
+            <button class="panel-sample-btn" id="chatLoadStandup">Load standup transcript</button>
+            <button class="panel-sample-btn" id="chatLoadClient">Load client call</button>
+            <button class="panel-sample-btn" id="chatLoadPlanning">Load planning</button>
+            <span class="chat-context-status" id="chatCanvasContextStatus"></span>
+          </div>
+        </div>
+        <div class="chat-eyebrow chat-history-label">CONVERSATION</div>
+        <div class="chat-canvas-history" id="chatCanvasHistory">
+          <div class="chat-canvas-empty">No messages yet. Edit the system prompt above, load a transcript, then send a message.</div>
+        </div>
+        <div class="chat-canvas-input-row">
+          <input class="chat-canvas-input" id="chatCanvasInput" placeholder="Type a message…" />
+          <button class="chat-canvas-send" id="chatCanvasSend">Send →</button>
+        </div>
+        <div class="chat-canvas-json-row" id="chatCanvasJsonRow" style="display:none">
+          <button class="json-toggle-btn" id="chatCanvasJsonBtn">Show last call JSON ▼</button>
+          <pre class="json-block" id="chatCanvasJsonBlock" style="display:none"></pre>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Toast notification (in-app fallback) -->
+    <div class="app-toast" id="appToast"></div>
 
     <!-- RIGHT PANEL -->
     <div class="right">
@@ -1430,42 +1605,7 @@
             Start the server to use the live interface — run <code>npm run server</code> in <code>student-output/</code>, then reload the page.
           </div>
 
-          <!-- Chat tab (Module 2 teaching UI) -->
-          <div class="live-panel" id="panel0" style="display:none">
-            <div class="panel-eyebrow">Chat — try it live</div>
-            <div class="panel-row">
-              <button class="panel-sample-btn" id="chatTabStandup">Load standup</button>
-              <button class="panel-sample-btn" id="chatTabClient">Load client call</button>
-            </div>
-            <div class="chat-context-status" id="chatTabContextStatus"></div>
-            <div class="chat-history" id="chatTabMessages"></div>
-            <div class="chat-input-row">
-              <input class="panel-input" id="chatTabInput" placeholder="Ask a follow-up question…" />
-              <button class="chat-send-btn" id="chatTabSend">Send</button>
-            </div>
-            <div class="json-toggle-row" id="chatTabJsonRow" style="display:none">
-              <button class="json-toggle-btn" id="chatTabJsonBtn">Show JSON ▼</button>
-              <pre class="json-block" id="chatTabJsonBlock" style="display:none"></pre>
-            </div>
-          </div>
-
-          <!-- Stage 1: Chat Assistant panel -->
-          <div class="live-panel" id="panel1" style="display:none">
-            <div class="panel-eyebrow">Try it live — Chat Assistant</div>
-            <textarea class="panel-textarea" id="chatTranscript" placeholder="Paste a transcript here…"></textarea>
-            <div class="panel-row">
-              <button class="panel-sample-btn" id="chatSampleBtn">Load standup</button>
-              <button class="panel-sample-btn" id="chatClientBtn">Load client call</button>
-              <button class="panel-sample-btn" id="chatPlanningBtn">Load planning</button>
-            </div>
-            <input class="panel-input" id="chatQuestion" placeholder="Ask a question about this transcript…" />
-            <button class="panel-btn" id="chatSubmit">Ask →</button>
-            <div class="panel-chat" id="chatOutput"></div>
-            <div class="json-toggle-row" id="chatJsonRow" style="display:none">
-              <button class="json-toggle-btn" id="chatJsonBtn">Show JSON</button>
-              <pre class="json-block" id="chatJsonBlock" style="display:none"></pre>
-            </div>
-          </div>
+          <!-- Stage 1 (chat) lives entirely in the main canvas; no right-panel content. -->
 
           <!-- Stage 2: Workflow panel -->
           <div class="live-panel" id="panel2" style="display:none">
@@ -1493,7 +1633,7 @@
               class="panel-instruction"
               id="orchInstruction"
               placeholder="Optional: tell the Conductor what you want. e.g. &quot;Just give me the action items&quot; or &quot;Only route this — skip the analysis&quot; — leave blank for full pipeline"
-              rows="2"
+              rows="5"
             ></textarea>
             <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
             <div id="orchConductorPlan" style="display:none" class="conductor-plan">
@@ -2096,9 +2236,12 @@ Return ONLY a JSON object:
     document.querySelectorAll('.top-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.tab === currentStage);
     });
-    const labels = { '0': '0 · chat', '1': '1 · chat assistant', '2': '2 · workflow pipeline', '3': '3 · agentic system' };
-    const titles = { '0': 'What\'s <em>happening?</em>', '1': 'What\'s <em>happening?</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
-    const nodeCounts = { '0': '—', '1': '3', '2': '6', '3': '7' };
+    const labels = { '0': '1 · chat assistant', '2': '2 · workflow pipeline', '3': '3 · agentic system' };
+    const titles = { '0': 'Chat · <em>multi-turn conversation</em>', '2': 'What\'s <em>happening?</em>', '3': 'What\'s <em>happening?</em>' };
+    const nodeCounts = { '0': '—', '2': '6', '3': '7' };
+    const clearLabels = { '0': 'Clear Chat', '2': 'Clear', '3': 'Clear' };
+    const clearBtn = $('clearBtn');
+    if (clearBtn) clearBtn.innerHTML = (clearLabels[currentStage] || 'Clear') + ' <span class="kbd">⌘K</span>';
     $('metaStage').textContent = labels[currentStage];
     $('metaNodes').textContent = nodeCounts[currentStage];
     $('rhTitle').innerHTML = titles[currentStage];
@@ -2114,7 +2257,7 @@ Return ONLY a JSON object:
 
   function fullReset() {
     $('feed').innerHTML = `
-      <div class="feed-empty">Press <em>Run Agent</em> to begin.</div>
+      <div class="feed-empty">Press <em>Run</em> at the bottom to begin.</div>
       <div class="feed-hint">
         <b>Try this:</b> click any node on the left to peek inside.<br>
         You'll see exactly what's making it tick — including the actual instructions it follows.
@@ -2128,6 +2271,25 @@ Return ONLY a JSON object:
     $('outContent').classList.remove('visible');
     $('canvasStatus').textContent = '● ready';
     $('canvasStatus').style.color = 'var(--orch)';
+    if ($('workflowResult')) $('workflowResult').innerHTML = '';
+    if ($('orchResult')) $('orchResult').innerHTML = '';
+    if ($('orchTranscript')) $('orchTranscript').value = '';
+    if ($('workflowTranscript')) $('workflowTranscript').value = '';
+    if ($('orchInstruction')) $('orchInstruction').value = '';
+    if ($('s3RunReport')) $('s3RunReport').style.display = 'none';
+    if ($('orchConductorPlan')) $('orchConductorPlan').style.display = 'none';
+    ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => { if ($(id)) setStep(id, 'idle'); });
+  }
+
+  // ── Toast (in-app notification fallback) ──
+  let toastTimer = null;
+  function toast(msg) {
+    const el = $('appToast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('visible'), 4000);
   }
 
   function addFeed(e) {
@@ -2227,12 +2389,12 @@ Return ONLY a JSON object:
     return 'p2'; // default: orch color
   }
 
-  async function run() {
-    exitInspect();
-    fullReset();
-    const runBtn = $('runBtn');
-    runBtn.disabled = true;
-    runBtn.innerHTML = 'Running… <span class="kbd">⌘R</span>';
+  // Plays the animation for the current stage. Called by per-panel Run buttons.
+  // Runs in parallel with the API call so the visualization feels alive.
+  async function playAnimation() {
+    if (!sequences[currentStage]) return;
+    document.querySelectorAll('.node').forEach(n => n.classList.remove('active','complete'));
+    Object.keys(pathRefs).forEach(p => pathRefs[p].classList.remove('active','complete'));
     $('canvasStatus').textContent = '● running';
 
     const sequence = sequences[currentStage];
@@ -2269,8 +2431,6 @@ Return ONLY a JSON object:
 
     $('canvasStatus').textContent = '● complete';
     $('canvasStatus').style.color = 'var(--sub)';
-    runBtn.disabled = false;
-    runBtn.innerHTML = 'Run Again <span class="kbd">⌘R</span>';
   }
 
   // ============ EVENT WIRING ============
@@ -2286,17 +2446,25 @@ Return ONLY a JSON object:
   });
 
   $('backBtn').addEventListener('click', exitInspect);
-  $('runBtn').addEventListener('click', run);
-  $('resetBtn').addEventListener('click', () => { exitInspect(); fullReset(); });
+
+  // Top button = Clear (tab-aware). Wipes everything for the active tab.
+  $('clearBtn').addEventListener('click', () => {
+    exitInspect();
+    if (currentStage === '0') {
+      clearChatCanvas();
+    } else {
+      fullReset();
+    }
+  });
 
   document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'r' && !$('runBtn').disabled) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      run();
+      $('clearBtn').click();
     }
     if (e.key === 'Escape') exitInspect();
     if (e.key === '1' && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('1');
+      if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('0');
     }
     if (e.key === '2' && !e.metaKey && !e.ctrlKey && !e.altKey) {
       if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') switchStage('2');
@@ -2327,12 +2495,13 @@ Return ONLY a JSON object:
   function showOfflineBanner() {
     serverOnline = false;
     $('serverBanner').style.display = 'block';
-    ['panel0','panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
+    ['panel2','panel3'].forEach(id => { const el = $(id); if (el) el.style.display = 'none'; });
   }
 
   function updatePanelForStage(s) {
-    ['panel0','panel1','panel2','panel3'].forEach(id => $(id).style.display = 'none');
-    if (serverOnline) $('panel' + s).style.display = 'block';
+    ['panel2','panel3'].forEach(id => { const el = $(id); if (el) el.style.display = 'none'; });
+    // Stage 0 (chat) lives in the main canvas, no right-panel content.
+    if (serverOnline && $('panel' + s)) $('panel' + s).style.display = 'block';
   }
 
   async function loadSample(targetId, filename) {
@@ -2344,8 +2513,9 @@ Return ONLY a JSON object:
   }
 
   // ── File drop support — drag a .txt file onto any transcript textarea ──
-  ['chatTranscript', 'workflowTranscript', 'orchTranscript'].forEach(id => {
+  ['workflowTranscript', 'orchTranscript'].forEach(id => {
     const el = $(id);
+    if (!el) return;
     el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
     el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
     el.addEventListener('drop', e => {
@@ -2359,194 +2529,152 @@ Return ONLY a JSON object:
     });
   });
 
-  // ── Stage 1: Chat ──
-  $('chatSampleBtn').addEventListener('click', () => loadSample('chatTranscript'));
-  $('chatClientBtn').addEventListener('click', () => loadSample('chatTranscript', 'sample-client-call.txt'));
-  $('chatPlanningBtn').addEventListener('click', () => loadSample('chatTranscript', 'sample-planning-session.txt'));
+  // ── Chat tab (multi-turn, in main canvas) ──
+  // Conversation state — these messages grow as you send each turn.
+  // The full array is sent to /api/chat on every turn, so Claude sees the
+  // whole conversation. THIS is what module-3 means by "the messages[] array."
+  let chatMessages = [];
+  let chatSystemPromptDefault = '';
+  let chatLastJson = null;
 
-  $('chatSubmit').addEventListener('click', async () => {
-    const question = $('chatQuestion').value.trim();
-    const context = $('chatTranscript').value.trim();
-    if (!question) return;
-    const chatOut = $('chatOutput');
-    const userBubble = document.createElement('div');
-    userBubble.className = 'chat-bubble user';
-    userBubble.textContent = question;
-    chatOut.appendChild(userBubble);
-    $('chatQuestion').value = '';
-    $('chatSubmit').disabled = true;
-    $('chatSubmit').textContent = 'Thinking…';
-    const requestPayload = { question, context: context.slice(0, 200) + (context.length > 200 ? '…' : '') };
-
-    // Show "Thinking..." placeholder while waiting
-    const thinkingEl = document.createElement('div');
-    thinkingEl.className = 'chat-thinking';
-    thinkingEl.innerHTML = '<div class="thinking-dot"></div>Thinking…';
-    chatOut.appendChild(thinkingEl);
-    $('rightBody').scrollTop = $('rightBody').scrollHeight;
-
-    const callStart = performance.now();
+  async function initChatCanvas() {
+    if (chatSystemPromptDefault) return; // only init once
     try {
-      const r = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, context }),
-      });
-      const elapsed = ((performance.now() - callStart) / 1000).toFixed(2);
-      const data = await r.json();
-      const { response, usage } = data;
-
-      // Remove thinking indicator
-      thinkingEl.remove();
-
-      const aiBubble = document.createElement('div');
-      aiBubble.className = 'chat-bubble assistant';
-      aiBubble.textContent = response;
-      chatOut.appendChild(aiBubble);
-
-      // Log strip — tokens + cost + timing
-      const logStrip = document.createElement('div');
-      logStrip.className = 'chat-log-strip';
-      if (usage && usage.input_tokens != null) {
-        const totalTokens = (usage.input_tokens || 0) + (usage.output_tokens || 0);
-        const costEst = ((totalTokens / 1000) * 0.001).toFixed(4);
-        logStrip.textContent = `[~${totalTokens} tokens · ~$${costEst} · ${elapsed}s]`;
-      } else {
-        logStrip.textContent = `[${elapsed}s]`;
-      }
-      chatOut.appendChild(logStrip);
-
-      $('rightBody').scrollTop = $('rightBody').scrollHeight;
-      // JSON toggle — show last request/response for Module 2 teaching
-      $('chatJsonBlock').textContent = JSON.stringify({
-        request: { method: 'POST', url: '/api/chat', body: requestPayload },
-        response: { status: r.status, body: { response: response.slice(0, 300) + (response.length > 300 ? '…' : '') } },
-      }, null, 2);
-      $('chatJsonRow').style.display = 'block';
-    } catch (err) {
-      thinkingEl.remove();
-      const errBubble = document.createElement('div');
-      errBubble.className = 'chat-bubble assistant';
-      errBubble.textContent = 'Error: ' + err.message;
-      chatOut.appendChild(errBubble);
-    } finally {
-      $('chatSubmit').disabled = false;
-      $('chatSubmit').textContent = 'Ask →';
+      const r = await fetch('/api/system-prompt');
+      const txt = await r.text();
+      chatSystemPromptDefault = txt;
+      $('chatSystemPrompt').value = txt;
+    } catch {
+      $('chatSystemPrompt').placeholder = 'Failed to load system prompt — server may be offline.';
     }
-  });
+  }
 
-  $('chatJsonBtn').addEventListener('click', () => {
-    const block = $('chatJsonBlock');
-    const btn = $('chatJsonBtn');
-    const visible = block.style.display !== 'none';
-    block.style.display = visible ? 'none' : 'block';
-    btn.textContent = visible ? 'Show JSON' : 'Hide JSON';
-  });
+  function renderChatMessages() {
+    const hist = $('chatCanvasHistory');
+    if (!chatMessages.length) {
+      hist.innerHTML = '<div class="chat-canvas-empty">No messages yet. Edit the system prompt above, load a transcript, then send a message.</div>';
+      return;
+    }
+    hist.innerHTML = '';
+    chatMessages.forEach(m => {
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble ' + (m.role === 'user' ? 'user' : 'assistant');
+      // Truncate very long content (transcripts) for readability
+      const display = m.content.length > 800 ? m.content.slice(0, 800) + '\n\n…(truncated for display, full text sent to Claude)' : m.content;
+      bubble.textContent = display;
+      hist.appendChild(bubble);
+    });
+    hist.scrollTop = hist.scrollHeight;
+  }
 
-  $('chatQuestion').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSubmit').click(); }
-  });
+  function clearChatCanvas() {
+    chatMessages = [];
+    renderChatMessages();
+    $('chatCanvasContextStatus').textContent = '';
+    $('chatCanvasInput').value = '';
+    if (chatSystemPromptDefault) $('chatSystemPrompt').value = chatSystemPromptDefault;
+    toast('Chat cleared.');
+  }
 
-  // ── Chat tab (Module 2) ──
-  let chatTabContext = '';
-  let chatTabLastRequest = null;
-  let chatTabLastResponse = null;
-
-  async function loadChatTabContext(filename) {
+  async function loadChatTranscript(filename, label) {
     try {
       const url = filename ? `/api/sample-transcript/${filename}` : '/api/sample-transcript';
       const r = await fetch(url);
-      chatTabContext = await r.text();
-      const label = filename === 'sample-client-call.txt' ? 'sample-client-call.txt' : 'sample-transcript.txt';
-      $('chatTabContextStatus').textContent = `Context: ${label} ✓`;
-    } catch { $('chatTabContextStatus').textContent = 'Failed to load transcript'; }
+      const text = await r.text();
+      // Push as the first user message so it's part of the conversation history
+      chatMessages.push({
+        role: 'user',
+        content: `Here's a transcript I want to discuss:\n\n${text}`,
+      });
+      chatMessages.push({
+        role: 'assistant',
+        content: 'Got it — I have the transcript. What would you like to know?',
+      });
+      renderChatMessages();
+      $('chatCanvasContextStatus').textContent = `loaded: ${label} (messages: ${chatMessages.length})`;
+    } catch {
+      $('chatCanvasContextStatus').textContent = 'Failed to load transcript.';
+    }
   }
 
-  async function sendChatTabMessage() {
-    const question = $('chatTabInput').value.trim();
-    if (!question || !chatTabContext) return;
-    const msgs = $('chatTabMessages');
+  async function sendChatMessage() {
+    const text = $('chatCanvasInput').value.trim();
+    if (!text) return;
+    chatMessages.push({ role: 'user', content: text });
+    renderChatMessages();
+    $('chatCanvasInput').value = '';
+    $('chatCanvasSend').disabled = true;
+    $('chatCanvasSend').textContent = '…';
 
-    const userBubble = document.createElement('div');
-    userBubble.className = 'chat-bubble user';
-    userBubble.textContent = question;
-    msgs.appendChild(userBubble);
-    $('chatTabInput').value = '';
-    $('chatTabSend').disabled = true;
-    $('chatTabSend').textContent = '…';
-
+    const hist = $('chatCanvasHistory');
     const thinkingEl = document.createElement('div');
     thinkingEl.className = 'chat-thinking';
     thinkingEl.innerHTML = '<div class="thinking-dot"></div>Thinking…';
-    msgs.appendChild(thinkingEl);
-    msgs.scrollTop = msgs.scrollHeight;
+    hist.appendChild(thinkingEl);
+    hist.scrollTop = hist.scrollHeight;
 
     const callStart = performance.now();
+    const systemPrompt = $('chatSystemPrompt').value;
     try {
       const r = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, context: chatTabContext }),
+        body: JSON.stringify({ messages: chatMessages, system: systemPrompt }),
       });
       const elapsed = ((performance.now() - callStart) / 1000).toFixed(2);
       const data = await r.json();
-      const { response, usage } = data;
+      const { response, usage, error } = data;
       thinkingEl.remove();
+      if (error) throw new Error(error);
 
-      const aiBubble = document.createElement('div');
-      aiBubble.className = 'chat-bubble assistant';
-      aiBubble.textContent = response;
-      msgs.appendChild(aiBubble);
+      chatMessages.push({ role: 'assistant', content: response });
+      renderChatMessages();
 
+      // Log strip
       const logStrip = document.createElement('div');
       logStrip.className = 'chat-log-strip';
       if (usage && usage.input_tokens != null) {
         const total = (usage.input_tokens || 0) + (usage.output_tokens || 0);
-        logStrip.textContent = `[~${total} tokens · ${elapsed}s]`;
+        logStrip.textContent = `[messages: ${chatMessages.length} · ~${total} tokens · ${elapsed}s]`;
       } else {
-        logStrip.textContent = `[${elapsed}s]`;
+        logStrip.textContent = `[messages: ${chatMessages.length} · ${elapsed}s]`;
       }
-      msgs.appendChild(logStrip);
-      msgs.scrollTop = msgs.scrollHeight;
+      hist.appendChild(logStrip);
+      hist.scrollTop = hist.scrollHeight;
 
-      chatTabLastRequest = {
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
-        system: 'You are a meeting analyst… [see student-output/prompts/system.md]',
-        messages: [{ role: 'user', content: question + '\n\n' + chatTabContext.slice(0, 120) + '…' }],
+      chatLastJson = {
+        request: { method: 'POST', url: '/api/chat', body: { messages: chatMessages.map(m => ({...m, content: m.content.length > 80 ? m.content.slice(0,80) + '…' : m.content})), system: systemPrompt.slice(0, 80) + (systemPrompt.length > 80 ? '…' : '') } },
+        response: { status: r.status, body: { response: response.slice(0, 300) + (response.length > 300 ? '…' : ''), usage } },
       };
-      chatTabLastResponse = {
-        content: [{ text: response.slice(0, 300) + (response.length > 300 ? '…' : '') }],
-        usage: usage || {},
-      };
-      $('chatTabJsonBlock').textContent = 'REQUEST\n' + JSON.stringify(chatTabLastRequest, null, 2) + '\n\nRESPONSE\n' + JSON.stringify(chatTabLastResponse, null, 2);
-      $('chatTabJsonRow').style.display = 'block';
+      $('chatCanvasJsonBlock').textContent = JSON.stringify(chatLastJson, null, 2);
+      $('chatCanvasJsonRow').style.display = 'block';
+      toast('Chat reply received.');
     } catch (err) {
       thinkingEl.remove();
       const errBubble = document.createElement('div');
       errBubble.className = 'chat-bubble assistant';
       errBubble.textContent = 'Error: ' + err.message;
-      msgs.appendChild(errBubble);
+      hist.appendChild(errBubble);
     } finally {
-      $('chatTabSend').disabled = false;
-      $('chatTabSend').textContent = 'Send';
+      $('chatCanvasSend').disabled = false;
+      $('chatCanvasSend').textContent = 'Send →';
     }
   }
 
-  $('chatTabStandup').addEventListener('click', () => loadChatTabContext('sample-transcript.txt'));
-  $('chatTabClient').addEventListener('click', () => loadChatTabContext('sample-client-call.txt'));
-
-  $('chatTabSend').addEventListener('click', sendChatTabMessage);
-  $('chatTabInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatTabMessage(); }
+  $('chatLoadStandup').addEventListener('click', () => loadChatTranscript(null, 'sample-transcript.txt'));
+  $('chatLoadClient').addEventListener('click', () => loadChatTranscript('sample-client-call.txt', 'client call'));
+  $('chatLoadPlanning').addEventListener('click', () => loadChatTranscript('sample-planning-session.txt', 'planning'));
+  $('chatCanvasSend').addEventListener('click', sendChatMessage);
+  $('chatCanvasInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
   });
 
-  $('chatTabJsonBtn').addEventListener('click', () => {
-    const block = $('chatTabJsonBlock');
-    const btn = $('chatTabJsonBtn');
+  $('chatCanvasJsonBtn').addEventListener('click', () => {
+    const block = $('chatCanvasJsonBlock');
+    const btn = $('chatCanvasJsonBtn');
     const visible = block.style.display !== 'none';
     block.style.display = visible ? 'none' : 'block';
-    btn.textContent = visible ? 'Show JSON ▼' : 'Hide JSON ▲';
+    btn.textContent = visible ? 'Show last call JSON ▼' : 'Hide last call JSON ▲';
   });
 
   // ── Stage 2: Workflow ──
@@ -2560,6 +2688,9 @@ Return ONLY a JSON object:
     $('workflowSubmit').disabled = true;
     $('workflowSubmit').textContent = 'Running…';
     $('workflowResult').innerHTML = '';
+    // Kick off the canvas animation in parallel with the API call so the
+    // student sees the pipeline come alive while we wait for the network.
+    const animPromise = playAnimation();
     try {
       const r = await fetch('/api/workflow', {
         method: 'POST',
@@ -2577,6 +2708,8 @@ Return ONLY a JSON object:
       html += '</div>';
       html += `<span class="class-badge">${classification}</span>`;
       $('workflowResult').innerHTML = html;
+      await animPromise;
+      toast(`Workflow complete — routed to ${classification}.`);
     } catch (err) {
       $('workflowResult').textContent = 'Error: ' + err.message;
     } finally {
@@ -2607,6 +2740,8 @@ Return ONLY a JSON object:
     $('orchResult').innerHTML = '';
     $('s3RunReport').style.display = 'none';
     ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
+    // Canvas animation in parallel with the orchestrator API calls.
+    const animPromise = playAnimation();
     try {
       $('orchConductorPlan').style.display = 'none';
       ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
@@ -2711,6 +2846,8 @@ Return ONLY a JSON object:
         <div class="result-report">${safe}</div>
       `;
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
+      await animPromise;
+      toast(`Orchestrator complete — ${tools.length} specialists ran${classification ? ', routed to ' + classification : ''}.`);
     } catch (err) {
       $('orchResult').textContent = 'Error: ' + err.message;
       ['orchStep1','orchStep2','orchStep3','orchStep4'].forEach(id => setStep(id, 'idle'));
@@ -2720,12 +2857,14 @@ Return ONLY a JSON object:
     }
   });
 
-  // Check server on load
-  checkServer();
-
-  // initial build
+  // initial build (must come before switchStage so paths exist)
   pathRefs = buildConnections();
   window.addEventListener('resize', () => { pathRefs = buildConnections(); });
+
+  // Check server on load + init the chat canvas (default tab is "chat")
+  checkServer();
+  initChatCanvas();
+  switchStage('0');
 </script>
 </body>
 </html>

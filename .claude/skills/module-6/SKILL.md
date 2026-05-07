@@ -23,9 +23,9 @@ Take it slow. Let each one land before moving to the next.
 
 Say:
 
-> "We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files. Stage 3 is a third thing — an agentic system.
+> "We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files. Stage 3 is parallel orchestration — Analyst and Extractor run at the same time, then Synthesizer combines them, then the Stage 2 router takes over.
 >
-> It's not a chat assistant, because it doesn't wait for you. It's not just a workflow, because it does more than classify. Instead, an orchestrator coordinates three specialists — two of them in parallel — then synthesizes the results, then routes everything.
+> Heads up on the vocabulary: by Anthropic's definition this is still a *workflow* — it runs predefined steps every time. In Module 7 we'll add a planning step (the Conductor) that decides which steps to take, and that's the moment it crosses into actual agent territory.
 >
 > And here's the payoff you've been set up for: the specialists you just read in Module 5, the workflow you built in Module 4 — the orchestrator is what wires them all together. You're not starting over. You're composing what you have."
 
@@ -195,7 +195,9 @@ Claude Code (orchestrator)
 
 > "Claude Code is an orchestrator. It takes your request, dispatches tools in parallel (reading files, searching code), synthesizes what it found, and produces the output. Same pattern you just built.
 >
-> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every agent you'll ever build is some version of this: input → parallel specialists → synthesis → output.**"
+> But Claude Code doesn't just dispatch once. It *loops*: dispatches sub-agents and tools, reads what came back, verifies the result, then decides what's next. Loop, until done. The Conductor you'll meet in Module 7 is one step of that loop. Production agents are that loop running on autopilot.
+>
+> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every multi-specialist system you'll build is some flavor of: dispatch → run specialists → combine → route.** The pattern you just built is one common shape (parallelization with synthesis). Other shapes exist — routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop on environmental feedback. Read `concepts/what-is-an-agent.md` for the broader taxonomy."
 
 ## Key takeaways
 
@@ -224,8 +226,7 @@ What you've built so far:
 1. Run `git add -A && git commit -m "Complete Module 6: The Agentic System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 6:` to `- [x] Module 6:` via Edit tool.
 
-3. **Run `/compact`** — type `/compact` to clear context before Module 7.
-4. Hand off:
+3. Hand off:
 
 > "You just built a multi-agent agentic system. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
 

@@ -40,6 +40,20 @@ export async function ask(question, context) {
   return response.content[0].text;
 }
 
+// ─── Building block: multi-turn chat ──────────────────────────────────────
+// Takes a full messages[] array (what the chat tab sends each turn).
+// The array grows on every turn — that's how Claude sees the conversation.
+// Returns { reply, usage } so the frontend can show token counts.
+export async function chatTurn(messages, systemOverride = null) {
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1024,
+    system: systemOverride || systemPrompt,
+    messages,
+  });
+  return { reply: response.content[0].text, usage: response.usage };
+}
+
 // ─── Interactive loop (only runs when invoked directly) ───────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
   const transcriptPath = process.argv[2];

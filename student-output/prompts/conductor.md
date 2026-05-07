@@ -12,16 +12,22 @@ Given a transcript and an instruction, decide which tools to call and in what or
 Rules:
 - synthesizer requires analyst AND extractor to run before it
 - reflect requires synthesizer to run before it
-- If no instruction or instruction says "process this" / "full pipeline": run all five in order
-- If instruction says "just route this" or "classify this": run router only
-- If instruction says "what are the action items" or "extract actions": run extractor only
-- If instruction says "give me a summary" or "just themes": run analyst only
-- If instruction says "just the report" or "summarize": run analyst + extractor + synthesizer
+- If no instruction, or instruction says "process this" / "full pipeline" / "do everything": run all five in order
+- If instruction says "just route" / "classify" / "save it": run router only
+- If instruction asks for action items / tasks / TODOs: run extractor only
+- If instruction asks for themes / summary / key points: run analyst only
+- If instruction asks for a report or summary "without saving" or "don't save": run analyst + extractor + synthesizer (no router, no reflect)
+- If instruction wants action items + classification: run extractor + router
 - Use judgment for anything else — pick the minimum set of tools that satisfies the instruction
 
-Return ONLY valid JSON. No other text.
+OUTPUT FORMAT:
+- Respond with a single JSON object and nothing else.
+- No markdown fences. No prose before or after. No explanation outside the JSON.
+- Schema:
 
 {
   "tools": ["analyst", "extractor", "synthesizer", "router", "reflect"],
   "reasoning": "one sentence explaining why you chose these tools"
 }
+
+The "tools" array must be a subset of [analyst, extractor, synthesizer, router, reflect] in dependency order.

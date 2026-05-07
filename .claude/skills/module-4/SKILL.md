@@ -160,8 +160,7 @@ What you've built so far:
 2. Update `CLAUDE.md`: change `- [ ] Module 4:` to `- [x] Module 4:` via Edit tool.
 3. Tell the student: *(Keep the server terminal running — you'll use it in Module 5.)*
 
-4. **Run `/compact`** — type `/compact` to clear context before Module 5.
-5. Hand off:
+4. Hand off:
 
 > "Stage 2 running. In Module 5 we'll extend the pipeline — add a new step by telling Claude what you want, not by editing code. Type `module-5` when you're ready."
 

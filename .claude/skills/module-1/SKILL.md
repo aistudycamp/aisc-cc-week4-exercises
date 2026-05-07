@@ -134,10 +134,11 @@ Say:
    git add -A && git commit -m "Complete Module 1: Tour the System"
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear context before Module 2.
-4. Say:
+3. Say:
 
-> "You now understand the shape of every agentic system — input, parallel specialists, synthesize, output. That's the skeleton. In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
+> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The one constant: at the heart of any real agent is a LOOP — plan, act, observe what came back, decide what's next, repeat. The pipeline you're about to build runs once and stops; that's a workflow with parallel dispatch. We're starting there because it's the simplest place to see all the moving parts. Read `concepts/what-is-an-agent.md` if you want the full picture.
+>
+> In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 
 ## Coach Guardrails
 

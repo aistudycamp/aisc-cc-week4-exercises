@@ -40,44 +40,80 @@ Show them the extension options without dwelling on them:
 
 ## Act 2: How Specialists Are Made (~15 min)
 
-### Step 2: Set the frame (2 min)
+### Step 2: Why specialists (3 min)
 
-Before we look at each prompt, here's the structure. Stage 3 needs three specialists to produce one report. Each specialist is a separate `ask()` call with a different system prompt:
-- Analyst — finds themes and decisions
-- Extractor — pulls every action item as structured JSON
-- Synthesizer — receives both outputs and combines them into the final report
-
-They're pre-written in `student-output/prompts/`. Your job here is to read them and understand what makes each one different.
+Before any prompts, ground the student in *why* this stage needs three of them.
 
 Say:
 
-> "The chat assistant you built in Module 2 is a single specialist. It has one job because of one file: `prompts/system.md`. That file says: 'You are a meeting analyst. Answer questions directly.'
+> "So far you've built one chat assistant with one system prompt — a generalist. Stage 3 needs three different specialists, working together: an Analyst that finds themes, an Extractor that pulls action items, a Synthesizer that combines both into a final report.
 >
-> Stage 3 needs three specialists: one that finds themes, one that pulls action items, and one that synthesizes both into a final report. Here's the thing: **each one is just the chat assistant with a different system prompt.** Same `ask()` function. Same API call. Different personality, different job, different output.
+> Why three specialists instead of one big call?
 >
-> Let's look at them."
+> 1. **Each one is focused** — narrower scope means better output. A generalist asked to do all three at once will compromise on each.
+> 2. **Each one is independently swappable** — you can change the Extractor without touching the Analyst.
+> 3. **Two of them can run in parallel** — Analyst and Extractor are independent, so you can fire both simultaneously and cut latency in half. (We'll see that in Module 6.)
+>
+> The thing to notice as we read each prompt: same `ask()` function, same API call. **Only the system prompt changes.** The system prompt is what turns one generic chat assistant into a focused specialist."
+
+Then show the architecture before any prompt files appear:
+
+```
+              transcript
+                  │
+    ┌─────────────┴─────────────┐
+    ▼                           ▼
+[ Analyst ]              [ Extractor ]   ← parallel, different system prompts
+themes + decisions       action items
+    │                           │
+    └─────────────┬─────────────┘
+                  ▼
+          [ Synthesizer ]                ← waits for both, combines into one report
+                  │
+                  ▼
+          [ Router ]                     ← Stage 2's workflow
+```
+
+> "Read top-to-bottom. Transcript in. Analyst and Extractor run in parallel — same input, different specialists, different jobs. Synthesizer waits for both, then merges them into one report. Then Stage 2's router classifies and saves. Three specialists, one orchestrator, one report.
+>
+> They're pre-written in `student-output/prompts/`. Your job here is to read them and understand what makes each one different."
 
 ### Step 3: Read the specialist prompts side by side (6 min)
 
-**Coach:** Use the Read tool to read each prompt file from `student-output/prompts/` and print the contents inline. Do not ask the student to open a terminal or run `cat`.
+**Coach:** Use the Read tool to read each prompt file from `student-output/prompts/` and print the contents inline. After printing each file, walk the student through it using the **Role / Output format / Rules / Why it differs** scaffold below. Do not ask the student to open a terminal or run `cat`.
 
-Here's `prompts/analyst.md`:
+#### Analyst
 
 **[Coach: Read `student-output/prompts/analyst.md` and print its full contents here]**
 
-> "The role: 'You are a meeting analyst.' The output format: KEY THEMES and KEY DECISIONS. Rules: use names from the transcript, don't pad. This is a focused specialist — one job."
+Then walk the student through:
 
-Here's `prompts/extractor.md`:
+- **Role:** "You are a meeting analyst" — first specialist, the thinker.
+- **Output format:** plain-text sections — KEY THEMES and KEY DECISIONS, one bullet per line.
+- **Rules / constraints:** use names from the transcript, don't invent people, don't pad.
+- **Why it differs from the others:** narrative output for humans to read. No JSON, no action items.
+
+#### Extractor
 
 **[Coach: Read `student-output/prompts/extractor.md` and print its full contents here]**
 
-> "Different specialist. Role: action item extractor. Output: JSON with owner, task, deadline for every action item. Rules: only output valid JSON. That JSON rule is critical — the orchestrator parses this output programmatically."
+Then walk the student through:
 
-Here's `prompts/synthesizer.md`:
+- **Role:** "You are an action item extractor" — second specialist, the lister.
+- **Output format:** strict JSON — array of objects with `owner`, `task`, `deadline`.
+- **Rules / constraints:** only output valid JSON, no prose. Use names from transcript.
+- **Why it differs from the others:** machine-readable, not human-readable. The orchestrator parses this output with `JSON.parse()` — the format isn't decorative, it's load-bearing.
+
+#### Synthesizer
 
 **[Coach: Read `student-output/prompts/synthesizer.md` and print its full contents here]**
 
-> "Third specialist. It receives the other two specialists' output and synthesizes them into the final structured report. It's downstream — it needs the analyst and extractor to finish first. That's why Stage 3 sequences them the way it does."
+Then walk the student through:
+
+- **Role:** "You are a synthesizer" — third specialist, the editor.
+- **Output format:** the final structured report — KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP.
+- **Rules / constraints:** combine *both* upstream outputs faithfully. Don't invent items not in the source data.
+- **Why it differs from the others:** it's downstream — its input isn't a transcript, it's the *outputs* of the other two specialists. It needs Analyst and Extractor to finish first, which is why Stage 3 sequences them the way it does.
 
 Ask:
 
@@ -87,21 +123,23 @@ Wait for their answer. The key insight: **the format instruction** — each spec
 
 > "Right. Same function, same API call, different format instruction in the system prompt = a different kind of output. That's the lever. When you see an AI product that does something specific and useful, this is usually what's happening underneath: a focused system prompt telling it exactly what shape to return."
 
-### Step 4: Open the browser — inspect each specialist (4 min)
+### Step 4: See it run (4 min)
 
 Open **http://localhost:3000** and click the **Stage 3** tab.
 
-Click each specialist node on the diagram:
+Click **Load standup**, leave the instruction field blank, then hit **Run Orchestrator →**.
 
-- **Analyst node** — the inspect panel shows `prompts/analyst.md`. This is the same file you just read.
+Watch each specialist fire — Analyst, then Extractor, then Synthesizer, then Router. Three specialists you just read, all running.
+
+> "Each checkmark is a real API call completing — and the prompts you just read are what made each one different. The Analyst returned themes. The Extractor returned a JSON list. The Synthesizer combined them into one report. Same `ask()` function, different system prompts. (How they're sequenced — what runs in what order, what runs alongside what — is Module 6.)"
+
+Then click each specialist node on the diagram to see the prompt file behind it:
+
+- **Analyst node** — the inspect panel shows `prompts/analyst.md`.
 - **Extractor node** — shows `prompts/extractor.md`.
 - **Synthesizer node** — shows `prompts/synthesizer.md`.
 
-> "The diagram is a window into your code. Each node maps to a prompt file. The prompt file IS the specialist."
-
-Point to the orchestrator node:
-
-> "The orchestrator doesn't have a personality — it coordinates. Analyst and Extractor run in parallel. Then Synthesizer takes both results and combines them. Then Router classifies and saves. That sequence is what you'll look at in Module 6."
+> "The diagram is a window into your code. Each node maps to a prompt file. The prompt file IS the specialist. The orchestrator doesn't have a personality — it coordinates. We'll walk through *how* it coordinates them in Module 6."
 
 ### Step 5: The key insight (2 min)
 
@@ -132,12 +170,11 @@ Module 5 closes Stage 2. Modules 4 and 5 are both Stage 2 — Stage 2 is wider t
 What you've built so far:
 
 ```
-┌──────────────────────────────┐   ┌──────────────────────────────┐
-│  Stage 1 — Chat Assistant    │   │  Stage 2 — Workflow           │
-│  stage-1/chat.js             │   │  stage-2/workflow.js          │
-│  ask() · system.md           │   │  runWorkflow()                │
-└──────────────────────────────┘   │  classifier.md               │
-                                   └──────────────────────────────┘
+┌──────────────────────────────┐   ┌────────────────────────────────────┐
+│  Stage 1 — Chat Assistant    │   │  Stage 2 — Workflow                │
+│  stage-1/chat.js             │   │  stage-2/workflow.js               │
+│  ask() · system.md           │   │  runWorkflow() · classifier.md     │
+└──────────────────────────────┘   └────────────────────────────────────┘
 
 Specialist prompts (pre-written, ready for Stage 3):
   prompts/analyst.md  ·  prompts/extractor.md  ·  prompts/synthesizer.md  ← you just read these
@@ -148,7 +185,7 @@ Specialist prompts (pre-written, ready for Stage 3):
 1. Run `git add -A && git commit -m "Complete Module 5: Specialists & Prompts"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
 2. Update `CLAUDE.md`: change `- [ ] Module 5:` to `- [x] Module 5:` via Edit tool.
 
-3. **Run `/compact`** — type `/compact` to clear context before Module 6.
+3. **Run `/compact`** — type `/compact` to clear context before Stage 3 (Module 6). Stage boundary cleanup keeps Claude focused for the new mental model coming next.
 4. Hand off:
 
 > "You now have all the pieces: a chat assistant, a workflow, and three specialist prompts. Stage 3 is just wiring them together. In Module 6 you'll see the orchestrator that coordinates them — and there's one new idea we haven't introduced yet. Type `module-6` when you're ready."

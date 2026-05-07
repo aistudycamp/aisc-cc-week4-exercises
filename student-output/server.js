@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import 'dotenv/config';
-import { ask } from './stage-1/chat.js';
+import { ask, chatTurn } from './stage-1/chat.js';
 import { runWorkflow } from './stage-2/workflow.js';
 import { analyst, extractor, synthesizer, reflect, conductor } from './stage-3/orchestrator.js';
 
@@ -41,14 +41,29 @@ app.get('/api/prompts/:name', (req, res) => {
 });
 
 // Stage 1 — Chat assistant
+// Accepts either:
+//   { messages: [{role, content}, ...], system? }  — multi-turn (preferred)
+//   { question, context }                          — one-shot legacy form
 app.post('/api/chat', async (req, res) => {
   try {
-    const { question, context } = req.body;
-    const response = await ask(question, context);
-    res.json({ response });
+    const { messages, system, question, context } = req.body;
+    if (Array.isArray(messages) && messages.length > 0) {
+      const { reply, usage } = await chatTurn(messages, system || null);
+      res.json({ response: reply, usage });
+    } else {
+      const response = await ask(question, context);
+      res.json({ response });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Serve the active system prompt (for the chat tab to display + edit)
+app.get('/api/system-prompt', (req, res) => {
+  const p = path.join(PROMPTS_DIR, 'system.md');
+  if (!fs.existsSync(p)) return res.status(404).json({ error: 'Not found' });
+  res.type('text').send(fs.readFileSync(p, 'utf-8'));
 });
 
 // Stage 2 — Workflow pipeline
