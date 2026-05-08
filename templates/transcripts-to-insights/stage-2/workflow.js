@@ -16,6 +16,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { exec } from "node:child_process";
 import "dotenv/config";
+import { withRetry } from "../utils/retry.js";
+import { extractJsonObject } from "../utils/json.js";
 
 const client = new Anthropic();
 const ROOT = path.join(import.meta.dirname, "..");
@@ -27,13 +29,13 @@ const promptClassifier = fs.readFileSync(
 
 // ─── Helper: classify a transcript ────────────────────────────────────────
 async function classify(transcript) {
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 256,
     system: promptClassifier,
     messages: [{ role: "user", content: transcript.slice(0, 1200) }],
-  });
-  return JSON.parse(response.content[0].text.trim());
+  }));
+  return extractJsonObject(response.content[0].text);
 }
 
 // ─── Helper: macOS notification ───────────────────────────────────────────

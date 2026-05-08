@@ -29,4 +29,4 @@ Rules:
 - Be specific. Reference actual content from the run (names, numbers, themes found).
 - Recommendations must be actionable. Every "Tell Claude:" instruction must be something that would genuinely improve the agent.
 - Don't pad. If only one thing was ambiguous, say one thing.
-- This is a per-run analysis — focus on what *this* transcript revealed about the agent's behavior. Adapt-it-for-your-use-case templates live in Module 8 (Personalize / Build New).
+- This is a per-run analysis — focus on what *this* transcript revealed about the agent's behavior.

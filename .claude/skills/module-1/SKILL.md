@@ -19,23 +19,20 @@ The point of this module: students *see* how an agentic system is structured bef
 Before anything else, show them the full arc:
 
 ```
-       Stage 1                Stage 2                 Stage 3
-       ───────                ───────                 ───────
+   Stage 1                    Stage 2                    Stage 3
+   ───────                    ───────                    ───────
 
-       chat.js           →    workflow.js       →    orchestrator.js
-       You ask                A file drops in.       An orchestrator runs
-       questions.             AI classifies +        Analyst + Extractor
-       Get answers back.      routes + notifies.     in parallel →
-                              Automatic.             Synthesizer →
-                                                     Router (saves + notifies).
+   Chat assistant       →     Workflow             →     Multi-specialist system
+   You ask questions,         A transcript arrives.      Three specialists run in
+   it answers.                AI classifies and          coordination, then route
+                              routes it.                 the result.
 
-       1 system prompt        1 classifier           3 specialist prompts
-       (meeting analyst)      prompt                 (analyst, extractor,
-                                                     synthesizer)
+   1 system prompt            1 classifier prompt        3 specialist prompts
+                                                         + 1 router
 
-       Interactive.           Event-triggered.       Fully automated.
-       You drive it.          File drops in,         One input →
-                              pipeline runs.         full structured report.
+   Interactive.               Event-triggered.           Fully coordinated.
+   You drive it.              Runs without you.          One input → structured
+                                                         report on disk.
 ```
 
 > "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across specialists and an orchestrator coordinates them.
@@ -53,17 +50,22 @@ Say:
 Print this ASCII:
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Stage 3 — Agentic System                                           │
-│                                                                      │
-│  transcript                                                          │
-│      ↓                                                               │
-│  [Analyst ‖ Extractor]   ← parallel specialists (Promise.all)       │
-│           ↓                                                          │
-│      [Synthesizer]        ← combines themes + actions into report    │
-│           ↓                                                          │
-│        [Router]           ← Stage 2 reused: classify + save + notify│
-└─────────────────────────────────────────────────────────────────────┘
+              ┌────────────────┐
+              │   Transcript   │
+              └────────────────┘
+                      ↓
+       ┌─────────────────────────────┐
+       │   Analyst   ‖   Extractor   │   ← run in parallel
+       │   (themes)      (actions)   │
+       └─────────────────────────────┘
+                      ↓
+              ┌────────────────┐
+              │  Synthesizer   │   ← combines themes + actions
+              └────────────────┘
+                      ↓
+              ┌────────────────┐
+              │     Router     │   ← Stage 2 reused: classify, save, notify
+              └────────────────┘
 ```
 
 Then explain:
@@ -81,16 +83,17 @@ Read the example file and show them its contents. Use the Read tool on `examples
 Point out:
 1. **The actual report output** — show them what the agent produces. Key themes, action items, recommended next step. This is what they're working toward.
 2. **The specialists** — the themes came from the Analyst, the action items came from the Extractor, the classification from the Router.
+3. **The system did more than produce text.** The transcript was classified, given a filename, and saved to `transcripts/team-standup/`. The report you just read isn't sitting in a chat window — it's a file on disk in the right folder, and a notification fired. That's the whole shape: structured output **plus** routing **plus** notification, every run.
 
 Ask:
 
-> "Notice something? This report is more structured than you'd get from one ChatGPT message. Why do you think splitting it into specialists produces better output?"
+> "You could get a structured report like this out of one ChatGPT message. So what's actually different here? Why bother splitting it into specialists, an orchestrator, a router?"
 
 Wait for their answer.
 
 If they're stuck, prompt:
 
-> "Three reasons. First — **parallel = faster.** Both Analyst and Extractor work at the same time, not one after the other. Second — **focus = better output.** Each prompt is laser-focused on one job. The Analyst isn't distracted by action items; the Extractor isn't guessing at themes. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
+> "Three reasons, and none of them are 'better-looking output.' First — **it runs without you.** Drop a transcript in, the whole pipeline fires: classify, route, save, notify. ChatGPT needs you in the loop every time. Second — **focus = better output, every time.** Each prompt is laser-focused on one job — the Analyst isn't distracted by action items, the Extractor isn't guessing at themes — and that consistency matters when the system runs on its own. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
 
 ## Step 5: The three principles (3 min)
 
@@ -102,17 +105,11 @@ Tell them:
 2. **Each agent gets its own prompt.** The system prompt shapes what the agent does — it defines its role, its output format, its rules. Change the prompt, change the agent. Three specialists = three prompts = three jobs.
 3. **Compose; don't conflate.** Build small pieces, then chain them. A bigger agent isn't always a better agent.
 
-## Step 6: The specialists in the example (2 min)
-
-Look back at the KEY THEMES section in the example output shown earlier. Point out:
-
-> "Each of those themes came from the Analyst specialist — one focused prompt, one job. The action items below it came from the Extractor — a different prompt, running in parallel. The meeting classification at the top came from the Router. Three specialists. One orchestrator that put it all together."
-
-## Step 7: Reflection (1 min)
+## Step 6: Reflection (1 min)
 
 Say:
 
-> "Before we move on, hold onto this picture in your head. After Module 8, when you go back to your day job, the question you'll ask about *any* problem is:
+> "Before we move on, hold onto this picture in your head. After this sprint, when you go back to your day job, the question you'll ask about *any* problem is:
 >
 > - What's the input?
 > - What's the output?
@@ -126,17 +123,17 @@ Say:
 - Every specialist is a system prompt — that's the spine of the pattern you're about to build
 - Stage 3 is Stage 1 and Stage 2 wired together
 
-## Step 8: Wrap and commit (1 min)
+## Step 7: Wrap and commit (1 min)
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module 1: Tour the System"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 1: Tour the System")
    ```
    Show the student the changed files in the commit output.
 3. Say:
 
-> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The pattern you just saw runs once and stops — real agents loop on what came back and decide what's next. You'll see that in Module 7. Read `concepts/what-is-an-agent.md` if you want the full picture now.
+> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The pattern you'll build in this sprint runs once and stops; the loop variant is the natural next step beyond what's covered here. Read `concepts/what-is-an-agent.md` if you want the full picture now.
 >
 > In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 
@@ -146,7 +143,7 @@ Say:
 - **Read the example file via Read tool** — don't send the student to the terminal to `cat` it. Print the relevant sections inline in the chat.
 - **Wait for the student's answer** to "Why do specialists produce better output?" in Step 3 before giving the answer. Their attempt matters more than getting it right.
 - **Print the ASCII diagrams** — don't describe them, show them. The visual anchor is the whole point.
-- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator runs Analyst and Extractor in parallel (Promise.all) — both work simultaneously.
+- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator runs Analyst and Extractor in parallel — both work simultaneously.
 
 ## Optional deeper reading
 

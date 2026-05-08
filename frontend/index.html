@@ -434,6 +434,8 @@
   }
   .node-sub-agent.sub .sa-icon { background: var(--sub-soft); color: var(--sub); }
   .node-sub-agent.extr .sa-icon { background: var(--extr-soft); color: var(--extr); }
+  .node-sub-agent.reflect .sa-icon { background: rgba(13, 148, 136, 0.08); color: var(--orch); font-weight: 600; }
+  .node-sub-agent.reflect .sa-name em { color: var(--orch); }
   .sa-info { flex: 1; min-width: 0; }
   .sa-tag {
     font-family: var(--mono);
@@ -504,10 +506,11 @@
   body[data-stage="3"] #s3-input   { left: 32px;       top: 30%; }
   body[data-stage="3"] #s3-agent   { left: 50%;        top: 8%;  transform: translateX(-50%); }
   body[data-stage="3"] #s3-output  { right: 32px;      top: 30%; }
-  body[data-stage="3"] #s3-summ    { left: 4%;         top: 70%; }
-  body[data-stage="3"] #s3-extr    { left: 27%;        top: 70%; }
-  body[data-stage="3"] #s3-route   { left: 52%;        top: 70%; }
-  body[data-stage="3"] #s3-router  { right: 4%;        top: 70%; }
+  body[data-stage="3"] #s3-summ    { left: 2%;         top: 70%; }
+  body[data-stage="3"] #s3-extr    { left: 21%;        top: 70%; }
+  body[data-stage="3"] #s3-route   { left: 40%;        top: 70%; }
+  body[data-stage="3"] #s3-router  { left: 59%;        top: 70%; }
+  body[data-stage="3"] #s3-reflect { right: 2%;        top: 70%; }
 
   /* PARTICLES */
   .particle {
@@ -762,6 +765,18 @@
     gap: 6px;
     margin-bottom: 6px;
   }
+  .panel-hint {
+    font-size: 12px;
+    color: var(--sub);
+    background: var(--panel-soft);
+    border-left: 3px solid var(--line-strong);
+    padding: 8px 10px;
+    margin: 6px 0 8px 0;
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+  .panel-hint b { color: var(--ink-2); }
+  .panel-hint em { color: var(--ink-2); font-style: italic; }
   .panel-sample-btn {
     font-family: var(--mono);
     font-size: 10.5px;
@@ -1583,6 +1598,22 @@
         </div>
       </div>
 
+      <div class="node node-sub-agent reflect" id="s3-reflect" data-stages="3" data-node="s3-reflect">
+        <div class="sa-header">
+          <div class="sa-icon">⟲</div>
+          <div class="sa-info">
+            <div class="sa-tag">Step 5 · After-action</div>
+            <div class="sa-name">The <em>Reflect</em></div>
+          </div>
+          <div class="sa-dot"></div>
+        </div>
+        <div class="sa-body">Reads the entire run — themes, actions, report, classification — and writes a self-eval report. The agent grading its own work.</div>
+        <div class="sa-foot">
+          <span id="s3-reflectState">idle</span>
+          <span id="s3-reflectTime">—</span>
+        </div>
+      </div>
+
       <!-- particles -->
       <div class="particle c-input" id="p1"></div>
       <div class="particle c-orch" id="p2"></div>
@@ -1591,6 +1622,7 @@
       <div class="particle c-extr" id="p5"></div>
       <div class="particle c-output" id="p6"></div>
       <div class="particle c-orch" id="p7"></div>
+      <div class="particle c-orch" id="p8"></div>
 
       <!-- Chat-in-canvas (Stage 1 / chat tab) -->
       <div class="chat-canvas" id="chatCanvas">
@@ -1654,6 +1686,7 @@
               <button class="panel-sample-btn" id="workflowClientBtn">Load client call</button>
               <button class="panel-sample-btn" id="workflowPlanningBtn">Load planning</button>
             </div>
+            <div class="panel-hint">💡 <b>Try each sample transcript</b> — the classification badge and the saved file path will change with the input.</div>
             <button class="panel-btn" id="workflowSubmit">Run Workflow →</button>
             <div class="panel-result" id="workflowResult"></div>
           </div>
@@ -1673,6 +1706,7 @@
               placeholder="Optional: tell the Conductor what you want. e.g. &quot;Just give me the action items&quot; or &quot;Only route this — skip the analysis&quot; — leave blank for full pipeline"
               rows="5"
             ></textarea>
+            <div class="panel-hint">💡 <b>Try a different transcript</b> or <b>type an instruction above</b> like <em>"just give me the action items"</em> — same code, different behavior. The system adapts to your input.</div>
             <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
             <div id="orchConductorPlan" style="display:none" class="conductor-plan">
               <span class="conductor-label">Conductor chose:</span>
@@ -1811,6 +1845,57 @@ Return ONLY a JSON object:
        | <span class="str">"planning-session"</span> | <span class="str">"other"</span>,
   "suggested_filename": <span class="str">"YYYY-MM-DD-[type].txt"</span>,
   "confidence": <span class="str">"high"</span> | <span class="str">"low"</span>
+}`;
+
+  // reflect.md — Stage 3 after-action report (runs last)
+  const promptReflect = `<span class="role">You are the after-action report.</span>
+
+You receive everything that just happened — the
+transcript, the analyst's themes, the extractor's
+actions, the synthesizer's report, and the router's
+classification.
+
+Produce a structured run review:
+
+<span class="key">RUN REPORT</span>
+
+<span class="key">What happened</span>
+2-3 sentences on the run.
+
+<span class="key">What went well</span>
+- <span class="str">Specific observation about output quality</span>
+
+<span class="key">What was ambiguous</span>
+- <span class="str">Specific gap, low-confidence result</span>
+
+<span class="key">Recommendations</span>
+- <span class="str">Each ends with: Tell Claude: "[paste-ready
+  instruction to improve a prompt file]"</span>
+
+<span class="com">// You won't be acted on automatically — your job</span>
+<span class="com">// is to make the next iteration possible.</span>`;
+
+  // conductor.md — Stage 3 planning step
+  const promptConductor = `<span class="role">You are the Conductor — an orchestrator
+that decides which specialists to call.</span>
+
+Tools available: analyst, extractor, synthesizer,
+router, reflect.
+
+Rules:
+- synthesizer requires analyst AND extractor first
+- reflect requires synthesizer first
+- "just route" / "classify" → router only
+- "action items" / "tasks" → extractor only
+- "themes" / "summary" → analyst only
+- "how it went" / "after-action report" → include reflect
+- no instruction → run all five in order
+
+Respond with a single JSON object, no fences:
+
+{
+  <span class="key">"tools"</span>: [<span class="str">"extractor"</span>, <span class="str">"router"</span>],
+  <span class="key">"reasoning"</span>: <span class="str">"one sentence why"</span>
 }`;
 
   const nodeData = {
@@ -1967,16 +2052,17 @@ Return ONLY a JSON object:
       title: "The <em>Conductor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The coordinator. In Stage 1, one Analyst did everything alone. Here, the Conductor splits the work:<br><br>• Analyst + Extractor run <em>at the same time</em> (parallel dispatch — first time anything runs simultaneously)<br>• Synthesizer combines their outputs into the final report<br>• Synthesizer calls Stage 2's router to classify, save both files, and notify<br><br>The Conductor contains zero prompt logic — all the content comes from the specialist prompts.` },
+          content: `The planner. Reads the user's instruction (or runs the full pipeline if none was given), then returns JSON saying which specialists to call. The orchestrator code reads that plan and dispatches accordingly.<br><br>The Conductor is what crosses the line from <em>workflow</em> (fixed steps every time) to <em>agentic system</em> (planner decides). Same pattern as every other specialist in this sprint: a system prompt with a job. Its job is to plan, not to do.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 synthesized report + 📁 saved files" } },
+          content: { in: "📝 transcript + instruction", out: "📋 JSON plan: which tools to call" } },
+        { label: "Its instructions (conductor.md)", type: "prompt", content: promptConductor },
         { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "The transcript", note: "receives input" },
-            { arrow: "↓‖", target: "The Analyst + Extractor", note: "step 1: parallel dispatch" },
-            { arrow: "↓", target: "The Synthesizer", note: "step 2: combine results → final report" },
-            { arrow: "↓", target: "The Router", note: "step 3: classify, save, notify (Stage 2 reused)" },
-            { arrow: "→", target: "Saved report", note: "step 4: output" }
+            { arrow: "←", target: "The transcript + instruction", note: "receives input" },
+            { arrow: "↓‖", target: "The Analyst + Extractor", note: "dispatches in parallel (if planned)" },
+            { arrow: "↓", target: "The Synthesizer", note: "dispatches after Analyst + Extractor return" },
+            { arrow: "↓", target: "The Router", note: "dispatches Stage 2's runWorkflow() to classify + save" },
+            { arrow: "↓", target: "Reflect", note: "after-action report on the run (optional)" }
           ] }
       ]
     },
@@ -2040,11 +2126,11 @@ Return ONLY a JSON object:
       ]
     },
     's3-router': {
-      eyebrow: "Inspecting · Step 3 · Router",
+      eyebrow: "Inspecting · Step 4 · Router",
       title: "The <em>Router</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `Step 3 — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.<br><br>After the Router completes, <strong>Step 4: Reflect</strong> runs — the Conductor evaluates the entire run and produces a report with observations, ambiguities, and actionable recommendations for improving the agent.` },
+          content: `Step 4 — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.<br><br>After the Router completes, <strong>Step 5: Reflect</strong> runs — the after-action report on the entire run.` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 transcript + 📄 report", out: "📁 saved files + 🔔 notification" } },
         { label: "File", type: "files",
@@ -2053,7 +2139,23 @@ Return ONLY a JSON object:
           content: [
             { arrow: "←", target: "The Conductor", note: "called after Synthesizer completes" },
             { arrow: "→", target: "Saved report", note: "routes, saves, notifies" },
-            { arrow: "→", target: "Reflect (Step 4)", note: "Conductor evaluates the run next" }
+            { arrow: "→", target: "Reflect (Step 5)", note: "Conductor passes the full run trace next" }
+          ] }
+      ]
+    },
+    's3-reflect': {
+      eyebrow: "Inspecting · Step 5 · After-action report",
+      title: "The <em>Reflect</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The <em>self-eval / after-action report</em>. Runs after the Router. Reads everything that just happened — the transcript, themes from the Analyst, actions from the Extractor, the Synthesizer's report, the Router's classification — and writes a structured review.<br><br>Output has 4 sections: <strong>What happened</strong>, <strong>What went well</strong>, <strong>What was ambiguous</strong>, and <strong>Recommendations</strong>. Each recommendation ends with a paste-ready <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">Tell Claude:</code> instruction to improve a prompt file.<br><br>You won't act on this in the sprint. The pattern matters: in production you'd feed Reflect's output into a manual review queue, OR wire up another Claude call to apply a recommendation automatically — closing the loop.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📋 the full run trace", out: "📊 structured run report" } },
+        { label: "Its instructions (reflect.md)", type: "prompt", content: promptReflect },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "The Conductor", note: "called after Router completes" },
+            { arrow: "↓", target: "Run Report panel", note: "output rendered below" }
           ] }
       ]
     }
@@ -2153,17 +2255,20 @@ Return ONLY a JSON object:
     } else if (stage === '3') {
       const inR = rect('s3-input'), agR = rect('s3-agent'), outR = rect('s3-output');
       const summR = rect('s3-summ'), extrR = rect('s3-extr'), routeR = rect('s3-route'), routerR = rect('s3-router');
+      const reflectR = rect('s3-reflect');
       const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), agentBot = ptB(agR), outputLeft = ptL(outR);
       const summTop = ptT(summR), extrTop = ptT(extrR), routeTop = ptT(routeR), routerTop = ptT(routerR);
+      const reflectTop = ptT(reflectR);
       paths = [
         { id: 's3-input>s3-agent',   d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-output',  d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-summ',    d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${summTop.x} ${summTop.y - 40}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-extr',    d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${extrTop.x} ${extrTop.y - 40}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-route',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routeTop.x} ${routeTop.y - 40}, ${routeTop.x} ${routeTop.y}`, cls: 'dashed' },
-        { id: 's3-agent>s3-router',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routerTop.x} ${routerTop.y - 40}, ${routerTop.x} ${routerTop.y}`, cls: 'dashed' }
+        { id: 's3-agent>s3-router',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routerTop.x} ${routerTop.y - 40}, ${routerTop.x} ${routerTop.y}`, cls: 'dashed' },
+        { id: 's3-agent>s3-reflect', d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${reflectTop.x} ${reflectTop.y - 40}, ${reflectTop.x} ${reflectTop.y}`, cls: 'dashed' }
       ];
-      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop);
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop, reflectTop);
     }
 
     paths.forEach(p => {
@@ -2327,6 +2432,37 @@ Return ONLY a JSON object:
     toastTimer = setTimeout(() => el.classList.remove('visible'), 4000);
   }
 
+  // ── Friendly error decoder ──
+  // Anthropic SDK error messages start with the HTTP status code (e.g. "529 {...}").
+  // Map common status codes to a friendly inline message + a short toast.
+  function describeApiError(message) {
+    const m = String(message || '');
+    const codeMatch = m.match(/^(\d{3})\b/);
+    const code = codeMatch ? parseInt(codeMatch[1], 10) : null;
+    if (code === 529 || /overloaded/i.test(m)) {
+      return { friendly: '⚠ Anthropic is overloaded right now. Try again in a moment.', toast: 'Anthropic overloaded — try again' };
+    }
+    if (code === 503) {
+      return { friendly: '⚠ Anthropic API is temporarily unavailable. Try again in a moment.', toast: 'API unavailable — try again' };
+    }
+    if (code === 429 || /rate.?limit/i.test(m)) {
+      return { friendly: '⚠ Rate limited. Wait a few seconds, then try again.', toast: 'Rate limited — wait a moment' };
+    }
+    if (code === 401) {
+      return { friendly: '⚠ API key issue. Check student-output/.env has a valid ANTHROPIC_API_KEY.', toast: 'API key issue — check .env' };
+    }
+    if (/Unexpected token|JSON|not valid JSON/i.test(m)) {
+      return { friendly: '⚠ A specialist returned malformed JSON (probably wrapped in markdown fences). Try running again — the retry helper usually clears it.', toast: 'Malformed JSON from specialist — try again' };
+    }
+    if (/ECONN|ETIMEDOUT|ENOTFOUND|fetch/i.test(m)) {
+      return { friendly: '⚠ Network error talking to the server. Make sure `npm run server` is still running in your terminal.', toast: 'Network error — is the server running?' };
+    }
+    // Default: surface the actual error message in the toast (truncated) so the
+    // student doesn't have to dig into the raw output for a hint.
+    const snippet = m.length > 80 ? m.slice(0, 77) + '…' : m;
+    return { friendly: '⚠ Something went wrong. Try again, or check the browser console for details.', toast: `Error: ${snippet}` };
+  }
+
   function addFeed(e) {
     const feed = $('feed');
     if (feed.querySelector('.feed-empty')) feed.innerHTML = '';
@@ -2417,6 +2553,7 @@ Return ONLY a JSON object:
     if (fromNodeId === 's3-extr') return 'p5';
     if (fromNodeId === 's3-route') return 'p4';
     if (fromNodeId === 's3-router') return 'p7';
+    if (fromNodeId === 's3-reflect') return 'p8';
     if (fromNodeId.includes('extr')) return 'p5';
     if (fromNodeId.includes('route')) return 'p4';
     if (fromNodeId.includes('standup') || fromNodeId.includes('client') || fromNodeId.includes('planning')) return 'p6';
@@ -2579,13 +2716,22 @@ Return ONLY a JSON object:
 
   async function initChatCanvas() {
     if (chatSystemPromptDefault) return; // only init once
+    const FALLBACK_PROMPT = 'You are a meeting analyst. Read the meeting transcript and produce a structured report with KEY THEMES, ACTION ITEMS, and a RECOMMENDED NEXT STEP.';
     try {
       const r = await fetch('/api/system-prompt');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       const txt = await r.text();
+      // Defense: if server returned an HTML error page despite 200, don't dump it.
+      if (txt.trim().toLowerCase().startsWith('<!doctype') || txt.trim().toLowerCase().startsWith('<html')) {
+        throw new Error('Got HTML response from /api/system-prompt');
+      }
       chatSystemPromptDefault = txt;
       $('chatSystemPrompt').value = txt;
-    } catch {
-      $('chatSystemPrompt').placeholder = 'Failed to load system prompt — server may be offline.';
+    } catch (err) {
+      chatSystemPromptDefault = FALLBACK_PROMPT;
+      $('chatSystemPrompt').value = FALLBACK_PROMPT;
+      $('chatSystemPrompt').placeholder = 'Using default prompt — couldn\'t load from server.';
+      toast('⚠ Couldn\'t load system prompt — using default. Make sure `npm run server` is running.');
     }
   }
 
@@ -2671,11 +2817,13 @@ Return ONLY a JSON object:
       toast('Chat reply received.');
     } catch (err) {
       thinkingEl.remove();
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
       const errBubble = document.createElement('div');
       errBubble.className = 'chat-bubble assistant';
-      errBubble.textContent = 'Error: ' + err.message;
+      errBubble.textContent = friendly + '\n\nRaw: ' + err.message;
       hist.appendChild(errBubble);
       updateChatJsonPanel(requestBody, { error: err.message }, null);
+      toast(toastMsg);
     } finally {
       $('chatCanvasSend').disabled = false;
       $('chatCanvasSend').textContent = 'Send →';
@@ -2743,19 +2891,27 @@ Return ONLY a JSON object:
       });
       const { steps, classification, outputPath, error } = await r.json();
       if (error) throw new Error(error);
-      let html = '<div class="orch-steps">';
+      const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const wordCount = transcript.split(/\s+/).filter(Boolean).length;
+      const preview = transcript.length > 140 ? transcript.slice(0, 140).replace(/\s+/g, ' ').trim() + '…' : transcript;
+      const savedPath = outputPath ? outputPath.replace(/^.*\/transcripts\//, 'transcripts/') : `transcripts/${classification}/`;
+      let html = `<span class="class-badge">${esc(classification)}</span>`;
+      html += `<div class="out-block"><div class="out-label">📄 Source transcript</div><p style="font-size:13px;color:var(--sub);margin:4px 0 6px 0;">${wordCount} words</p><p style="font-style:italic;color:var(--sub);">"${esc(preview)}"</p></div>`;
+      html += `<div class="out-block"><div class="out-label">📁 Saved as</div><p><code>${esc(savedPath)}</code></p></div>`;
+      html += '<div class="out-block"><div class="out-label">⚙️ What happened</div><div class="orch-steps">';
       if (steps && steps.length) {
         for (const step of steps) {
-          html += `<div class="orch-step done"><span class="step-check">✓</span><span>${step.step}</span></div>`;
+          html += `<div class="orch-step done"><span class="step-check">✓</span><span>${esc(step.step)}</span></div>`;
         }
       }
-      html += '</div>';
-      html += `<span class="class-badge">${classification}</span>`;
+      html += '</div></div>';
       $('workflowResult').innerHTML = html;
       await animPromise;
       toast(`Workflow complete — routed to ${classification}.`);
     } catch (err) {
-      $('workflowResult').textContent = 'Error: ' + err.message;
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
+      $('workflowResult').textContent = friendly + '\n\nRaw: ' + err.message;
+      toast(toastMsg);
     } finally {
       $('workflowSubmit').disabled = false;
       $('workflowSubmit').textContent = 'Run Workflow →';
@@ -2923,7 +3079,14 @@ Return ONLY a JSON object:
         $('orchConductorPlan').style.display = 'block';
         log('orch', 'The Conductor', `Plan: <code>[${plan.tools.join(', ')}]</code>. ${plan.reasoning}`);
       } else {
-        log('orch', 'The Conductor', 'No instruction — running the full pipeline.');
+        // Default run (no instruction): show a synthetic plan badge so the
+        // student always sees what's about to fire and why. The Conductor
+        // isn't actually called here — its rule "no instruction → run all
+        // five" is implicit and we surface it as the plan.
+        $('orchConductorTools').textContent = tools.join(' → ');
+        $('orchConductorReason').textContent = 'No instruction given — running the full pipeline.';
+        $('orchConductorPlan').style.display = 'block';
+        log('orch', 'The Conductor', 'No instruction — running the full pipeline (default plan).');
         await sleep(DWELL_BEFORE_DISPATCH);
       }
       await sleep(DWELL_BEFORE_DISPATCH);
@@ -2973,6 +3136,9 @@ Return ONLY a JSON object:
         // Wait for return particles to land + a beat of Conductor dwell
         // before firing the next dispatch.
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('synthesizer')) {
+          log('orch', 'The Conductor', 'Got themes and actions back. Sending them to the Synthesizer.');
+        }
       }
 
       // Step 3: Synthesizer
@@ -2993,6 +3159,9 @@ Return ONLY a JSON object:
         log('extr', 'The Synthesizer', 'Report complete. Returning to Conductor.');
         setStep('orchStep3', 'done');
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('router')) {
+          log('orch', 'The Conductor', 'Got the report. Sending transcript + report to the Router.');
+        }
       }
 
       // Step 4: Router (Stage 2 reused)
@@ -3013,11 +3182,16 @@ Return ONLY a JSON object:
         log('orch', 'The Router', `Classified as <em>${cls}</em>. Saved + notified.`);
         setStep('orchStep4', 'done');
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('reflect')) {
+          log('orch', 'The Conductor', 'Router done. Sending the full run trace to Reflect for an after-action report.');
+        }
       }
 
       // Step 5: Reflect — run report
       if (tools.includes('reflect')) {
-        log('orch', 'The Conductor', 'Reflecting on the run — what happened, what went well, what to fix…');
+        fire('s3-agent', 's3-reflect');
+        begin('s3-reflect');
+        log('sub', 'The Reflect', 'Reading the full run — themes, actions, report, classification. Writing the after-action report…');
         setStep('orchStep5', 'running');
         const r4 = await fetch('/api/orchestrate/step4', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3026,9 +3200,11 @@ Return ONLY a JSON object:
         const { runReport, error: e4 } = await r4.json();
         if (e4) throw new Error(e4);
         setStep('orchStep5', 'done');
+        finish('s3-reflect');
+        fire('s3-reflect', 's3-agent');
         $('s3RunReportContent').textContent = runReport;
         $('s3RunReport').style.display = 'block';
-        log('orch', 'The Conductor', 'Run report complete.');
+        log('sub', 'The Reflect', 'After-action report complete. Returning to Conductor.');
         await sleep(DWELL_BEFORE_DISPATCH);
       }
 
@@ -3050,7 +3226,9 @@ Return ONLY a JSON object:
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
       toast(`Orchestrator complete — ${tools.length} specialists ran${classification ? ', routed to ' + classification : ''}.`);
     } catch (err) {
-      $('orchResult').textContent = 'Error: ' + err.message;
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
+      $('orchResult').textContent = friendly + '\n\nRaw: ' + err.message;
+      toast(toastMsg);
       ALL_STEPS.forEach(id => setStep(id, 'idle'));
       $('canvasStatus').textContent = '● error';
     } finally {

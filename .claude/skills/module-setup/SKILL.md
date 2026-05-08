@@ -41,7 +41,7 @@ Print this:
    ~1 hour                    ~45 min                    ~1 hour
 ```
 
-Stage 2's classifier reuses Stage 1's chat call. Stage 3's orchestrator imports both Stage 1's `ask()` and Stage 2's `runWorkflow()` — same pattern, layered up.
+Stage 2's classifier reuses Stage 1's chat call. Stage 3's orchestrator reuses both Stage 1's chat assistant and Stage 2's workflow — same pattern, layered up.
 
 > "Same use case the whole way through — turning meeting transcripts into clean insight reports. Each stage adds one new idea on top of the last. You won't write code yourself — you'll describe what you want and let Claude build it.
 >
@@ -182,10 +182,10 @@ Explain inline (don't make them open a file):
 
 Wrap and update progress:
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module Setup:` to `- [x] Module Setup:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module Setup:` to `- [x] Module Setup:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module Setup: setup + API key"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module Setup: setup + API key")
    ```
    Show the student the changed files in the commit output.
 3. Say:

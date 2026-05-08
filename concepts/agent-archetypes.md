@@ -9,7 +9,7 @@ Why one stock use case for everyone? Two reasons:
 1. **The arc is the lesson.** Going from a chat assistant → a workflow → an agentic system is the spine of what you'll learn. We want every student feeling the same "aha" at the same moment.
 2. **It's genuinely useful.** Transcripts are everywhere — meetings, calls, voice notes. By the end of Stage 3, you'll have a tool that actually saves you time.
 
-You'll get to **personalize** the system prompts in Module 8 — that's where you make the agent yours. Until then, you're following the same path as everyone else.
+After Module 7, you have a clear path to make this yours: same orchestrator code, swap the prompts, point it at your own domain.
 
 ## What you'll build, by stage
 

@@ -17,6 +17,7 @@ Rules:
 - If instruction asks for action items / tasks / TODOs: run extractor only
 - If instruction asks for themes / summary / key points: run analyst only
 - If instruction asks for a report or summary "without saving" or "don't save": run analyst + extractor + synthesizer (no router, no reflect)
+- If instruction asks "how it went" / "how did the run go" / "tell me what to improve" / "evaluate this" / "after-action report": include reflect (along with whatever tools produce the data it needs)
 - If instruction wants action items + classification: run extractor + router
 - Use judgment for anything else — pick the minimum set of tools that satisfies the instruction
 

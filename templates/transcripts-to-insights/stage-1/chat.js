@@ -18,6 +18,7 @@ import readline from "node:readline";
 import fs from "node:fs";
 import path from "node:path";
 import "dotenv/config";
+import { withRetry } from "../utils/retry.js";
 
 const client = new Anthropic();
 
@@ -31,12 +32,12 @@ const systemPrompt = fs.readFileSync(
 // Stage 2 and Stage 3 import this — it's the shared foundation.
 export async function ask(question, context) {
   const content = context ? `${question}\n\n${context}` : question;
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: systemPrompt,
     messages: [{ role: "user", content }],
-  });
+  }));
   return response.content[0].text;
 }
 
@@ -45,12 +46,12 @@ export async function ask(question, context) {
 // The array grows on every turn — that's how Claude sees the conversation.
 // Returns { reply, usage } so the frontend can show token counts.
 export async function chatTurn(messages, systemOverride = null) {
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: systemOverride || systemPrompt,
     messages,
-  });
+  }));
   return { reply: response.content[0].text, usage: response.usage };
 }
 
@@ -100,12 +101,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     messages.push({ role: "user", content: text });
 
     try {
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-6",
+      const response = await withRetry(() => client.messages.create({
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 1024,
         system: systemPrompt,
         messages,
-      });
+      }));
 
       const reply = response.content[0].text;
       messages.push({ role: "assistant", content: reply });

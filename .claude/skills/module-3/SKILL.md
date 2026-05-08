@@ -1,6 +1,6 @@
 ---
 name: module-3
-description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student runs stage-1/chat.js interactively with a pre-loaded transcript, asks follow-up questions, edits the system prompt to see personality change, then restores it. No manual code editing — all edits go through Claude.
+description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student runs the chat assistant interactively in the browser with a pre-loaded transcript, asks follow-up questions, edits the system prompt to see personality change, then restores it. No manual code editing — all edits go through Claude.
 ---
 
 # Module 3: Run the Chat Assistant
@@ -44,7 +44,7 @@ Print this so the loop is visible:
 [ POST /api/chat with messages[] ]
             │
             ▼
-[ ask() → Anthropic API ]   ← system prompt steers everything
+[ Anthropic API call ]   ← system prompt steers everything
             │
             ▼
 [ response back, append to messages[] ]
@@ -57,13 +57,11 @@ Print this so the loop is visible:
 
 ## Step 3: Read the system prompt (3 min)
 
-Read `prompts/system.md` via Read tool and print the full contents inline:
+The system prompt is saved at `prompts/system.md`. You can read and edit it live in the **Chat tab's system prompt panel** — it's the editable textarea at the top of the canvas. Open the browser to **http://localhost:3000** if you haven't already.
 
-"Here's what's inside `prompts/system.md` right now:"
+> "That panel **is** the file. Whatever's in there is what shapes every output: KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined there. Change the panel, change the agent. That's the leverage."
 
-[print full file contents]
-
-> "This is what makes every output look the way it does. KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined here. Change this file and the output format changes entirely. That's the leverage."
+**Verification convention for the rest of this module:** every time Claude edits `prompts/system.md`, the system-prompt panel in the Chat tab shows the new contents — that's how you verify each edit landed. We won't repeat this for every edit below.
 
 ## Step 4: Start the server (1 min)
 
@@ -100,10 +98,6 @@ Say to Claude:
 
 > "Update `prompts/system.md` — change the first line from `You are a meeting analyst...` to: `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`"
 
-After Claude edits it, read the file back and print the full updated contents inline:
-
-"Here's what it looks like now:" [print full file contents]
-
 Then restart the server so the new prompt takes effect. In your terminal: press `Ctrl+C` to stop, then:
 
 ```bash
@@ -134,10 +128,6 @@ This time we change BOTH the personality and the structure of the output. Say to
 > Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
 > ```"
 
-After Claude edits it, read the file back and print the full updated contents inline:
-
-"Here's what it looks like now:" [print full file contents]
-
 Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question — or just send an empty message after loading to get the full report.
 
 > "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output, AND its structure, is shaped by it. You went from a Renaissance scholar to a pirate captain by editing a single file. That's the leverage."
@@ -146,9 +136,7 @@ Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://loca
 
 Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
 
-Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool. Then read `prompts/system.md` back via Read tool and print the full contents inline:
-
-"Here's the original prompt restored:" [print full file contents]
+Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool.
 
 Restart the server (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask one question to confirm the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format is back.
 
@@ -157,7 +145,7 @@ If they want to keep a custom prompt, save it first — write their current modi
 ## Key takeaways
 
 - The system prompt is the leverage point — change it, change everything the agent does
-- Same `ask()` function, same API call — only the prompt changes
+- Same chat assistant, same API call — only the prompt changes
 - Always restore `system-original.md` before moving on — every module from here depends on the baseline prompt
 
 ## Step 7: Wrap and commit (1 min)
@@ -167,16 +155,15 @@ What you've built so far:
 ```
 ┌──────────────────────────────┐
 │  Stage 1 — Chat Assistant    │  ← running live in the browser
-│  stage-1/chat.js             │
-│  ask() · system.md prompt    │
-│  server running at :3000     │
+│  Interactive, multi-turn     │
+│  Server running at :3000     │
 └──────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 3:` to `- [x] Module 3:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root (in a second terminal tab if needed, so the server keeps running):
    ```bash
-   git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 3: Run the Chat Assistant")
    ```
    Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear context before Stage 2 (Module 4). Stage boundary cleanup keeps Claude focused for the new mental model coming next.

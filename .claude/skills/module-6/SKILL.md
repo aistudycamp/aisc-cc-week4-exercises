@@ -1,257 +1,139 @@
 ---
 name: module-6
-description: The Agentic System — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". Student reads stage-3/orchestrator.js inline (coach prints it), sees the parallel dispatch (Promise.all), walks through the 3-step sequence (Analyst+Extractor parallel → Synthesizer → Router), runs the full system, and arrives at the Claude Code connection — "you've been using this pattern all week."
+description: The Conductor — Module 6 of the AISC Agent Sprint. Triggered when a student types "module-6". The student's multi-specialist workflow becomes a true multi-agent system. The Conductor is a planning step that reads the instruction and decides which specialists to call. This is the peak of the sprint — the moment the workflow becomes agentic.
 ---
 
-# Module 6: The Agentic System
+# Module 6: The Conductor
 
-**Time:** ~30 minutes
+**Time:** ~16-20 minutes
 
 **What we're building**
-By the end: a working agentic orchestrator. Analyst and Extractor run in parallel, their outputs are combined by Synthesizer, and the result is routed by the workflow you built in Module 4. Stage 3 is live.
+By the end: you'll have added a Conductor — a planning step in front of your multi-specialist workflow. The Conductor reads each instruction and decides which specialists to call. Different instructions trigger different specialists. Same five tools you have, but now the system reasons about which ones to use. **This is the peak of the sprint** — the moment your workflow becomes a true multi-agent system.
 
 ## Coach Instructions
 
-This is the conceptual peak. Three moments to land:
-1. **The parallel dispatch** — first time anything in this course runs simultaneously.
-2. **The building blocks click** — the orchestrator imports their own work from Stages 1 and 2.
-3. **The Claude Code connection** — "You've been using this pattern all week."
+**This is the peak of the sprint.** The student built a chat assistant (M3), a workflow (M4), and a multi-specialist workflow (M5). All of those have a fixed shape — every input runs through the same steps in the same order. The Conductor is the new idea: a planning step that reasons about the instruction and dispatches a tailored set of specialists. That's what crosses the line from "workflow" to "agentic system" in Anthropic's framing.
 
-Take it slow. Let each one land before moving to the next.
+**Anchor on Anthropic's "Building Effective Agents" guide.** Reference the published distinction between workflows (fixed paths) and agentic systems (planner decides). The Conductor is your planner. This anchor matters because students will encounter this vocabulary elsewhere; consistency with the canonical Anthropic definition keeps their mental model clean.
 
-## Step 1: Set the frame (3 min)
+**No code in the terminal.** The Conductor's prompt is `prompts/conductor.md`. The frontend's Agentic System tab shows the Conductor node — the student clicks it to see the system prompt. Use the frontend as the viewing surface. Do NOT inline code blocks, line numbers, or function signatures.
 
-Say:
+**Three runs that show three layers of agentic behavior.** Run 1 targets a Stage 3 specialist (Extractor only). Run 2 targets a Stage 2 component (Router only). Runs 1 and 2 prove the Conductor can dispatch ANY of the available tools. Run 3 is the full pipeline plus Reflect — the **self-eval / after-action report** — which shows the agent analyzing its own work. Watch which steps light up versus stay dark — that's the visible proof of the planning decision.
 
-> "We've built two things: a chat assistant that answers questions, and a workflow that classifies and routes files. Stage 3 is parallel orchestration — Analyst and Extractor run at the same time, then Synthesizer combines them, then the Stage 2 router takes over.
+**No "Acts." No "Stage N —" prefixes in step headers.** Earlier versions of this module had a multi-Act structure that was confusing. Each step is just a step.
+
+---
+
+## Step 1: Opener (1 min)
+
+> "You built an agentic workflow in Module 5 — five specialists in a fixed sequence. Same input shape, same output shape, every time. Now you make it a real multi-agent system: a Conductor that **decides** which specialists to call based on the instruction."
+
+> "This is the peak of the sprint. Up until now you've been building. After this, you'll have a system that reasons."
+
+## Step 2: Anthropic's framing (1 min)
+
+> "Anthropic published a guide called 'Building Effective Agents' that draws this exact line. **Workflows** have fixed paths — the LLM is a step inside a deterministic pipeline. **Agentic systems** have a planner that decides what to do. The Conductor you're about to add is your planner."
+
+> "Read it later if you want — https://www.anthropic.com/engineering/building-effective-agents — it's the canonical reference for the patterns we're using."
+
+## Step 3: Meet the Conductor (2 min)
+
+> "Open the **Agentic System** tab in your browser. You saw the **Conductor** node at the top of the diagram in Module 5 — but you haven't actually used it yet. Click it now."
+
+> "The Conductor's job: read the user's instruction, then return JSON like `{tools: ['extractor'], reasoning: 'instruction asked for action items'}`. That's it. No prose response — a plan. The orchestrator then runs only the tools the Conductor picked."
+
+> "Same pattern as every other specialist in this sprint: a system prompt with a job. The Conductor's job is just to plan, not to do. Its prompt lives at `prompts/conductor.md` — open it in VS Code if you want to read it."
+
+## Step 4: Run 1 — targeted specialist (3-4 min)
+
+> "Let's see what happens when you give it a specific instruction. Click **Load standup**. In the instruction field, type:"
+
+```
+Just give me the action items
+```
+
+> "Then click **Run Orchestrator →**."
+
+Wait for the student to run it.
+
+> "Watch what happens — only the **Extractor** step lights up. Analyst stays dark. Synthesizer stays dark. Router stays dark. The Conductor read your instruction, decided 'this person wants action items, that's the Extractor,' and called only that one."
+
+> "Tell me what you see in the Conductor plan badge — what tools did it pick, and what was its reasoning?"
+
+Wait for the student's answer. The Conductor should have returned `{tools: ["extractor"]}` or similar with reasoning that mentions action items.
+
+## Step 5: Run 2 — different part of the system (3-4 min)
+
+> "Now run it again with a different kind of instruction. Click **Clear**, then **Load standup**. Type:"
+
+```
+Just route it
+```
+
+> "Then click **Run Orchestrator →**."
+
+Wait for the student to run it.
+
+> "This time only the **Router** step lights up — the Stage 2 component you built in Module 4. The Analyst, Extractor, Synthesizer all stay dark. Same Conductor. Different instruction. Different part of the system activated."
+
+> "The Conductor doesn't care that Router is from Stage 2 and Extractor is from Stage 3 — it just sees five tools and picks the right ones for the job."
+
+> "What was the Conductor's reasoning this time?"
+
+Wait for the student's answer.
+
+## Step 6: Run 3 — full pipeline, with the after-action report (4-5 min)
+
+> "Two runs in, you've seen the Conductor pick a single specialist or route. Now let's ask for everything — and a check on how the run went. Click **Clear**, then **Load standup**. Type:"
+
+```
+Give me the full report — and tell me how it went
+```
+
+> "Then click **Run Orchestrator →**."
+
+Wait for the student to run it.
+
+> "All five specialists fire this time. Analyst and Extractor in parallel, then Synthesizer, then Router. **Then Reflect** — the fifth specialist on the far right of the bottom row. The Conductor dispatches it last, after all the work is done. This is the agent's **self-eval / after-action report**. Reflect reads everything that just happened — themes, action items, the final report, the classification — and writes a structured review of how the run went."
+
+> "Click the **Reflect** node to read its system prompt. Then scroll down to the **Run Report** panel (below the step list) — that's where Reflect's actual output for this run lands. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**."
+
+Wait for the student to read.
+
+> "Notice the Recommendations section. Each one ends with a literal `Tell Claude:` instruction — a paste-ready prompt that would improve one of your specialist prompt files."
+
+> "Now here's the choice you have in production. The after-action report is the input. **Two ways to act on it:**
 >
-> Heads up on the vocabulary: by Anthropic's definition this is still a *workflow* — it runs predefined steps every time. In Module 7 we'll add a planning step (the Conductor) that decides which steps to take, and that's the moment it crosses into actual agent territory.
+> 1. **Manual** — you read the reports yourself, decide which recommendations matter, and edit the prompt files when you spot a weakness.
+> 2. **Fully automated** — you wire up another Claude call that reads the after-action report, picks a recommendation, and updates the prompt files automatically. The loop closes itself. No human in the middle.
 >
-> And here's the payoff you've been set up for: the specialists you just read in Module 5, the workflow you built in Module 4 — the orchestrator is what wires them all together. You're not starting over. You're composing what you have."
+> Either way, the agent analyzing its own work and telling you how it went is what makes the rest possible. We're not going to wire up either operator today — the pattern matters more than which one you pick. You'll have everything you need to build it."
 
-Before we look at any code, ask:
+> "What did the after-action report flag for your run — what was strong, what was ambiguous?"
 
-> "What's the difference between running two things *in sequence* versus running them *in parallel*?"
+Wait for the student's answer.
 
-Wait for their answer. Then:
+## Step 7: What just happened (1 min)
 
-> "In sequence: Analyst finishes, *then* Extractor starts. In parallel: both start at the same time, both run simultaneously, both finish before we move on. For our two independent specialists — Analyst and Extractor — there's no reason one has to wait for the other. Running them in parallel cuts the time roughly in half."
+> "You just built a multi-agent system. Up until ten minutes ago you had a workflow — fixed steps, same order every time. Now the system reasons about the instruction and dispatches the right tools, and the agent grades its own output along the way. One new node, plus a new way to use the existing ones. New behavior."
 
-## Step 2: The architecture (3 min)
+> "Same pattern works for any agentic system: a planner reads the input, picks the tools, dispatches them, and (optionally) an after-action report grades the run. That's what's happening inside Claude Code, inside customer-support agents, inside research assistants. Different specialists. Same shape."
 
-Print this:
+## Step 8: Commit + checklist + `/compact` (1 min)
 
-```
-transcript
-     ↓
-[Analyst  ‖  Extractor]   ← parallel — both run at the same time (Promise.all)
-          ↓
-     [Synthesizer]         ← receives both outputs, produces the final report
-          ↓
-       [Router]            ← Stage 2's runWorkflow() — classifies from transcript,
-                              saves both transcript + report to typed folder, notifies
-```
+**Coach:** Do all of the following automatically — do not ask the student to run terminal commands:
 
-> "Read it top to bottom. The transcript goes in. Analyst and Extractor run simultaneously — that double bar ‖ means parallel. When both finish, Synthesizer combines their outputs into the final report. Then Router takes the transcript and the report, classifies the meeting type, saves both files to the right folder, and sends the notification.
->
-> Three steps. Four API calls total (two parallel, one synthesis, one classifier). Two building blocks you already built."
+1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 6: The Conductor")` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]" (or "No changes to commit." if nothing was staged.)
+2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 6:` to `- [x] Module 6:`.
+3. **Run `/compact`** — type `/compact` to clear context before Module 7. Stage boundary cleanup keeps Claude focused for the send-off.
 
-## Step 3: Read orchestrator.js — start at the imports (5 min)
+After `/compact`:
 
-**Coach:** Use the Read tool to read `student-output/stage-3/orchestrator.js` and print the relevant sections inline. Do not ask the student to open the file or run any terminal command just to view it.
+> "Module 6 done. You've built a multi-agent system. Type `module-7` when you're ready — that's the send-off, and a few examples of where this pattern goes next."
 
-Here's what's at the top of `stage-3/orchestrator.js` right now:
+## Coach guardrails
 
-**[Coach: Read `student-output/stage-3/orchestrator.js` and print the prompt-loading block and the import line below]**
-
-Start with the prompt file loads:
-
-```js
-const promptAnalyst    = fs.readFileSync(path.join(ROOT, 'prompts', 'analyst.md'),    'utf-8');
-const promptExtractor  = fs.readFileSync(path.join(ROOT, 'prompts', 'extractor.md'),  'utf-8');
-const promptSynthesizer = fs.readFileSync(path.join(ROOT, 'prompts', 'synthesizer.md'), 'utf-8');
-```
-
-> "Stop here. These three files are the specialists you read in Module 5. The orchestrator loads them at startup — each one becomes the system prompt for a different API call."
-
-Then the import:
-
-```js
-import { runWorkflow } from '../stage-2/workflow.js'; // ← Stage 2 building block
-```
-
-> "And this — `runWorkflow` from Stage 2. The workflow you built in Module 4. The orchestrator imports it directly. Two modules ago you were building this function. Now it's a building block."
-
-Ask:
-
-> "You've seen the prompts load and the workflow import. What do you think happens first when the orchestrator runs?"
-
-Wait for their answer. The answer: Analyst and Extractor fire at the same time.
-
-## Step 4: Walk through the parallel dispatch (4 min)
-
-**Coach:** Print the `orchestrator()` function — specifically the Promise.all block and the two lines that follow:
-
-```js
-// Step 1: Analyst + Extractor run in parallel — first time anything runs simultaneously
-const [themes, actions] = await Promise.all([
-  analyst(transcript),
-  extractor(transcript),
-]);
-```
-
-> "This is the most important line in Stage 3. `Promise.all` fires both calls at the same time. Both send their request to Anthropic. Both wait. Both return. The `[themes, actions]` destructuring captures both results when they're both done.
->
-> This is the first time in this course anything runs simultaneously. As we said in Step 1, Anthropic still calls this a workflow — it runs predefined steps every time. But it's a *parallel* workflow, and it's the direct predecessor to what becomes an agent in Module 7 when the Conductor decides which steps to take."
-
-Then the synthesis:
-
-```js
-// Step 2: Synthesizer combines results into the final report
-const report = await synthesizer(themes, actions);
-```
-
-> "Synthesizer takes themes from the Analyst and actions from the Extractor. It can't start until both finish — that's why it's *after* the Promise.all, not inside it."
-
-Then the router:
-
-```js
-// Step 3: Router — classify from transcript, save both files, notify
-const { classification, outputPath } = await runWorkflow(transcript, sourceFilename, report);
-```
-
-> "And the last step: `runWorkflow()`. Your Stage 2 function. It classifies the meeting type, saves the transcript to the typed folder, *also* saves the synthesized report alongside it, and sends the notification. That optional `report` parameter is why you wrote the workflow the way you did."
-
-## Step 5: Run it (5 min)
-
-The server should already be running from Module 3. If you just opened a fresh terminal, run `cd [repo-root]` first (use `pwd` to confirm the repo root), then:
-
-```bash
-npm run server
-```
-
-Open **http://localhost:3000** and click the **Stage 3** tab.
-
-Click **Load standup**, then hit **Run Orchestrator →**.
-
-Watch each step light up:
-
-```
-📄 Input: transcripts/sample-transcript.txt (N words)
-🤖 Orchestrator starting — Analyst + Extractor in parallel, then Synthesizer, then Router.
-
-  🔀 Step 1: Analyst + Extractor running in parallel...
-  ✓ Analyst complete. Extractor complete.
-  🧠 Step 2: Synthesizer combining results...
-  ✓ Report synthesized.
-  ⚙️  Step 3: Router — classifying, saving, notifying...
-    🔍 Classifying meeting type...
-    ✓ Classified as: team-standup
-    ✓ Routed → transcripts/team-standup/...
-    ✓ Report  → transcripts/team-standup/...-report.md
-✓ Orchestration complete.
-
-────────────────────────────────────────────────────────────
-[final report here]
-```
-
-Point at the output:
-
-> "Step 1 says 'Analyst + Extractor running in parallel' — both fired at once. Step 2 is Synthesizer — it waited. Step 3 is the workflow you built in Module 4. And after it, there's now a report file alongside the transcript in the typed folder."
-
-**Coach:** Use the Read tool to list the `student-output/transcripts/team-standup/` directory and show the student the two files: the transcript and the report.
-
-> "Two files: the transcript and the report. That's Stage 3."
-
-## Step 6: Run it through the browser (4 min)
-
-You're already in the browser. Click each node on the diagram and point to the code behind it.
-
-> "Each checkmark is a real API call completing. Step 1 shows both analysts finishing simultaneously — you can see the parallel dispatch happening."
-
-Show the inspect panels — each one maps to a specific file you've now run.
-
-## Step 7: The Claude Code connection (3 min)
-
-Say:
-
-> "One more thing before we wrap. You've been using Claude Code all sprint — you type what you want, it reads the code, thinks about what to change, and does it.
->
-> Here's what's actually happening when you do that:"
-
-Print this:
-
-```
-You (user message)
-     ↓
-Claude Code (orchestrator)
-     ↓
-[Read file ‖ Search codebase ‖ Check context]   ← parallel tool calls
-          ↓
-     [Reason about changes]
-          ↓
-       [Write files + Report back]
-```
-
-> "Claude Code is an orchestrator. It takes your request, dispatches tools in parallel (reading files, searching code), synthesizes what it found, and produces the output. Same pattern you just built.
->
-> But here's the part you haven't built yet — the **loop**:"
-
-```
-plan → act → observe → decide → repeat
-   ↑                              │
-   └──────────────────────────────┘
-```
-
-> "Claude Code doesn't just dispatch once. It plans (reads your message, picks tools), acts (calls them), observes (reads what came back), decides (am I done? do I need more?), and repeats until the task is finished. The orchestrator you just built runs the loop *once* and stops. A real agent runs it as long as it needs to.
->
-> The Conductor you'll meet in Module 7 is one step of that loop — the planning step. Production agents are that loop running on autopilot.
->
-> When you built Stage 3, you weren't just learning about agentic systems — you were reverse-engineering the tool you were using to build it. **Every multi-specialist system you'll work with is some flavor of: dispatch → run specialists → combine → route**, often inside a loop. The pattern you just built is one common shape (parallelization with synthesis). Other shapes exist — routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop on environmental feedback. Read `concepts/what-is-an-agent.md` for the broader taxonomy."
-
-## Key takeaways
-
-- `Promise.all` runs specialists in parallel — both start at once, you wait for both to finish
-- The orchestrator doesn't add intelligence — it coordinates. The specialists do the work.
-- Stage 3 builds on everything: `ask()` from Stage 1, `runWorkflow()` from Stage 2, parallel dispatch from this module
-
-## Step 8: Wrap and commit (2 min)
-
-What you've built so far:
-
-```
-┌────────────┐   ┌────────────┐   ┌──────────────────────────────────────┐
-│  Stage 1   │   │  Stage 2   │   │  Stage 3 — Agentic System             │  ← you designed this
-│  chat.js   │   │workflow.js │ → │  orchestrator.js                      │
-│  ask()     │   │runWorkflow │   │  [Analyst ‖ Extractor] (parallel)     │
-└────────────┘   └────────────┘   │            ↓                          │
-                                  │     [Synthesizer]                     │
-                                  │            ↓                          │
-                                  │  [Router → saves transcript + report] │
-                                  └──────────────────────────────────────┘
-```
-
-**Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
-
-1. Run `git add -A && git commit -m "Complete Module 6: The Agentic System"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
-2. Update `CLAUDE.md`: change `- [ ] Module 6:` to `- [x] Module 6:` via Edit tool.
-
-3. Hand off:
-
-> "You just designed a multi-agent system end-to-end. You read every prompt, you specified every step, you watched it run. That's the actual peak of this sprint. Two more modules: in Module 7 you'll tour the full system in the browser, and in Module 8 you'll make it your own. Type `module-7` when you're ready."
-
-## Coach Guardrails
-
-- **Slow down at the Promise.all** — "This is the most important line in Stage 3" means it. Don't move past the parallel dispatch until the student understands why it matters.
-- **Make the prediction first** — "What do you think happens first when the orchestrator runs?" in Step 3 is not optional. Wait for their prediction before walking through the code.
-- **The Claude Code connection is the capstone** — don't skip Step 7. It reframes everything they did this week. Land it before the commit.
-- **Coach reads files inline** — never ask the student to open `orchestrator.js` or run `cat`. Use the Read tool and print the relevant sections directly in chat.
-- **"Agentic" vs "workflow"** — the distinction is: parallel dispatch, context passing between specialists, and synthesis. If a student asks what makes Stage 3 *agentic* specifically, those are the three answers.
-- **Have them look at the output folder** — show the two files via Read tool. Don't just describe it.
-
-## Optional deeper reading
-
-Just ask me: *"Read concepts/what-is-an-orchestrator.md and walk me through it."*
-
-- `concepts/what-is-an-orchestrator.md` — goes deeper on orchestration patterns, parallel vs. sequential dispatch
-- `concepts/what-is-an-agent.md` — re-read the hierarchy section now that you've built all three levels
+- **No code in the terminal.** The Conductor prompt is visible in the frontend; point students there if they want to read it.
+- **Two runs, both fast.** Don't add a third run "to make sure it works." The contrast between the two is the lesson.
+- **Don't claim the curriculum builds a loop.** Real agentic systems often loop (plan → act → observe → repeat). This curriculum doesn't build that — the Conductor runs once and the orchestrator runs the chosen tools once. If the student asks "does it loop?" — answer honestly: no, this is a single planning pass; loops are the next thing to add but aren't here.
+- **Anchor every "this is agentic because…" claim back to Anthropic's framing.** The vocabulary should be consistent: planner / decides / dispatches / dynamic — not loose synonyms.

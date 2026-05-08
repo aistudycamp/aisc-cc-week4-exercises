@@ -1,6 +1,6 @@
 ---
 name: module-2
-description: Your First API Call — Module 2 of the AISC Agent Sprint. Triggered when a student types "module-2". The demystify-the-API moment. Student opens chat.js, runs it for the first time, and sees the JSON request and response. By the end, AI products are no longer magic.
+description: Your First API Call — Module 2 of the AISC Agent Sprint. Triggered when a student types "module-2". The demystify-the-API moment. Student runs the chat assistant from the browser for the first time and sees the JSON request and response. By the end, AI products are no longer magic.
 ---
 
 # Module 2: Your First API Call
@@ -65,7 +65,7 @@ Show them what the code is about to send to Anthropic — this is the JSON objec
 
 ```json
 {
-  "model": "claude-sonnet-4-6",
+  "model": "claude-haiku-4-5-20251001",
   "max_tokens": 1024,
   "system": "You are a meeting analyst. ...",
   "messages": [
@@ -98,13 +98,17 @@ npm run server
 
 (Use the repo root path you saved in module-setup.) You should see `🚀 Server running at http://localhost:3000`. Leave that tab open — the server runs there for the rest of the sprint.
 
-Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab. Click **Load standup** — that loads the sample transcript as the first message in the conversation.
+Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab.
 
-Now ask a question: `Who looks most blocked?`
+**Click `Load standup`.** Watch what happens — the sample transcript appears in the conversation, and within a couple seconds Claude responds with a structured report: KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP. **That's your first API call.** The same JSON you just saw in Step 3 went over the wire to Anthropic's servers, and the structured response came back as text. Less than a second, less than a penny.
 
-Watch the response appear. That's the API call firing — the same JSON you just saw in Step 3, going over the wire to Anthropic's servers, coming back as text.
+Now try a follow-up to see multi-turn in action. In the input box at the bottom of the chat, type:
 
-Notice the log strip below the reply: `[messages: N · ~tokens · time]`. That `messages: N` count is the size of the `messages[]` array — it grows by 2 every turn (your message, Claude's reply). That growth is what gives the chat memory across turns. We'll come back to it in Module 3.
+```
+Who looks most blocked?
+```
+
+Hit send. Claude reads the prior transcript + your new question and answers. **That's your second API call.** Notice the log strip below the reply: `[messages: N · ~tokens · time]`. The `messages: N` count grew by 2 (your message + Claude's reply). That growing array is what gives the chat memory across turns — we'll dig into it in Module 3.
 
 If something errors:
 - **`ANTHROPIC_API_KEY` undefined** → check `.env` is in the right folder and has the real key
@@ -158,15 +162,14 @@ What you've built so far:
 ```
 ┌──────────────────────────────┐
 │  Stage 1 — Chat Assistant    │  ← you built this
-│  stage-1/chat.js             │
-│  ask() · system.md prompt    │
+│  Interactive, you drive it   │
 └──────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 2:` to `- [x] Module 2:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 2:` to `- [x] Module 2:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module 2: First API Call"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 2: Your First API Call")
    ```
    Show the student the changed files in the commit output.
 3. Hand off:
@@ -186,4 +189,4 @@ Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pu
 - **Don't skip the JSON walkthrough** — Steps 2 and 3 (reading the file and showing the request object) are the point of this module. Don't jump straight to running it.
 - **Diagnose errors before moving on** — if the student gets a `401`, `Cannot find module`, or `ANTHROPIC_API_KEY undefined`, fix it here. A broken setup will block every module from here forward.
 - **The "full JSON response" step is optional** — follow the student's curiosity. If they want to see the full response object, great. If not, move on without guilt.
-- **Fresh terminal recovery** — if the student just opened a new terminal, remind them: `cd [repo-root]/student-output` before running `npm run stage-1`. The repo root path is the one established in Module Setup.
+- **Fresh terminal recovery** — if the student just opened a new terminal and the server isn't running, remind them: `cd [repo-root]/student-output && npm run server` to bring it back up. The repo root path is the one established in Module Setup.
