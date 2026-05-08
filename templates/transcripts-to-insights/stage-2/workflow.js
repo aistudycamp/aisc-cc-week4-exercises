@@ -17,6 +17,7 @@ import path from "node:path";
 import { exec } from "node:child_process";
 import "dotenv/config";
 import { withRetry } from "../utils/retry.js";
+import { extractJsonObject } from "../utils/json.js";
 
 const client = new Anthropic();
 const ROOT = path.join(import.meta.dirname, "..");
@@ -34,7 +35,7 @@ async function classify(transcript) {
     system: promptClassifier,
     messages: [{ role: "user", content: transcript.slice(0, 1200) }],
   }));
-  return JSON.parse(response.content[0].text.trim());
+  return extractJsonObject(response.content[0].text);
 }
 
 // ─── Helper: macOS notification ───────────────────────────────────────────
