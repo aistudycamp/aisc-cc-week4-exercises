@@ -97,7 +97,7 @@ After Module Setup, the student's working folder is `student-output/` — copied
 | `module-3` | 1 | ~25 min | Run the chat assistant; edit the system prompt to feel the leverage | Multi-turn chat run; two distinct system-prompt edits experienced |
 | `module-4` | 2 | ~25 min | Build the workflow — deterministic pipeline that classifies + routes + notifies | Working pipeline; transcript classified and routed to typed folder |
 | `module-5` | 3 | ~15-20 min | The multi-specialist system — three specialists in coordination plus the Stage 2 Router; one end-to-end run | Working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router → Reflect |
-| `module-6` | 3 | ~12-15 min | The Conductor — planning step that decides which specialists to call; this is where it becomes agentic | Conductor routing observed across two contrasting instructions (extractor only / router only) |
+| `module-6` | 3 | ~16-20 min | The Conductor — planning step that decides which specialists to call; this is where it becomes agentic. Closes with the self-eval / after-action report (Reflect) | Conductor routing observed across three runs (extractor only / router only / full pipeline + Reflect) |
 | `module-7` | 3 | ~5-10 min | What's next — three example agent systems showing the same pattern in different domains; send-off | Mental model of pattern reuse; "what will you build next?" as the open question |
 
 ## Key Files

@@ -94,7 +94,7 @@ A macOS notification should appear in the top-right corner of the screen: **"Rou
 
 > "The pipeline fired. You clicked a button. The AI classified it, routed it, and notified you — all automatically.
 >
-> Same pipeline — triggered from the browser. The `runWorkflow()` function doesn't care where the transcript came from. The server just hands it the text and it does its job."
+> Same pipeline — triggered from the browser. The same workflow doesn't care where the transcript came from. The server just hands it the text and it does its job."
 
 Click each node on the diagram. Show the inspect panels — what each step does.
 

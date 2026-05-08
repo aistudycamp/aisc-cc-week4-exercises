@@ -96,9 +96,7 @@ Say to Claude:
 
 > "Update `prompts/system.md` — change the first line from `You are a meeting analyst...` to: `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`"
 
-After Claude edits it, read the file back and print the full updated contents inline:
-
-"Here's what it looks like now:" [print full file contents]
+After Claude edits it, the system-prompt panel in the Chat tab will show the new prompt — verify the change there.
 
 Then restart the server so the new prompt takes effect. In your terminal: press `Ctrl+C` to stop, then:
 
@@ -130,9 +128,7 @@ This time we change BOTH the personality and the structure of the output. Say to
 > Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
 > ```"
 
-After Claude edits it, read the file back and print the full updated contents inline:
-
-"Here's what it looks like now:" [print full file contents]
+After Claude edits it, the system-prompt panel in the Chat tab will show the new prompt — verify the change there.
 
 Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question — or just send an empty message after loading to get the full report.
 
@@ -142,9 +138,7 @@ Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://loca
 
 Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
 
-Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool. Then read `prompts/system.md` back via Read tool and print the full contents inline:
-
-"Here's the original prompt restored:" [print full file contents]
+Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool. The system-prompt panel in the Chat tab will show the original prompt restored.
 
 Restart the server (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask one question to confirm the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format is back.
 
@@ -153,7 +147,7 @@ If they want to keep a custom prompt, save it first — write their current modi
 ## Key takeaways
 
 - The system prompt is the leverage point — change it, change everything the agent does
-- Same `ask()` function, same API call — only the prompt changes
+- Same chat assistant, same API call — only the prompt changes
 - Always restore `system-original.md` before moving on — every module from here depends on the baseline prompt
 
 ## Step 7: Wrap and commit (1 min)
@@ -163,9 +157,8 @@ What you've built so far:
 ```
 ┌──────────────────────────────┐
 │  Stage 1 — Chat Assistant    │  ← running live in the browser
-│  stage-1/chat.js             │
-│  ask() · system.md prompt    │
-│  server running at :3000     │
+│  Interactive, multi-turn     │
+│  Server running at :3000     │
 └──────────────────────────────┘
 ```
 

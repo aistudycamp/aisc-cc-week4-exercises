@@ -158,8 +158,7 @@ What you've built so far:
 ```
 ┌──────────────────────────────┐
 │  Stage 1 — Chat Assistant    │  ← you built this
-│  stage-1/chat.js             │
-│  ask() · system.md prompt    │
+│  Interactive, you drive it   │
 └──────────────────────────────┘
 ```
 

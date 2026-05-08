@@ -5,7 +5,7 @@ description: The Conductor — Module 6 of the AISC Agent Sprint. Triggered when
 
 # Module 6: The Conductor
 
-**Time:** ~12-15 minutes
+**Time:** ~16-20 minutes
 
 **What we're building**
 By the end: you'll have added a Conductor — a planning step in front of your multi-specialist workflow. The Conductor reads each instruction and decides which specialists to call. Different instructions trigger different specialists. Same five tools you have, but now the system reasons about which ones to use. **This is the peak of the sprint** — the moment your workflow becomes a true multi-agent system.
@@ -18,7 +18,7 @@ By the end: you'll have added a Conductor — a planning step in front of your m
 
 **No code in the terminal.** The Conductor's prompt is `prompts/conductor.md`. The frontend's Agentic System tab shows the Conductor node — the student clicks it to see the system prompt. Use the frontend as the viewing surface. Do NOT inline code blocks, line numbers, or function signatures.
 
-**Two contrast runs.** The student runs the orchestrator twice with different instructions — one targets a Stage 3 specialist (Extractor only), one targets a Stage 2 component (Router only). The contrast shows the Conductor can dispatch ANY of the available tools, not just one flavor. Watch which steps light up versus stay dark — that's the visible proof of the planning decision.
+**Three runs that show three layers of agentic behavior.** Run 1 targets a Stage 3 specialist (Extractor only). Run 2 targets a Stage 2 component (Router only). Runs 1 and 2 prove the Conductor can dispatch ANY of the available tools. Run 3 is the full pipeline plus Reflect — the **self-eval / after-action report** — which shows the agent analyzing its own work. Watch which steps light up versus stay dark — that's the visible proof of the planning decision.
 
 **No "Acts." No "Stage N —" prefixes in step headers.** Earlier versions of this module had a multi-Act structure that was confusing. Each step is just a step.
 
@@ -82,13 +82,44 @@ Wait for the student to run it.
 
 Wait for the student's answer.
 
-## Step 6: What just happened (1 min)
+## Step 6: Run 3 — full pipeline, with the after-action report (4-5 min)
 
-> "You just built a multi-agent system. Up until five minutes ago you had a workflow — fixed steps, same order every time. Now the system reasons about the instruction and dispatches the right tools. One new node. New behavior."
+> "Two runs in, you've seen the Conductor pick a single specialist or route. Now let's ask for everything — and a check on how the run went. Click **Clear**, then **Load standup**. Type:"
 
-> "Same pattern works for any agentic system: a planner reads the input, picks the tools, dispatches them. That's what's happening inside Claude Code, inside customer-support agents, inside research assistants. Different specialists. Same shape."
+```
+Give me the full report — and tell me how it went
+```
 
-## Step 7: Commit + checklist + `/compact` (1 min)
+> "Then click **Run Orchestrator →**."
+
+Wait for the student to run it.
+
+> "All five specialists fire this time. Analyst and Extractor in parallel, then Synthesizer, then Router. **Then Reflect** — the fifth specialist, the one that's been quiet in our other runs. This is the agent's **self-eval / after-action report**. Reflect reads everything that just happened — themes, action items, the final report, the classification — and writes a structured review of how the run went."
+
+> "Click the **Reflect** node and read the after-action report on the right. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**."
+
+Wait for the student to read.
+
+> "Notice the Recommendations section. Each one ends with a literal `Tell Claude:` instruction — a paste-ready prompt that would improve one of your specialist prompt files."
+
+> "Now here's the choice you have in production. The after-action report is the input. **Two ways to act on it:**
+>
+> 1. **Manual** — you read the reports yourself, decide which recommendations matter, and edit the prompt files when you spot a weakness.
+> 2. **Fully automated** — you wire up another Claude call that reads the after-action report, picks a recommendation, and updates the prompt files automatically. The loop closes itself. No human in the middle.
+>
+> Either way, the agent analyzing its own work and telling you how it went is what makes the rest possible. We're not going to wire up either operator today — the pattern matters more than which one you pick. You'll have everything you need to build it."
+
+> "What did the after-action report flag for your run — what was strong, what was ambiguous?"
+
+Wait for the student's answer.
+
+## Step 7: What just happened (1 min)
+
+> "You just built a multi-agent system. Up until ten minutes ago you had a workflow — fixed steps, same order every time. Now the system reasons about the instruction and dispatches the right tools, and the agent grades its own output along the way. One new node, plus a new way to use the existing ones. New behavior."
+
+> "Same pattern works for any agentic system: a planner reads the input, picks the tools, dispatches them, and (optionally) an after-action report grades the run. That's what's happening inside Claude Code, inside customer-support agents, inside research assistants. Different specialists. Same shape."
+
+## Step 8: Commit + checklist + `/compact` (1 min)
 
 **Coach:** Do all of the following automatically — do not ask the student to run terminal commands:
 

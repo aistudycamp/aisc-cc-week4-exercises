@@ -63,7 +63,7 @@ If you need to stop mid-module, just close your terminal. When you come back, ru
 | `module-3` | Run the Chat Assistant — interactive loop and system prompt | ~25 min | A working chat assistant you can have a conversation with |
 | `module-4` | Build the Workflow — pipeline that runs automatically on a file drop | ~25 min | A workflow that classifies and routes transcripts without you |
 | `module-5` | The Multi-Specialist System — three specialists in coordination plus the Stage 2 Router; one end-to-end run | ~15-20 min | A working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router → Reflect |
-| `module-6` | The Conductor — the planning step that turns a workflow into a real agent | ~12-15 min | A Conductor that decides which specialists to run based on the instruction |
+| `module-6` | The Conductor — the planning step that turns a workflow into a real agent + the self-eval / after-action report | ~16-20 min | A Conductor that decides which specialists to run based on the instruction, plus a Reflect step that grades the run |
 | `module-7` | What's Next — three example agent systems showing the pattern in different domains; send-off | ~5-10 min | Mental model of pattern reuse + an open question: "what will you build next?" |
 
 **Total: ~3 hours.** Most students spread it across 2–3 sessions.

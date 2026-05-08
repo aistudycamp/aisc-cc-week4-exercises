@@ -149,7 +149,7 @@ Say:
 - **Read the example file via Read tool** — don't send the student to the terminal to `cat` it. Print the relevant sections inline in the chat.
 - **Wait for the student's answer** to "Why do specialists produce better output?" in Step 3 before giving the answer. Their attempt matters more than getting it right.
 - **Print the ASCII diagrams** — don't describe them, show them. The visual anchor is the whole point.
-- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator runs Analyst and Extractor in parallel (Promise.all) — both work simultaneously.
+- **Parallel vs. sequential is a dispatch strategy, not the reason to split** — the reason to split is focus (one job, one system prompt). Mention that the orchestrator runs Analyst and Extractor in parallel — both work simultaneously.
 
 ## Optional deeper reading
 

@@ -1,6 +1,6 @@
 ---
 name: module-5
-description: The Multi-Specialist System — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Stage 2 is done. Now the student tours the full multi-specialist system end-to-end — three specialists running together (Analyst, Extractor, Synthesizer) plus the Stage 2 Router and a Reflect step. One end-to-end run. This is the agentic-workflow milestone. Module 6 is where it becomes a true multi-agent system with the Conductor.
+description: The Multi-Specialist System — Module 5 of the AISC Agent Sprint. Triggered when a student types "module-5". Stage 2 is done. Now the student tours the full multi-specialist system end-to-end — three specialists running together (Analyst, Extractor, Synthesizer) plus the Stage 2 Router. A fifth specialist, Reflect, runs too — it's the system's self-eval / after-action report. Its purpose lands in Module 6. One end-to-end run. This is the agentic-workflow milestone. Module 6 is where it becomes a true multi-agent system with the Conductor.
 ---
 
 # Module 5: The Multi-Specialist System
@@ -8,7 +8,7 @@ description: The Multi-Specialist System — Module 5 of the AISC Agent Sprint. 
 **Time:** ~15-20 minutes
 
 **What we're building**
-By the end: you'll have run a five-specialist agentic workflow end-to-end — three Stage 3 specialists (Analyst, Extractor, Synthesizer) plus the Stage 2 Router and a Reflect step that evaluates the run. You've seen the pieces. Now they work together.
+By the end: you'll have run a multi-specialist agentic workflow end-to-end — three Stage 3 specialists (Analyst, Extractor, Synthesizer) plus the Stage 2 Router, with a fifth specialist (Reflect — the self-eval / after-action report) running quietly behind them. You've seen the pieces. Now they work together.
 
 ## Coach Instructions
 
@@ -26,7 +26,7 @@ By the end: you'll have run a five-specialist agentic workflow end-to-end — th
 
 ## Step 1: Opener (1 min)
 
-> "You've built a chat assistant and a workflow. This module brings them together into a multi-specialist system: three specialists running in coordination, plus the Stage 2 Router and a final Reflect step. Five specialists. One run. Let's see it work."
+> "You've built a chat assistant and a workflow. This module brings them together into a multi-specialist system: three specialists running in coordination, plus the Stage 2 Router. A fifth specialist (Reflect — the system's self-eval / after-action report) runs too; we'll dig into what it produces in Module 6. One run. Let's see it work."
 
 ## Step 2: Meet the three specialists (2 min)
 
@@ -42,7 +42,7 @@ By the end: you'll have run a five-specialist agentic workflow end-to-end — th
 
 ## Step 3: The architecture (2 min)
 
-> "Look at the diagram on the Agentic tab. Top to bottom: transcript comes in, Analyst and Extractor run **in parallel** — same input, different specialists, finishing at the same time. Their outputs flow into Synthesizer, which combines them into one report. Then the Stage 2 Router takes the report, classifies the meeting type, saves the file, sends a notification. Last step is Reflect — it evaluates the run and produces a self-improvement note."
+> "Look at the diagram on the Agentic tab. Top to bottom: transcript comes in, Analyst and Extractor run **in parallel** — same input, different specialists, finishing at the same time. Their outputs flow into Synthesizer, which combines them into one report. Then the Stage 2 Router takes the report, classifies the meeting type, saves the file, sends a notification. There's also a Reflect step that fires at the very end — it's the system's **self-eval / after-action report**. We'll see what it produces in Module 6, where it earns its place."
 
 > "Five specialists, one orchestrator. The orchestrator doesn't add intelligence — it coordinates. The specialists do the work."
 
@@ -54,7 +54,7 @@ By the end: you'll have run a five-specialist agentic workflow end-to-end — th
 
 Wait for the student to run it.
 
-> "Watch the steps fire — Analyst and Extractor light up at the same time, Synthesizer waits for both, Router runs, Reflect closes it out. Five specialists, all coordinated."
+> "Watch the steps fire — Analyst and Extractor light up at the same time, Synthesizer waits for both, Router runs. Reflect runs last (the after-action report) — for now just notice the node light up; we'll read what it produced in Module 6."
 
 After it completes:
 
