@@ -118,14 +118,14 @@ Try loading the other sample transcript ("Load client call") and run it again. P
 Print this:
 
 ```
-  Trigger side — what fires the pipeline:    Output side — what happens at the end:
-  ─────────────────────────────────────      ─────────────────────────────────────
-  Button click in the browser                macOS notification (what you just saw)
-  File dropped into a folder                 Slack message to a channel
-  Scheduled timer (every 6 hours)            Write a row to a spreadsheet
-
-  The classify-and-route logic in the middle stays the same.
-  The trigger and destination are the pluggable parts.
+┌─────────────────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐
+│  Trigger                │     │  Classify and route     │     │  Output                 │
+│  (pluggable)            │  →  │  (stays the same)       │  →  │  (pluggable)            │
+│                         │     │                         │     │                         │
+│  • Button click         │     │  AI decides the type,   │     │  • macOS notification   │
+│  • File drop            │     │  pipeline saves the     │     │  • Slack message        │
+│  • Scheduled timer      │     │  file                   │     │  • Spreadsheet row      │
+└─────────────────────────┘     └─────────────────────────┘     └─────────────────────────┘
 ```
 
 > "Chat assistants are great for back-and-forth. Workflows are great for automated, event-triggered processing. Once you see this pattern, you start seeing it everywhere — any 'something happens → AI decides → something else happens' problem is a workflow."
