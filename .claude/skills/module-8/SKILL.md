@@ -374,8 +374,8 @@ If their project is still in `student-output/`, walk them through `cp -R student
 
 **Coach:** In the **sprint repo** (not the new project), do all of this automatically:
 
-1. Run `git add -A && git commit -m "Complete Module 8: Where This Goes"` via Bash tool from the sprint repo root and show the student the changed files.
-2. Update `CLAUDE.md`: change `- [ ] Module 8:` to `- [x] Module 8:` via Edit tool.
+1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 8: Where This Goes")` via Bash tool from the sprint repo root and show the student the changed files (or "No changes to commit." if nothing was staged.)
+2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 8:` to `- [x] Module 8:`.
 3. **Run `/compact`** — type `/compact` to end the session cleanly.
 
 Then say:

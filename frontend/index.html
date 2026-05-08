@@ -2327,6 +2327,28 @@ Return ONLY a JSON object:
     toastTimer = setTimeout(() => el.classList.remove('visible'), 4000);
   }
 
+  // ── Friendly error decoder ──
+  // Anthropic SDK error messages start with the HTTP status code (e.g. "529 {...}").
+  // Map common status codes to a friendly inline message + a short toast.
+  function describeApiError(message) {
+    const m = String(message || '');
+    const codeMatch = m.match(/^(\d{3})\b/);
+    const code = codeMatch ? parseInt(codeMatch[1], 10) : null;
+    if (code === 529 || /overloaded/i.test(m)) {
+      return { friendly: '⚠ Anthropic is overloaded right now. Try again in a moment.', toast: 'Anthropic overloaded — try again' };
+    }
+    if (code === 503) {
+      return { friendly: '⚠ Anthropic API is temporarily unavailable. Try again in a moment.', toast: 'API unavailable — try again' };
+    }
+    if (code === 429 || /rate.?limit/i.test(m)) {
+      return { friendly: '⚠ Rate limited. Wait a few seconds, then try again.', toast: 'Rate limited — wait a moment' };
+    }
+    if (code === 401) {
+      return { friendly: '⚠ API key issue. Check student-output/.env has a valid ANTHROPIC_API_KEY.', toast: 'API key issue' };
+    }
+    return { friendly: '⚠ Something went wrong. Try again, or check the browser console for details.', toast: 'Error — try again' };
+  }
+
   function addFeed(e) {
     const feed = $('feed');
     if (feed.querySelector('.feed-empty')) feed.innerHTML = '';
@@ -2671,11 +2693,13 @@ Return ONLY a JSON object:
       toast('Chat reply received.');
     } catch (err) {
       thinkingEl.remove();
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
       const errBubble = document.createElement('div');
       errBubble.className = 'chat-bubble assistant';
-      errBubble.textContent = 'Error: ' + err.message;
+      errBubble.textContent = friendly + '\n\nRaw: ' + err.message;
       hist.appendChild(errBubble);
       updateChatJsonPanel(requestBody, { error: err.message }, null);
+      toast(toastMsg);
     } finally {
       $('chatCanvasSend').disabled = false;
       $('chatCanvasSend').textContent = 'Send →';
@@ -2755,7 +2779,9 @@ Return ONLY a JSON object:
       await animPromise;
       toast(`Workflow complete — routed to ${classification}.`);
     } catch (err) {
-      $('workflowResult').textContent = 'Error: ' + err.message;
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
+      $('workflowResult').textContent = friendly + '\n\nRaw: ' + err.message;
+      toast(toastMsg);
     } finally {
       $('workflowSubmit').disabled = false;
       $('workflowSubmit').textContent = 'Run Workflow →';
@@ -3050,7 +3076,9 @@ Return ONLY a JSON object:
       $('rightBody').scrollTop = $('rightBody').scrollHeight;
       toast(`Orchestrator complete — ${tools.length} specialists ran${classification ? ', routed to ' + classification : ''}.`);
     } catch (err) {
-      $('orchResult').textContent = 'Error: ' + err.message;
+      const { friendly, toast: toastMsg } = describeApiError(err.message);
+      $('orchResult').textContent = friendly + '\n\nRaw: ' + err.message;
+      toast(toastMsg);
       ALL_STEPS.forEach(id => setStep(id, 'idle'));
       $('canvasStatus').textContent = '● error';
     } finally {

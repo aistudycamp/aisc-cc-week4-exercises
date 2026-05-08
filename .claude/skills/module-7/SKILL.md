@@ -225,8 +225,8 @@ What you've built so far:
 
 **Coach:** Do all of the following automatically — do not ask the student to run terminal commands:
 
-1. Run `git add -A && git commit -m "Complete Module 7: Use Your Live System + The Conductor"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
-2. Update `CLAUDE.md`: change `- [ ] Module 7:` to `- [x] Module 7:` via Edit tool.
+1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 7: Use Your Live System + The Conductor")` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]" (or "No changes to commit." if nothing was staged.)
+2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 7:` to `- [x] Module 7:`.
 
 3. **Run `/compact`** — type `/compact` to clear context before Module 8 (the final send-off). Stage boundary cleanup keeps Claude focused for what comes next.
 4. Hand off:

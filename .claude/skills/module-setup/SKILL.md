@@ -182,10 +182,10 @@ Explain inline (don't make them open a file):
 
 Wrap and update progress:
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module Setup:` to `- [x] Module Setup:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module Setup:` to `- [x] Module Setup:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module Setup: setup + API key"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module Setup: setup + API key")
    ```
    Show the student the changed files in the commit output.
 3. Say:

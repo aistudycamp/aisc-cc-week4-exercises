@@ -158,8 +158,8 @@ What you've built so far:
 
 **Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
 
-1. Run `git add -A && git commit -m "Complete Module 4: Build the Workflow"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
-2. Update `CLAUDE.md`: change `- [ ] Module 4:` to `- [x] Module 4:` via Edit tool.
+1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 4: Build the Workflow")` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]" (or "No changes to commit." if nothing was staged.)
+2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 4:` to `- [x] Module 4:`.
 3. Tell the student: *(Keep the server terminal running — you'll use it in Module 5.)*
 
 4. Hand off:

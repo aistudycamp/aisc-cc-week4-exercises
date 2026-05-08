@@ -173,10 +173,10 @@ What you've built so far:
 └──────────────────────────────┘
 ```
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 3:` to `- [x] Module 3:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 3:` to `- [x] Module 3:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root (in a second terminal tab if needed, so the server keeps running):
    ```bash
-   git add -A && git commit -m "Complete Module 3: Run the Chat Assistant"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 3: Run the Chat Assistant")
    ```
    Show the student the changed files in the commit output.
 3. **Run `/compact`** — type `/compact` to clear context before Stage 2 (Module 4). Stage boundary cleanup keeps Claude focused for the new mental model coming next.

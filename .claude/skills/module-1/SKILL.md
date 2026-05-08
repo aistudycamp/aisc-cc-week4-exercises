@@ -128,10 +128,10 @@ Say:
 
 ## Step 8: Wrap and commit (1 min)
 
-1. **Update `CLAUDE.md`**: change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
+1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && git commit -m "Complete Module 1: Tour the System"
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 1: Tour the System")
    ```
    Show the student the changed files in the commit output.
 3. Say:

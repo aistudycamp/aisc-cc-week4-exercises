@@ -173,8 +173,8 @@ Where you are in the arc:
 
 **Coach:** Do all of the following automatically — do not ask the student to run terminal commands:
 
-1. Run `git add -A && git commit -m "Complete Module 5: Meet the Specialists"` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]"
-2. Update `CLAUDE.md`: change `- [ ] Module 5:` to `- [x] Module 5:` via Edit tool.
+1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 5: Meet the Specialists")` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]" (or "No changes to commit." if nothing was staged.)
+2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 5:` to `- [x] Module 5:`.
 
 3. **Run `/compact`** — type `/compact` to clear context before Stage 3 (Module 6). Stage boundary cleanup keeps Claude focused for the new mental model coming next.
 4. Hand off:

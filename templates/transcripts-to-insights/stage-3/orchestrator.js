@@ -21,6 +21,7 @@ import fs from "node:fs";
 import path from "node:path";
 import "dotenv/config";
 import { runWorkflow } from "../stage-2/workflow.js"; // ← Stage 2 building block
+import { withRetry } from "../utils/retry.js";
 
 const ROOT = path.join(import.meta.dirname, "..");
 const client = new Anthropic();
@@ -35,24 +36,24 @@ const promptConductor  = fs.readFileSync(path.join(ROOT, "prompts", "conductor.m
 // ─── Specialist: Analyst ──────────────────────────────────────────────────────
 // Identifies key themes and decisions — same API call as Stage 1, different prompt
 export async function analyst(transcript) {
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: promptAnalyst,
     messages: [{ role: "user", content: transcript }],
-  });
+  }));
   return response.content[0].text;
 }
 
 // ─── Specialist: Extractor ────────────────────────────────────────────────────
 // Pulls every action item — same API call as Stage 1, different prompt
 export async function extractor(transcript) {
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: promptExtractor,
     messages: [{ role: "user", content: transcript }],
-  });
+  }));
   return response.content[0].text;
 }
 
@@ -65,12 +66,12 @@ export async function synthesizer(themes, actions) {
     "Combine these into the final structured insights report.",
   ].join("\n\n");
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: promptSynthesizer,
     messages: [{ role: "user", content: userMessage }],
-  });
+  }));
   return response.content[0].text;
 }
 
@@ -86,12 +87,12 @@ export async function reflect(transcript, themes, actions, report, classificatio
     "Produce the run report.",
   ].join("\n\n");
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: promptReflect,
     messages: [{ role: "user", content: userMessage }],
-  });
+  }));
   return response.content[0].text;
 }
 
@@ -123,12 +124,12 @@ export async function conductor(transcript, instruction) {
     "Decide which tools to call. Respond with valid JSON only.",
   ].join("\n\n");
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+  const response = await withRetry(() => client.messages.create({
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 512,
     system: promptConductor,
     messages: [{ role: "user", content: userMessage }],
-  });
+  }));
 
   const raw = response.content[0].text;
   try {
