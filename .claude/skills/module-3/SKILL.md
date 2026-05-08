@@ -1,6 +1,6 @@
 ---
 name: module-3
-description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student runs stage-1/chat.js interactively with a pre-loaded transcript, asks follow-up questions, edits the system prompt to see personality change, then restores it. No manual code editing — all edits go through Claude.
+description: Run the Chat Assistant — Module 3 of the AISC Agent Sprint. Triggered when a student types "module-3". Student runs the chat assistant interactively in the browser with a pre-loaded transcript, asks follow-up questions, edits the system prompt to see personality change, then restores it. No manual code editing — all edits go through Claude.
 ---
 
 # Module 3: Run the Chat Assistant
@@ -44,7 +44,7 @@ Print this so the loop is visible:
 [ POST /api/chat with messages[] ]
             │
             ▼
-[ ask() → Anthropic API ]   ← system prompt steers everything
+[ Anthropic API call ]   ← system prompt steers everything
             │
             ▼
 [ response back, append to messages[] ]
