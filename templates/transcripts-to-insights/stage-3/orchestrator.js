@@ -95,13 +95,32 @@ export async function reflect(transcript, themes, actions, report, classificatio
   return response.content[0].text;
 }
 
+// ─── Helper: extract a JSON object from a model response ──────────────────────
+// Models sometimes wrap JSON in markdown fences or add preamble text.
+// This pulls the first balanced {...} block out and parses it.
+function extractJsonObject(text) {
+  let cleaned = text.trim();
+  cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+  const start = cleaned.indexOf("{");
+  if (start === -1) throw new Error("no JSON object found");
+  let depth = 0;
+  for (let i = start; i < cleaned.length; i++) {
+    if (cleaned[i] === "{") depth++;
+    else if (cleaned[i] === "}") {
+      depth--;
+      if (depth === 0) return JSON.parse(cleaned.slice(start, i + 1));
+    }
+  }
+  throw new Error("unmatched braces");
+}
+
 // ─── Specialist: Conductor ────────────────────────────────────────────────────
 // Planning step — decides which tools to call based on optional instruction
 export async function conductor(transcript, instruction) {
   const userMessage = [
     `TRANSCRIPT:\n${transcript}`,
     `INSTRUCTION: ${instruction || "Process this transcript — run the full pipeline."}`,
-    "Decide which tools to call.",
+    "Decide which tools to call. Respond with valid JSON only.",
   ].join("\n\n");
 
   const response = await client.messages.create({
@@ -111,11 +130,12 @@ export async function conductor(transcript, instruction) {
     messages: [{ role: "user", content: userMessage }],
   });
 
+  const raw = response.content[0].text;
   try {
-    return JSON.parse(response.content[0].text);
-  } catch {
-    // Fallback to full pipeline if JSON parse fails
-    return { tools: ["analyst", "extractor", "synthesizer", "router", "reflect"], reasoning: "Defaulting to full pipeline." };
+    return extractJsonObject(raw);
+  } catch (err) {
+    console.warn(`  ⚠️  Conductor JSON parse failed (${err.message}). Raw response:\n${raw}\n`);
+    return { tools: ["analyst", "extractor", "synthesizer", "router", "reflect"], reasoning: "Defaulting to full pipeline (JSON parse failed)." };
   }
 }
 

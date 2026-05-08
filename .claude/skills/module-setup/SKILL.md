@@ -136,8 +136,15 @@ student-output/
 
 ## Step 6: Install dependencies + add API key (3 min)
 
-Two steps. First, install packages. In your terminal:
+Two commands to run — but **not in this terminal**. This terminal is running Claude Code; if you run other commands here, you'll exit our conversation.
 
+**Open a new terminal window in VS Code** so Claude Code keeps running here:
+
+> **Terminal → New Terminal** (this opens a second terminal panel — Claude Code stays running in the first one)
+
+In that **new** terminal, run these two commands:
+
+**1. Install dependencies** (run this once):
 ```bash
 cd [repo-root]/student-output
 npm install
@@ -145,11 +152,13 @@ npm install
 
 (Use the repo root path from Step 2.)
 
-Now add the API key. Run this command in your terminal, replacing `sk-ant-your-key-here` with the real key you copied:
+**2. Add your API key** — replace `sk-ant-your-key-here` with the real key you copied from console.anthropic.com:
 
 ```bash
 echo "ANTHROPIC_API_KEY=sk-ant-your-key-here" > .env
 ```
+
+When both are done, come back to **this** terminal (the Claude Code one) and tell me you're done.
 
 After they run it, open `student-output/.env` in VS Code and confirm your key is there — it should start with `sk-ant-`. That's where it lives for the rest of the sprint. Don't commit this file — it's in `.gitignore`.
 
