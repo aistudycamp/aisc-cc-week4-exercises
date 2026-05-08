@@ -13,23 +13,25 @@ You don't need to know JavaScript. Claude writes the code — you describe what 
 
 ## Getting Started
 
-1. **Clone this repo**
+1. **Open VS Code.**
+
+2. **Open a terminal in VS Code:** menu **Terminal → New Terminal**.
+
+3. **Clone the repo.** Paste this into the terminal and hit Enter:
    ```
    git clone https://github.com/aistudycamp/aisc-cc-week4-exercises.git
    ```
 
-2. **Open the folder in VS Code, then open a new terminal there**
-   - In VS Code: **File → Open Folder** → pick `aisc-cc-week4-exercises`
-   - Then: **Terminal → New Terminal** (the terminal opens inside your project folder automatically)
+4. **Open the new folder in VS Code:** **File → Open Folder** → pick `aisc-cc-week4-exercises`. VS Code reloads with the project.
 
-3. **Start Claude Code**
-   In that terminal, run:
+5. **Open a fresh terminal in the project:** **Terminal → New Terminal** again. It opens inside the project folder automatically.
+
+6. **Start Claude Code.** In that terminal, run:
    ```
    claude
    ```
 
-4. **Say hello!**
-   Claude will greet you and guide you from there. No need to memorize anything — the next move is always the next module command.
+7. **Say hello!** Claude will greet you and guide you from there. No need to memorize anything — the next move is always the next module command.
 
 ## The 3-Stage Arc
 
