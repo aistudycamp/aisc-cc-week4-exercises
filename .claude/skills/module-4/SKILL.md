@@ -51,23 +51,11 @@ Wait for their answer. The answer: it read the transcript and decided what kind 
 
 > "Exactly. That's the AI decision step. It reads the beginning of the transcript and returns a JSON answer: the meeting type and a suggested filename. The rest of the pipeline just follows that decision."
 
-## Step 3: Look at the workflow export (4 min)
+## Step 3: Stage 2 is a building block (2 min)
 
-Here's the bottom of `student-output/stage-2/workflow.js` — the part that matters for understanding how Stage 3 will use it:
+Before we run it, plant the through-line:
 
-I'll read it now and show you the relevant section.
-
-**Coach:** Run `Read` on `student-output/stage-2/workflow.js`, then print the export line:
-
-```js
-export async function runWorkflow(transcript, sourceFilename)
-```
-
-> "Same pattern as Stage 1 — we export `runWorkflow()` as a building block. Stage 3 will import this, just like a workflow could import `ask()` from Stage 1.
->
-> What do you think Stage 3 will import from THIS file?"
-
-Wait for their answer. The answer: `runWorkflow`. The point: the same export pattern they're looking at right now is what makes Stage 3 possible.
+> "Stage 2 isn't the end of the road. It's a building block. Stage 1 gave you a chat assistant you could call. Stage 2 gives you a whole workflow you can call — one input goes in, classification + routing + notification all happen automatically. In Stage 3, the orchestrator will hand transcripts to this same workflow as the last step of a bigger pipeline. The router you're about to use lives on after this module."
 
 ## Step 4: Confirm the server is running (1 min)
 
@@ -149,11 +137,9 @@ What you've built so far:
 
 ```
 ┌──────────────────────────────┐   ┌──────────────────────────────┐
-│  Stage 1 — Chat Assistant    │   │  Stage 2 — Workflow           │  ← you just built this
-│  stage-1/chat.js             │   │  stage-2/workflow.js          │
-│  ask() · system.md           │   │  runWorkflow()                │
-└──────────────────────────────┘   │  classifier.md               │
-                                   └──────────────────────────────┘
+│  Stage 1 — Chat Assistant    │ → │  Stage 2 — Workflow           │  ← you just built this
+│  Interactive, you drive it   │   │  Triggered, runs to completion│
+└──────────────────────────────┘   └──────────────────────────────┘
 ```
 
 **Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:
@@ -171,7 +157,6 @@ What you've built so far:
 - **The trigger is a button, not a file drop** — this module no longer uses `npm run stage-2` or `npm run drop-test`. The browser's "Run Workflow →" button calls `/api/workflow` directly. There's no file watcher to start.
 - **Only one terminal needed** — the server terminal from Module 3. If it's still running, no new terminal is needed at all.
 - **Pause for the reflection question in Step 2** — "what did the AI have to figure out to route correctly?" — wait for their answer before explaining. It's a 30-second check that makes the pipeline landing in Step 5 much more satisfying.
-- **Pause for the Stage 3 question in Step 3** — "what will Stage 3 import from this file?" — wait for their answer before explaining. It plants the payoff for Module 5.
 - **Show the frontend after the pipeline fires** — the visualization is most effective right after the student sees the classification result appear. Don't wait until the end.
 - **Coach reads files inline** — never ask the student to open a file or run `cat`. Use the Read tool and print the relevant content directly.
 

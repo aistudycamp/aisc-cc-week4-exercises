@@ -81,16 +81,17 @@ Read the example file and show them its contents. Use the Read tool on `examples
 Point out:
 1. **The actual report output** — show them what the agent produces. Key themes, action items, recommended next step. This is what they're working toward.
 2. **The specialists** — the themes came from the Analyst, the action items came from the Extractor, the classification from the Router.
+3. **The system did more than produce text.** The transcript was classified, given a filename, and saved to `transcripts/team-standup/`. The report you just read isn't sitting in a chat window — it's a file on disk in the right folder, and a notification fired. That's the whole shape: structured output **plus** routing **plus** notification, every run.
 
 Ask:
 
-> "Notice something? This report is more structured than you'd get from one ChatGPT message. Why do you think splitting it into specialists produces better output?"
+> "You could get a structured report like this out of one ChatGPT message. So what's actually different here? Why bother splitting it into specialists, an orchestrator, a router?"
 
 Wait for their answer.
 
 If they're stuck, prompt:
 
-> "Three reasons. First — **parallel = faster.** Both Analyst and Extractor work at the same time, not one after the other. Second — **focus = better output.** Each prompt is laser-focused on one job. The Analyst isn't distracted by action items; the Extractor isn't guessing at themes. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
+> "Three reasons, and none of them are 'better-looking output.' First — **it runs without you.** Drop a transcript in, the whole pipeline fires: classify, route, save, notify. ChatGPT needs you in the loop every time. Second — **focus = better output, every time.** Each prompt is laser-focused on one job — the Analyst isn't distracted by action items, the Extractor isn't guessing at themes — and that consistency matters when the system runs on its own. Third — **composable = reusable.** The Extractor can be used without the Analyst. The Router already existed in Stage 2 — we didn't rewrite it, we reused it. Each piece is independent."
 
 ## Step 5: The three principles (3 min)
 

@@ -57,13 +57,9 @@ Print this so the loop is visible:
 
 ## Step 3: Read the system prompt (3 min)
 
-Read `prompts/system.md` via Read tool and print the full contents inline:
+The system prompt is saved at `prompts/system.md`. You can read and edit it live in the **Chat tab's system prompt panel** — it's the editable textarea at the top of the canvas. Open the browser to **http://localhost:3000** if you haven't already.
 
-"Here's what's inside `prompts/system.md` right now:"
-
-[print full file contents]
-
-> "This is what makes every output look the way it does. KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined here. Change this file and the output format changes entirely. That's the leverage."
+> "That panel **is** the file. Whatever's in there is what shapes every output: KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined there. Change the panel, change the agent. That's the leverage."
 
 ## Step 4: Start the server (1 min)
 
