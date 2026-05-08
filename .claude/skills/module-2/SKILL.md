@@ -98,13 +98,17 @@ npm run server
 
 (Use the repo root path you saved in module-setup.) You should see `🚀 Server running at http://localhost:3000`. Leave that tab open — the server runs there for the rest of the sprint.
 
-Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab. Click **Load standup** — that loads the sample transcript as the first message in the conversation.
+Now switch back to your Claude Code tab (or open a browser) and go to **http://localhost:3000**. You'll see the Chat tab.
 
-Now ask a question: `Who looks most blocked?`
+**Click `Load standup`.** Watch what happens — the sample transcript appears in the conversation, and within a couple seconds Claude responds with a structured report: KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP. **That's your first API call.** The same JSON you just saw in Step 3 went over the wire to Anthropic's servers, and the structured response came back as text. Less than a second, less than a penny.
 
-Watch the response appear. That's the API call firing — the same JSON you just saw in Step 3, going over the wire to Anthropic's servers, coming back as text.
+Now try a follow-up to see multi-turn in action. In the input box at the bottom of the chat, type:
 
-Notice the log strip below the reply: `[messages: N · ~tokens · time]`. That `messages: N` count is the size of the `messages[]` array — it grows by 2 every turn (your message, Claude's reply). That growth is what gives the chat memory across turns. We'll come back to it in Module 3.
+```
+Who looks most blocked?
+```
+
+Hit send. Claude reads the prior transcript + your new question and answers. **That's your second API call.** Notice the log strip below the reply: `[messages: N · ~tokens · time]`. The `messages: N` count grew by 2 (your message + Claude's reply). That growing array is what gives the chat memory across turns — we'll dig into it in Module 3.
 
 If something errors:
 - **`ANTHROPIC_API_KEY` undefined** → check `.env` is in the right folder and has the real key
