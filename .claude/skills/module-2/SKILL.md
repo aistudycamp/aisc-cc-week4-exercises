@@ -166,7 +166,7 @@ What you've built so far:
 1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 2:` to `- [x] Module 2:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:
    ```bash
-   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 2: First API Call")
+   git add -A && (git diff --cached --quiet || git commit -m "Complete Module 2: Your First API Call")
    ```
    Show the student the changed files in the commit output.
 3. Hand off:

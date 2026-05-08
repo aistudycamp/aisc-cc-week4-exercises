@@ -112,7 +112,7 @@ Look back at the KEY THEMES section in the example output shown earlier. Point o
 
 Say:
 
-> "Before we move on, hold onto this picture in your head. After Module 8, when you go back to your day job, the question you'll ask about *any* problem is:
+> "Before we move on, hold onto this picture in your head. After this sprint, when you go back to your day job, the question you'll ask about *any* problem is:
 >
 > - What's the input?
 > - What's the output?
@@ -136,7 +136,7 @@ Say:
    Show the student the changed files in the commit output.
 3. Say:
 
-> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The pattern you just saw runs once and stops — real agents loop on what came back and decide what's next. You'll see that in Module 7. Read `concepts/what-is-an-agent.md` if you want the full picture now.
+> "You just toured one common shape — parallelization plus synthesis. Real agents come in many shapes: routing, prompt chains, evaluator-optimizer loops, fully autonomous agents that loop until done. The pattern you'll build in this sprint runs once and stops; the loop variant is the natural next step beyond what's covered here. Read `concepts/what-is-an-agent.md` if you want the full picture now.
 >
 > In Module 2 you'll send your first API call and see how a single specialist comes alive. Type `module-2` when you're ready."
 

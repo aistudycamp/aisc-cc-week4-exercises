@@ -164,14 +164,14 @@ What you've built so far:
 
 4. Hand off:
 
-> "Stage 2 running. In Module 5 we'll extend the pipeline — add a new step by telling Claude what you want, not by editing code. Type `module-5` when you're ready."
+> "Stage 2 running. In Module 5 you'll see the multi-specialist system — three Stage 3 specialists working in coordination with the Stage 2 Router you just built. End-to-end run. Type `module-5` when you're ready."
 
 ## Coach Guardrails
 
 - **The trigger is a button, not a file drop** — this module no longer uses `npm run stage-2` or `npm run drop-test`. The browser's "Run Workflow →" button calls `/api/workflow` directly. There's no file watcher to start.
 - **Only one terminal needed** — the server terminal from Module 3. If it's still running, no new terminal is needed at all.
 - **Pause for the reflection question in Step 2** — "what did the AI have to figure out to route correctly?" — wait for their answer before explaining. It's a 30-second check that makes the pipeline landing in Step 5 much more satisfying.
-- **Pause for the Stage 3 question in Step 3** — "what will Stage 3 import from this file?" — wait for their answer before explaining. It plants the payoff for Module 6.
+- **Pause for the Stage 3 question in Step 3** — "what will Stage 3 import from this file?" — wait for their answer before explaining. It plants the payoff for Module 5.
 - **Show the frontend after the pipeline fires** — the visualization is most effective right after the student sees the classification result appear. Don't wait until the end.
 - **Coach reads files inline** — never ask the student to open a file or run `cat`. Use the Read tool and print the relevant content directly.
 

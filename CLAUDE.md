@@ -4,7 +4,7 @@
 
 ## What This Repo Is
 
-Week 4 of the AI Study Camp Vibe Coding course. Students build a real working **agentic system** in JavaScript over 3 stages (8 modules + an intro). The use case is the same the whole way through: turn a meeting transcript into a structured insights report. The arc is the lesson:
+Week 4 of the AI Study Camp Vibe Coding course. Students build a real working **agentic system** in JavaScript over 3 stages (7 modules + an intro). The use case is the same the whole way through: turn a meeting transcript into a structured insights report. The arc is the lesson:
 
 ```
 Stage 1 — Chat Assistant
@@ -61,13 +61,10 @@ If the progress checklist below already shows completed modules, welcome them ba
 ### Stage 2 — Workflow
 - [ ] Module 4: Build the Workflow
 
-### Bridge
-- [ ] Module 5: Meet the Specialists
-
 ### Stage 3 — Agentic System
-- [ ] Module 6: The Agentic System
-- [ ] Module 7: Use Your Live System + The Conductor
-- [ ] Module 8: Where This Goes
+- [ ] Module 5: The Multi-Specialist System
+- [ ] Module 6: The Conductor
+- [ ] Module 7: What's Next
 
 Update this checklist as the student completes each module. Check the box by changing `- [ ]` to `- [x]`.
 
@@ -84,8 +81,8 @@ After Module Setup, the student's working folder is `student-output/` — copied
 - **Never ask students to edit code manually.** They are vibe coders. If a step requires a code change, the instruction should be: "Tell Claude: [what you want in plain English]." Claude writes the code; the student runs it.
 - **Use ASCII diagrams.** Seeing the system helps cement it. Most modules already have one — print it.
 - **"Orchestrator" means two things — be explicit.** "The orchestrator *system*" or "Stage 3" means the full agentic system. "The `orchestrator()` *function*" means the specific exported function inside `stage-3/orchestrator.js`. When a student is confused, check which level you're discussing.
-- **Module 5 is a bridge.** Stage 2 ends in Module 4. Module 5 introduces the three Stage 3 specialists (analyst, extractor, synthesizer) before Module 6 builds the orchestrator. Don't call M5 "still Stage 2" or "the start of Stage 3" — it's the connector.
-- **Workflow vs agent vocabulary.** Stage 2 is a workflow (deterministic, AI makes one decision). Stage 3 (M6) is also still a workflow by Anthropic's definition — predefined steps every time. The Conductor in M7 is what crosses into agent territory because it *decides* which steps to run. Be consistent across modules.
+- **Module 5 is the multi-specialist milestone.** It's where students see the full Stage 3 system end-to-end: three specialists running in coordination plus the Stage 2 Router. Same orchestrator code, single end-to-end run. Frame this as "an agentic workflow" — the workflow piece matters because it's still deterministic.
+- **Workflow vs agent vocabulary.** Stage 2 is a workflow (deterministic, AI makes one decision). Module 5 is also still a workflow by Anthropic's definition — predefined steps every time. The Conductor in Module 6 is what crosses into agent territory because it *decides* which steps to run. Be consistent across modules.
 - **Celebrate every module completion.** "You just called the API." "You just built an automation." "You just designed a multi-agent system." These are real milestones — react like it.
 - **When directing students to a module, NEVER add a `/` prefix.** Say `module-3`, not `/module-3`.
 - **Most students have never written real code.** Be patient. If they get stuck on something basic (terminal navigation, opening a file, copying text), explain it once cleanly. Don't get exasperated.
@@ -97,12 +94,11 @@ After Module Setup, the student's working folder is `student-output/` — copied
 | `module-setup` | Setup | ~10–15 min | Orient, install Node, set up API key, scaffold project | Working `student-output/` folder with API key + dependencies |
 | `module-1` | 1 | ~15 min | Systems-thinking tour (no code) | Mental model: orchestrator, specialists, system prompts, data flow |
 | `module-2` | 1 | ~20 min | First API call demystified — see the raw JSON go and come back | First successful API call from the browser; JSON request/response visible |
-| `module-3` | 1 | ~25 min | Run the chat assistant; edit the system prompt (Shakespeare → Pirate Captain) to feel the leverage | Multi-turn chat run; two distinct system-prompt edits experienced |
+| `module-3` | 1 | ~25 min | Run the chat assistant; edit the system prompt to feel the leverage | Multi-turn chat run; two distinct system-prompt edits experienced |
 | `module-4` | 2 | ~25 min | Build the workflow — deterministic pipeline that classifies + routes + notifies | Working pipeline; transcript classified and routed to typed folder |
-| `module-5` | Bridge | ~15 min | Meet the three Stage 3 specialists (analyst, extractor, synthesizer); preview them firing | Understanding of why specialists, what each one returns, what the architecture looks like |
-| `module-6` | 3 | ~30 min | The agentic system — parallel orchestrator that wires Stages 1+2 together | Working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router |
-| `module-7` | 3 | ~30 min | Use the live system; meet the Conductor — the planning step that decides which specialists run | Screenshot of live system; Conductor routing observed across multiple instructions |
-| `module-8` | 3 | ~25 min | Where this goes — pick a path: Personalize what you built, or scaffold a new architecture starter | A working personalized agent in your own folder, or a scaffolded Council starter |
+| `module-5` | 3 | ~15-20 min | The multi-specialist system — three specialists in coordination plus the Stage 2 Router; one end-to-end run | Working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router → Reflect |
+| `module-6` | 3 | ~12-15 min | The Conductor — planning step that decides which specialists to call; this is where it becomes agentic | Conductor routing observed across two contrasting instructions (extractor only / router only) |
+| `module-7` | 3 | ~5-10 min | What's next — three example agent systems showing the same pattern in different domains; send-off | Mental model of pattern reuse; "what will you build next?" as the open question |
 
 ## Key Files
 
@@ -114,7 +110,7 @@ After Module Setup, the student's working folder is `student-output/` — copied
 
 ## The Stock Use Case (everyone builds this)
 
-Every student builds a system that turns a meeting transcript into a structured insights report. Same scaffold for everyone through Module 7. They personalize the prompts in Module 8 for their own use case.
+Every student builds a system that turns a meeting transcript into a structured insights report. Same scaffold for every module. Module 7 sends them off with three example agent systems and a "what will you build next?" close — they personalize from there on their own.
 
 The system prompts in `student-output/prompts/`:
 - `system.md` — the meeting analyst's core instructions (used by Stage 1 chat and the Stage 3 synthesizer)
@@ -122,7 +118,7 @@ The system prompts in `student-output/prompts/`:
 - `analyst.md` — Stage 3 specialist that finds key themes and decisions
 - `extractor.md` — Stage 3 specialist that pulls action items as JSON
 - `synthesizer.md` — Stage 3 specialist that combines analyst + extractor into the final report
-- `conductor.md` — Stage 3 planning step (Module 7) that decides which specialists run for a given instruction
+- `conductor.md` — Stage 3 planning step (Module 6) that decides which specialists run for a given instruction
 - `system-original.md` — untouched backup (for restoring after Module 3 edits)
 
 The Node.js code:

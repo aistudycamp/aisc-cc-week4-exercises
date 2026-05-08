@@ -60,12 +60,11 @@ If you need to stop mid-module, just close your terminal. When you come back, ru
 | `module-setup` | Setup — Node, API key, scaffold your project | ~10 min | A working project folder with your API key wired in |
 | `module-1` | Tour the System — the mental model before any code | ~15 min | *(no artifact — a clear picture of what you're building)* |
 | `module-2` | Your First API Call — demystify what the API actually is | ~20 min | A successful API call that prints Claude's response |
-| `module-3` | Build the Chat Assistant — interactive loop and system prompt | ~25 min | A working chat assistant you can have a conversation with |
+| `module-3` | Run the Chat Assistant — interactive loop and system prompt | ~25 min | A working chat assistant you can have a conversation with |
 | `module-4` | Build the Workflow — pipeline that runs automatically on a file drop | ~25 min | A workflow that classifies and routes transcripts without you |
-| `module-5` | Meet the Specialists — read the three Stage 3 prompts (analyst, extractor, synthesizer) | ~15 min | An understanding of the three specialists Stage 3 will coordinate |
-| `module-6` | The Agentic System — orchestrator that coordinates three specialists | ~30 min | A working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router |
-| `module-7` | Use the System + the Conductor — tour all three stages, then meet the planning step that turns a workflow into an agent | ~30 min | A screenshot of your live system + a Conductor that decides which specialists to run |
-| `module-8` | Make It Yours — point the system at a real use case from your life | ~25 min | A personalized version running on a real document you brought |
+| `module-5` | The Multi-Specialist System — three specialists in coordination plus the Stage 2 Router; one end-to-end run | ~15-20 min | A working multi-specialist system: Analyst ‖ Extractor → Synthesizer → Router → Reflect |
+| `module-6` | The Conductor — the planning step that turns a workflow into a real agent | ~12-15 min | A Conductor that decides which specialists to run based on the instruction |
+| `module-7` | What's Next — three example agent systems showing the pattern in different domains; send-off | ~5-10 min | Mental model of pattern reuse + an open question: "what will you build next?" |
 
 **Total: ~3 hours.** Most students spread it across 2–3 sessions.
 
@@ -74,7 +73,7 @@ If you need to stop mid-module, just close your terminal. When you come back, ru
 By the end, you will have:
 
 - A working multi-agent system you can keep running on your own meeting transcripts — or any long document you point it at
-- A personalized version configured for your specific use case (Module 8)
+- A clear pattern you can reuse: same orchestrator code, different specialists, different domain
 - A visual frontend showing the system architecture, with each component inspectable
 - Real understanding of the pattern behind every serious AI product: **input → orchestrator → specialists → synthesis → output**
 - The skill to build the next one in a fraction of the time
