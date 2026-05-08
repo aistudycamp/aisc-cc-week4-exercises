@@ -19,23 +19,20 @@ The point of this module: students *see* how an agentic system is structured bef
 Before anything else, show them the full arc:
 
 ```
-       Stage 1                Stage 2                 Stage 3
-       ───────                ───────                 ───────
+   Stage 1                    Stage 2                    Stage 3
+   ───────                    ───────                    ───────
 
-       chat.js           →    workflow.js       →    orchestrator.js
-       You ask                A file drops in.       An orchestrator runs
-       questions.             AI classifies +        Analyst + Extractor
-       Get answers back.      routes + notifies.     in parallel →
-                              Automatic.             Synthesizer →
-                                                     Router (saves + notifies).
+   Chat assistant       →     Workflow             →     Multi-specialist system
+   You ask questions,         A transcript arrives.      Three specialists run in
+   it answers.                AI classifies and          coordination, then route
+                              routes it.                 the result.
 
-       1 system prompt        1 classifier           3 specialist prompts
-       (meeting analyst)      prompt                 (analyst, extractor,
-                                                     synthesizer)
+   1 system prompt            1 classifier prompt        3 specialist prompts
+                                                         + 1 router
 
-       Interactive.           Event-triggered.       Fully automated.
-       You drive it.          File drops in,         One input →
-                              pipeline runs.         full structured report.
+   Interactive.               Event-triggered.           Fully coordinated.
+   You drive it.              Runs without you.          One input → structured
+                                                         report on disk.
 ```
 
 > "Same problem each stage — turn a transcript into insights. Each stage adds one new idea: in Stage 1 you build the assistant; in Stage 2 you wire a trigger so it runs without you; in Stage 3 you split the work across specialists and an orchestrator coordinates them.
@@ -53,17 +50,22 @@ Say:
 Print this ASCII:
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Stage 3 — Agentic System                                           │
-│                                                                      │
-│  transcript                                                          │
-│      ↓                                                               │
-│  [Analyst ‖ Extractor]   ← parallel specialists (Promise.all)       │
-│           ↓                                                          │
-│      [Synthesizer]        ← combines themes + actions into report    │
-│           ↓                                                          │
-│        [Router]           ← Stage 2 reused: classify + save + notify│
-└─────────────────────────────────────────────────────────────────────┘
+              ┌────────────────┐
+              │   Transcript   │
+              └────────────────┘
+                      ↓
+       ┌─────────────────────────────┐
+       │   Analyst   ‖   Extractor   │   ← run in parallel
+       │   (themes)      (actions)   │
+       └─────────────────────────────┘
+                      ↓
+              ┌────────────────┐
+              │  Synthesizer   │   ← combines themes + actions
+              └────────────────┘
+                      ↓
+              ┌────────────────┐
+              │     Router     │   ← Stage 2 reused: classify, save, notify
+              └────────────────┘
 ```
 
 Then explain:

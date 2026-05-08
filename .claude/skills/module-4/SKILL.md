@@ -29,16 +29,21 @@ Say:
 Print the pipeline:
 
 ```
-transcripts/incoming/[transcript text]
-         ↓
-    Read the transcript
-         ↓
-    AI classifies meeting type
-    → "team-standup" / "client-call" / "planning-session"
-         ↓
-    Route to transcripts/[type]/[new-filename]
-         ↓
-    Send macOS notification: "Routed to: team-standup"
+┌─────────────────────────────┐
+│  Transcript arrives         │
+└─────────────────────────────┘
+              ↓
+┌─────────────────────────────┐
+│  AI classifies meeting type │  ← the only AI step
+└─────────────────────────────┘
+              ↓
+┌─────────────────────────────┐
+│  File saved to right folder │
+└─────────────────────────────┘
+              ↓
+┌─────────────────────────────┐
+│  Notification fires         │
+└─────────────────────────────┘
 ```
 
 > "Four steps. The AI does step 2 (classification). The workflow does everything else — reading, routing, notifying. The AI makes one decision inside a larger automated sequence. That's what a workflow is."
@@ -129,7 +134,7 @@ Print this:
 
 - A workflow is a deterministic sequence — AI makes one decision, the pipeline handles the rest
 - Trigger and destination are pluggable — the classify-and-route logic in the middle stays the same
-- `runWorkflow()` is now a building block — Stage 3 imports it directly
+- Stage 2 is now a building block — Stage 3 will use it as the last step of a bigger pipeline
 
 ## Step 7: Wrap and commit (2 min)
 
