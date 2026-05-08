@@ -137,10 +137,10 @@ Print this:
 What you've built so far:
 
 ```
-┌──────────────────────────────┐   ┌──────────────────────────────┐
-│  Stage 1 — Chat Assistant    │ → │  Stage 2 — Workflow           │  ← you just built this
-│  Interactive, you drive it   │   │  Triggered, runs to completion│
-└──────────────────────────────┘   └──────────────────────────────┘
+┌────────────────────────────────┐   ┌────────────────────────────────┐
+│  Stage 1 — Chat Assistant      │ → │  Stage 2 — Workflow            │  ← you just built this
+│  Interactive, you drive it     │   │  Triggered, runs to completion │
+└────────────────────────────────┘   └────────────────────────────────┘
 ```
 
 **Coach:** Do all three of the following steps automatically — do not ask the student to run terminal commands:

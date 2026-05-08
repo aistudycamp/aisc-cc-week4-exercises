@@ -38,11 +38,11 @@ By the end: you'll have added a Conductor — a planning step in front of your m
 
 ## Step 3: Meet the Conductor (2 min)
 
-> "Open the **Agentic System** tab in your browser. You'll see a new node at the top — the **Conductor**. Click it."
+> "Open the **Agentic System** tab in your browser. You saw the **Conductor** node at the top of the diagram in Module 5 — but you haven't actually used it yet. Click it now."
 
-> "The right panel shows its system prompt. The Conductor reads the user's instruction, then returns JSON: `{tools: ['extractor'], reasoning: 'instruction asked for action items'}`. That's it. No prose response — a plan."
+> "The Conductor's job: read the user's instruction, then return JSON like `{tools: ['extractor'], reasoning: 'instruction asked for action items'}`. That's it. No prose response — a plan. The orchestrator then runs only the tools the Conductor picked."
 
-> "Same pattern as every other specialist in this sprint: a system prompt with a job. The Conductor's job is just to plan, not to do."
+> "Same pattern as every other specialist in this sprint: a system prompt with a job. The Conductor's job is just to plan, not to do. Its prompt lives at `prompts/conductor.md` — open it in VS Code if you want to read it."
 
 ## Step 4: Run 1 — targeted specialist (3-4 min)
 

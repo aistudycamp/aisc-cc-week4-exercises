@@ -1827,6 +1827,29 @@ Return ONLY a JSON object:
   "confidence": <span class="str">"high"</span> | <span class="str">"low"</span>
 }`;
 
+  // conductor.md — Stage 3 planning step
+  const promptConductor = `<span class="role">You are the Conductor — an orchestrator
+that decides which specialists to call.</span>
+
+Tools available: analyst, extractor, synthesizer,
+router, reflect.
+
+Rules:
+- synthesizer requires analyst AND extractor first
+- reflect requires synthesizer first
+- "just route" / "classify" → router only
+- "action items" / "tasks" → extractor only
+- "themes" / "summary" → analyst only
+- "how it went" / "after-action report" → include reflect
+- no instruction → run all five in order
+
+Respond with a single JSON object, no fences:
+
+{
+  <span class="key">"tools"</span>: [<span class="str">"extractor"</span>, <span class="str">"router"</span>],
+  <span class="key">"reasoning"</span>: <span class="str">"one sentence why"</span>
+}`;
+
   const nodeData = {
     // --- Stage 1 ---
     's1-input': {
@@ -1981,16 +2004,17 @@ Return ONLY a JSON object:
       title: "The <em>Conductor</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `The coordinator. In Stage 1, one Analyst did everything alone. Here, the Conductor splits the work:<br><br>• Analyst + Extractor run <em>at the same time</em> (parallel dispatch — first time anything runs simultaneously)<br>• Synthesizer combines their outputs into the final report<br>• Synthesizer calls Stage 2's router to classify, save both files, and notify<br><br>The Conductor contains zero prompt logic — all the content comes from the specialist prompts.` },
+          content: `The planner. Reads the user's instruction (or runs the full pipeline if none was given), then returns JSON saying which specialists to call. The orchestrator code reads that plan and dispatches accordingly.<br><br>The Conductor is what crosses the line from <em>workflow</em> (fixed steps every time) to <em>agentic system</em> (planner decides). Same pattern as every other specialist in this sprint: a system prompt with a job. Its job is to plan, not to do.` },
         { label: "What goes in / out", type: "ioflow",
-          content: { in: "📝 a transcript", out: "📊 synthesized report + 📁 saved files" } },
+          content: { in: "📝 transcript + instruction", out: "📋 JSON plan: which tools to call" } },
+        { label: "Its instructions (conductor.md)", type: "prompt", content: promptConductor },
         { label: "Connects to", type: "connections",
           content: [
-            { arrow: "←", target: "The transcript", note: "receives input" },
-            { arrow: "↓‖", target: "The Analyst + Extractor", note: "step 1: parallel dispatch" },
-            { arrow: "↓", target: "The Synthesizer", note: "step 2: combine results → final report" },
-            { arrow: "↓", target: "The Router", note: "step 3: classify, save, notify (Stage 2 reused)" },
-            { arrow: "→", target: "Saved report", note: "step 4: output" }
+            { arrow: "←", target: "The transcript + instruction", note: "receives input" },
+            { arrow: "↓‖", target: "The Analyst + Extractor", note: "dispatches in parallel (if planned)" },
+            { arrow: "↓", target: "The Synthesizer", note: "dispatches after Analyst + Extractor return" },
+            { arrow: "↓", target: "The Router", note: "dispatches Stage 2's runWorkflow() to classify + save" },
+            { arrow: "↓", target: "Reflect", note: "after-action report on the run (optional)" }
           ] }
       ]
     },
@@ -2358,9 +2382,18 @@ Return ONLY a JSON object:
       return { friendly: '⚠ Rate limited. Wait a few seconds, then try again.', toast: 'Rate limited — wait a moment' };
     }
     if (code === 401) {
-      return { friendly: '⚠ API key issue. Check student-output/.env has a valid ANTHROPIC_API_KEY.', toast: 'API key issue' };
+      return { friendly: '⚠ API key issue. Check student-output/.env has a valid ANTHROPIC_API_KEY.', toast: 'API key issue — check .env' };
     }
-    return { friendly: '⚠ Something went wrong. Try again, or check the browser console for details.', toast: 'Error — try again' };
+    if (/Unexpected token|JSON|not valid JSON/i.test(m)) {
+      return { friendly: '⚠ A specialist returned malformed JSON (probably wrapped in markdown fences). Try running again — the retry helper usually clears it.', toast: 'Malformed JSON from specialist — try again' };
+    }
+    if (/ECONN|ETIMEDOUT|ENOTFOUND|fetch/i.test(m)) {
+      return { friendly: '⚠ Network error talking to the server. Make sure `npm run server` is still running in your terminal.', toast: 'Network error — is the server running?' };
+    }
+    // Default: surface the actual error message in the toast (truncated) so the
+    // student doesn't have to dig into the raw output for a hint.
+    const snippet = m.length > 80 ? m.slice(0, 77) + '…' : m;
+    return { friendly: '⚠ Something went wrong. Try again, or check the browser console for details.', toast: `Error: ${snippet}` };
   }
 
   function addFeed(e) {
@@ -3035,6 +3068,9 @@ Return ONLY a JSON object:
         // Wait for return particles to land + a beat of Conductor dwell
         // before firing the next dispatch.
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('synthesizer')) {
+          log('orch', 'The Conductor', 'Got themes and actions back. Sending them to the Synthesizer.');
+        }
       }
 
       // Step 3: Synthesizer
@@ -3055,6 +3091,9 @@ Return ONLY a JSON object:
         log('extr', 'The Synthesizer', 'Report complete. Returning to Conductor.');
         setStep('orchStep3', 'done');
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('router')) {
+          log('orch', 'The Conductor', 'Got the report. Sending transcript + report to the Router.');
+        }
       }
 
       // Step 4: Router (Stage 2 reused)
@@ -3075,6 +3114,9 @@ Return ONLY a JSON object:
         log('orch', 'The Router', `Classified as <em>${cls}</em>. Saved + notified.`);
         setStep('orchStep4', 'done');
         await sleep(PARTICLE_MS + DWELL_AFTER_RETURN);
+        if (tools.includes('reflect')) {
+          log('orch', 'The Conductor', 'Router done. Sending the full run trace to Reflect for an after-action report.');
+        }
       }
 
       // Step 5: Reflect — run report
