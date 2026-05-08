@@ -94,9 +94,9 @@ Give me the full report — and tell me how it went
 
 Wait for the student to run it.
 
-> "All five specialists fire this time. Analyst and Extractor in parallel, then Synthesizer, then Router. **Then Reflect** — the fifth specialist, the one that's been quiet in our other runs. This is the agent's **self-eval / after-action report**. Reflect reads everything that just happened — themes, action items, the final report, the classification — and writes a structured review of how the run went."
+> "All five specialists fire this time. Analyst and Extractor in parallel, then Synthesizer, then Router. **Then Reflect** — the node on the right side of the diagram, between the Conductor and the specialist row. This is the agent's **self-eval / after-action report**. Reflect reads everything that just happened — themes, action items, the final report, the classification — and writes a structured review of how the run went."
 
-> "Click the **Reflect** node and read the after-action report on the right. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**."
+> "Click the **Reflect** node to read its system prompt. Then scroll down to the **Run Report** panel (below the step list) — that's where Reflect's actual output for this run lands. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**."
 
 Wait for the student to read.
 

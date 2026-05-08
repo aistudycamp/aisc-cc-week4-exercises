@@ -434,6 +434,8 @@
   }
   .node-sub-agent.sub .sa-icon { background: var(--sub-soft); color: var(--sub); }
   .node-sub-agent.extr .sa-icon { background: var(--extr-soft); color: var(--extr); }
+  .node-sub-agent.reflect .sa-icon { background: rgba(13, 148, 136, 0.08); color: var(--orch); font-weight: 600; }
+  .node-sub-agent.reflect .sa-name em { color: var(--orch); }
   .sa-info { flex: 1; min-width: 0; }
   .sa-tag {
     font-family: var(--mono);
@@ -508,6 +510,7 @@
   body[data-stage="3"] #s3-extr    { left: 27%;        top: 70%; }
   body[data-stage="3"] #s3-route   { left: 52%;        top: 70%; }
   body[data-stage="3"] #s3-router  { right: 4%;        top: 70%; }
+  body[data-stage="3"] #s3-reflect { right: 4%;        top: 47%; }
 
   /* PARTICLES */
   .particle {
@@ -1595,6 +1598,22 @@
         </div>
       </div>
 
+      <div class="node node-sub-agent reflect" id="s3-reflect" data-stages="3" data-node="s3-reflect">
+        <div class="sa-header">
+          <div class="sa-icon">⟲</div>
+          <div class="sa-info">
+            <div class="sa-tag">Step 5 · After-action</div>
+            <div class="sa-name">The <em>Reflect</em></div>
+          </div>
+          <div class="sa-dot"></div>
+        </div>
+        <div class="sa-body">Reads the entire run — themes, actions, report, classification — and writes a self-eval report. The agent grading its own work.</div>
+        <div class="sa-foot">
+          <span id="s3-reflectState">idle</span>
+          <span id="s3-reflectTime">—</span>
+        </div>
+      </div>
+
       <!-- particles -->
       <div class="particle c-input" id="p1"></div>
       <div class="particle c-orch" id="p2"></div>
@@ -1603,6 +1622,7 @@
       <div class="particle c-extr" id="p5"></div>
       <div class="particle c-output" id="p6"></div>
       <div class="particle c-orch" id="p7"></div>
+      <div class="particle c-orch" id="p8"></div>
 
       <!-- Chat-in-canvas (Stage 1 / chat tab) -->
       <div class="chat-canvas" id="chatCanvas">
@@ -1826,6 +1846,34 @@ Return ONLY a JSON object:
   "suggested_filename": <span class="str">"YYYY-MM-DD-[type].txt"</span>,
   "confidence": <span class="str">"high"</span> | <span class="str">"low"</span>
 }`;
+
+  // reflect.md — Stage 3 after-action report (runs last)
+  const promptReflect = `<span class="role">You are the after-action report.</span>
+
+You receive everything that just happened — the
+transcript, the analyst's themes, the extractor's
+actions, the synthesizer's report, and the router's
+classification.
+
+Produce a structured run review:
+
+<span class="key">RUN REPORT</span>
+
+<span class="key">What happened</span>
+2-3 sentences on the run.
+
+<span class="key">What went well</span>
+- <span class="str">Specific observation about output quality</span>
+
+<span class="key">What was ambiguous</span>
+- <span class="str">Specific gap, low-confidence result</span>
+
+<span class="key">Recommendations</span>
+- <span class="str">Each ends with: Tell Claude: "[paste-ready
+  instruction to improve a prompt file]"</span>
+
+<span class="com">// You won't be acted on automatically — your job</span>
+<span class="com">// is to make the next iteration possible.</span>`;
 
   // conductor.md — Stage 3 planning step
   const promptConductor = `<span class="role">You are the Conductor — an orchestrator
@@ -2078,11 +2126,11 @@ Respond with a single JSON object, no fences:
       ]
     },
     's3-router': {
-      eyebrow: "Inspecting · Step 3 · Router",
+      eyebrow: "Inspecting · Step 4 · Router",
       title: "The <em>Router</em>",
       sections: [
         { label: "What this is", type: "desc",
-          content: `Step 3 — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.<br><br>After the Router completes, <strong>Step 4: Reflect</strong> runs — the Conductor evaluates the entire run and produces a report with observations, ambiguities, and actionable recommendations for improving the agent.` },
+          content: `Step 4 — and <em>the exact same code as Stage 2</em>. Classifies the meeting type from the transcript, saves both the transcript and the synthesized report to the correct typed folder, then fires the macOS notification.<br><br>This is Stage 2's <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">runWorkflow()</code> function called directly — zero new code. Stage 3 <em>reuses</em> Stage 2.<br><br>After the Router completes, <strong>Step 5: Reflect</strong> runs — the after-action report on the entire run.` },
         { label: "What goes in / out", type: "ioflow",
           content: { in: "📝 transcript + 📄 report", out: "📁 saved files + 🔔 notification" } },
         { label: "File", type: "files",
@@ -2091,7 +2139,23 @@ Respond with a single JSON object, no fences:
           content: [
             { arrow: "←", target: "The Conductor", note: "called after Synthesizer completes" },
             { arrow: "→", target: "Saved report", note: "routes, saves, notifies" },
-            { arrow: "→", target: "Reflect (Step 4)", note: "Conductor evaluates the run next" }
+            { arrow: "→", target: "Reflect (Step 5)", note: "Conductor passes the full run trace next" }
+          ] }
+      ]
+    },
+    's3-reflect': {
+      eyebrow: "Inspecting · Step 5 · After-action report",
+      title: "The <em>Reflect</em>",
+      sections: [
+        { label: "What this is", type: "desc",
+          content: `The <em>self-eval / after-action report</em>. Runs after the Router. Reads everything that just happened — the transcript, themes from the Analyst, actions from the Extractor, the Synthesizer's report, the Router's classification — and writes a structured review.<br><br>Output has 4 sections: <strong>What happened</strong>, <strong>What went well</strong>, <strong>What was ambiguous</strong>, and <strong>Recommendations</strong>. Each recommendation ends with a paste-ready <code style="font-family:var(--mono);font-size:12px;background:#F0EDE6;padding:1px 6px;border-radius:3px;color:var(--ink);">Tell Claude:</code> instruction to improve a prompt file.<br><br>You won't act on this in the sprint. The pattern matters: in production you'd feed Reflect's output into a manual review queue, OR wire up another Claude call to apply a recommendation automatically — closing the loop.` },
+        { label: "What goes in / out", type: "ioflow",
+          content: { in: "📋 the full run trace", out: "📊 structured run report" } },
+        { label: "Its instructions (reflect.md)", type: "prompt", content: promptReflect },
+        { label: "Connects to", type: "connections",
+          content: [
+            { arrow: "←", target: "The Conductor", note: "called after Router completes" },
+            { arrow: "↓", target: "Run Report panel", note: "output rendered below" }
           ] }
       ]
     }
@@ -2191,17 +2255,20 @@ Respond with a single JSON object, no fences:
     } else if (stage === '3') {
       const inR = rect('s3-input'), agR = rect('s3-agent'), outR = rect('s3-output');
       const summR = rect('s3-summ'), extrR = rect('s3-extr'), routeR = rect('s3-route'), routerR = rect('s3-router');
+      const reflectR = rect('s3-reflect');
       const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), agentBot = ptB(agR), outputLeft = ptL(outR);
       const summTop = ptT(summR), extrTop = ptT(extrR), routeTop = ptT(routeR), routerTop = ptT(routerR);
+      const reflectLeft = ptL(reflectR), reflectTop = ptT(reflectR);
       paths = [
         { id: 's3-input>s3-agent',   d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-output',  d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-summ',    d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${summTop.x} ${summTop.y - 40}, ${summTop.x} ${summTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-extr',    d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${extrTop.x} ${extrTop.y - 40}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-route',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routeTop.x} ${routeTop.y - 40}, ${routeTop.x} ${routeTop.y}`, cls: 'dashed' },
-        { id: 's3-agent>s3-router',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routerTop.x} ${routerTop.y - 40}, ${routerTop.x} ${routerTop.y}`, cls: 'dashed' }
+        { id: 's3-agent>s3-router',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routerTop.x} ${routerTop.y - 40}, ${routerTop.x} ${routerTop.y}`, cls: 'dashed' },
+        { id: 's3-agent>s3-reflect', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 60} ${agentRight.y}, ${reflectLeft.x - 60} ${reflectLeft.y}, ${reflectLeft.x} ${reflectLeft.y}`, cls: 'dashed' }
       ];
-      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop);
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop, reflectLeft);
     }
 
     paths.forEach(p => {
@@ -2486,6 +2553,7 @@ Respond with a single JSON object, no fences:
     if (fromNodeId === 's3-extr') return 'p5';
     if (fromNodeId === 's3-route') return 'p4';
     if (fromNodeId === 's3-router') return 'p7';
+    if (fromNodeId === 's3-reflect') return 'p8';
     if (fromNodeId.includes('extr')) return 'p5';
     if (fromNodeId.includes('route')) return 'p4';
     if (fromNodeId.includes('standup') || fromNodeId.includes('client') || fromNodeId.includes('planning')) return 'p6';
@@ -3121,7 +3189,9 @@ Respond with a single JSON object, no fences:
 
       // Step 5: Reflect — run report
       if (tools.includes('reflect')) {
-        log('orch', 'The Conductor', 'Reflecting on the run — what happened, what went well, what to fix…');
+        fire('s3-agent', 's3-reflect');
+        begin('s3-reflect');
+        log('sub', 'The Reflect', 'Reading the full run — themes, actions, report, classification. Writing the after-action report…');
         setStep('orchStep5', 'running');
         const r4 = await fetch('/api/orchestrate/step4', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3130,9 +3200,11 @@ Respond with a single JSON object, no fences:
         const { runReport, error: e4 } = await r4.json();
         if (e4) throw new Error(e4);
         setStep('orchStep5', 'done');
+        finish('s3-reflect');
+        fire('s3-reflect', 's3-agent');
         $('s3RunReportContent').textContent = runReport;
         $('s3RunReport').style.display = 'block';
-        log('orch', 'The Conductor', 'Run report complete.');
+        log('sub', 'The Reflect', 'After-action report complete. Returning to Conductor.');
         await sleep(DWELL_BEFORE_DISPATCH);
       }
 
