@@ -8,7 +8,7 @@
     "stage-1": "node stage-1/chat.js",
     "stage-2": "node stage-2/workflow.js",
     "stage-3": "node stage-3/orchestrator.js",
-    "server": "node server.js",
+    "server": "(lsof -ti:3000 | xargs kill -9) 2>/dev/null; node server.js",
     "drop-test": "node --input-type=module --eval \"import{copyFileSync}from'node:fs';const dest='transcripts/incoming/test-'+Date.now()+'.txt';copyFileSync('transcripts/sample-transcript.txt',dest);console.log('Dropped:',dest);\""
   },
   "dependencies": {
