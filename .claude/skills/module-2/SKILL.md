@@ -1,6 +1,6 @@
 ---
 name: module-2
-description: Your First API Call — Module 2 of the AISC Agent Sprint. Triggered when a student types "module-2". The demystify-the-API moment. Student opens chat.js, runs it for the first time, and sees the JSON request and response. By the end, AI products are no longer magic.
+description: Your First API Call — Module 2 of the AISC Agent Sprint. Triggered when a student types "module-2". The demystify-the-API moment. Student runs the chat assistant from the browser for the first time and sees the JSON request and response. By the end, AI products are no longer magic.
 ---
 
 # Module 2: Your First API Call
@@ -65,7 +65,7 @@ Show them what the code is about to send to Anthropic — this is the JSON objec
 
 ```json
 {
-  "model": "claude-sonnet-4-6",
+  "model": "claude-haiku-4-5-20251001",
   "max_tokens": 1024,
   "system": "You are a meeting analyst. ...",
   "messages": [
@@ -189,4 +189,4 @@ Just ask me: *"Read concepts/what-is-an-api.md and walk me through it."* I'll pu
 - **Don't skip the JSON walkthrough** — Steps 2 and 3 (reading the file and showing the request object) are the point of this module. Don't jump straight to running it.
 - **Diagnose errors before moving on** — if the student gets a `401`, `Cannot find module`, or `ANTHROPIC_API_KEY undefined`, fix it here. A broken setup will block every module from here forward.
 - **The "full JSON response" step is optional** — follow the student's curiosity. If they want to see the full response object, great. If not, move on without guilt.
-- **Fresh terminal recovery** — if the student just opened a new terminal, remind them: `cd [repo-root]/student-output` before running `npm run stage-1`. The repo root path is the one established in Module Setup.
+- **Fresh terminal recovery** — if the student just opened a new terminal and the server isn't running, remind them: `cd [repo-root]/student-output && npm run server` to bring it back up. The repo root path is the one established in Module Setup.
