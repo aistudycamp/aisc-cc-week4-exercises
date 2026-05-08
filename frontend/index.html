@@ -762,6 +762,18 @@
     gap: 6px;
     margin-bottom: 6px;
   }
+  .panel-hint {
+    font-size: 12px;
+    color: var(--sub);
+    background: var(--panel-soft);
+    border-left: 3px solid var(--line-strong);
+    padding: 8px 10px;
+    margin: 6px 0 8px 0;
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+  .panel-hint b { color: var(--ink-2); }
+  .panel-hint em { color: var(--ink-2); font-style: italic; }
   .panel-sample-btn {
     font-family: var(--mono);
     font-size: 10.5px;
@@ -1654,6 +1666,7 @@
               <button class="panel-sample-btn" id="workflowClientBtn">Load client call</button>
               <button class="panel-sample-btn" id="workflowPlanningBtn">Load planning</button>
             </div>
+            <div class="panel-hint">💡 <b>Try each sample transcript</b> — the classification badge and the saved file path will change with the input.</div>
             <button class="panel-btn" id="workflowSubmit">Run Workflow →</button>
             <div class="panel-result" id="workflowResult"></div>
           </div>
@@ -1673,6 +1686,7 @@
               placeholder="Optional: tell the Conductor what you want. e.g. &quot;Just give me the action items&quot; or &quot;Only route this — skip the analysis&quot; — leave blank for full pipeline"
               rows="5"
             ></textarea>
+            <div class="panel-hint">💡 <b>Try a different transcript</b> or <b>type an instruction above</b> like <em>"just give me the action items"</em> — same code, different behavior. The system adapts to your input.</div>
             <button class="panel-btn" id="orchSubmit">Run Orchestrator →</button>
             <div id="orchConductorPlan" style="display:none" class="conductor-plan">
               <span class="conductor-label">Conductor chose:</span>
@@ -2776,14 +2790,20 @@ Return ONLY a JSON object:
       });
       const { steps, classification, outputPath, error } = await r.json();
       if (error) throw new Error(error);
-      let html = '<div class="orch-steps">';
+      const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const wordCount = transcript.split(/\s+/).filter(Boolean).length;
+      const preview = transcript.length > 140 ? transcript.slice(0, 140).replace(/\s+/g, ' ').trim() + '…' : transcript;
+      const savedPath = outputPath ? outputPath.replace(/^.*\/transcripts\//, 'transcripts/') : `transcripts/${classification}/`;
+      let html = `<span class="class-badge">${esc(classification)}</span>`;
+      html += `<div class="out-block"><div class="out-label">📄 Source transcript</div><p style="font-size:13px;color:var(--sub);margin:4px 0 6px 0;">${wordCount} words</p><p style="font-style:italic;color:var(--sub);">"${esc(preview)}"</p></div>`;
+      html += `<div class="out-block"><div class="out-label">📁 Saved as</div><p><code>${esc(savedPath)}</code></p></div>`;
+      html += '<div class="out-block"><div class="out-label">⚙️ What happened</div><div class="orch-steps">';
       if (steps && steps.length) {
         for (const step of steps) {
-          html += `<div class="orch-step done"><span class="step-check">✓</span><span>${step.step}</span></div>`;
+          html += `<div class="orch-step done"><span class="step-check">✓</span><span>${esc(step.step)}</span></div>`;
         }
       }
-      html += '</div>';
-      html += `<span class="class-badge">${classification}</span>`;
+      html += '</div></div>';
       $('workflowResult').innerHTML = html;
       await animPromise;
       toast(`Workflow complete — routed to ${classification}.`);
@@ -2958,7 +2978,14 @@ Return ONLY a JSON object:
         $('orchConductorPlan').style.display = 'block';
         log('orch', 'The Conductor', `Plan: <code>[${plan.tools.join(', ')}]</code>. ${plan.reasoning}`);
       } else {
-        log('orch', 'The Conductor', 'No instruction — running the full pipeline.');
+        // Default run (no instruction): show a synthetic plan badge so the
+        // student always sees what's about to fire and why. The Conductor
+        // isn't actually called here — its rule "no instruction → run all
+        // five" is implicit and we surface it as the plan.
+        $('orchConductorTools').textContent = tools.join(' → ');
+        $('orchConductorReason').textContent = 'No instruction given — running the full pipeline.';
+        $('orchConductorPlan').style.display = 'block';
+        log('orch', 'The Conductor', 'No instruction — running the full pipeline (default plan).');
         await sleep(DWELL_BEFORE_DISPATCH);
       }
       await sleep(DWELL_BEFORE_DISPATCH);
