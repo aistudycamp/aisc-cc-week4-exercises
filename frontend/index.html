@@ -506,11 +506,11 @@
   body[data-stage="3"] #s3-input   { left: 32px;       top: 30%; }
   body[data-stage="3"] #s3-agent   { left: 50%;        top: 8%;  transform: translateX(-50%); }
   body[data-stage="3"] #s3-output  { right: 32px;      top: 30%; }
-  body[data-stage="3"] #s3-summ    { left: 4%;         top: 70%; }
-  body[data-stage="3"] #s3-extr    { left: 27%;        top: 70%; }
-  body[data-stage="3"] #s3-route   { left: 52%;        top: 70%; }
-  body[data-stage="3"] #s3-router  { right: 4%;        top: 70%; }
-  body[data-stage="3"] #s3-reflect { right: 4%;        top: 47%; }
+  body[data-stage="3"] #s3-summ    { left: 2%;         top: 70%; }
+  body[data-stage="3"] #s3-extr    { left: 21%;        top: 70%; }
+  body[data-stage="3"] #s3-route   { left: 40%;        top: 70%; }
+  body[data-stage="3"] #s3-router  { left: 59%;        top: 70%; }
+  body[data-stage="3"] #s3-reflect { right: 2%;        top: 70%; }
 
   /* PARTICLES */
   .particle {
@@ -2258,7 +2258,7 @@ Respond with a single JSON object, no fences:
       const reflectR = rect('s3-reflect');
       const inputRight = ptR(inR), agentLeft = ptL(agR), agentRight = ptR(agR), agentBot = ptB(agR), outputLeft = ptL(outR);
       const summTop = ptT(summR), extrTop = ptT(extrR), routeTop = ptT(routeR), routerTop = ptT(routerR);
-      const reflectLeft = ptL(reflectR), reflectTop = ptT(reflectR);
+      const reflectTop = ptT(reflectR);
       paths = [
         { id: 's3-input>s3-agent',   d: `M ${inputRight.x} ${inputRight.y} C ${inputRight.x + 80} ${inputRight.y}, ${agentLeft.x - 80} ${agentLeft.y}, ${agentLeft.x} ${agentLeft.y}`, cls: 'main' },
         { id: 's3-agent>s3-output',  d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 80} ${agentRight.y}, ${outputLeft.x - 80} ${outputLeft.y}, ${outputLeft.x} ${outputLeft.y}`, cls: 'main' },
@@ -2266,9 +2266,9 @@ Respond with a single JSON object, no fences:
         { id: 's3-agent>s3-extr',    d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${extrTop.x} ${extrTop.y - 40}, ${extrTop.x} ${extrTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-route',   d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routeTop.x} ${routeTop.y - 40}, ${routeTop.x} ${routeTop.y}`, cls: 'dashed' },
         { id: 's3-agent>s3-router',  d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${routerTop.x} ${routerTop.y - 40}, ${routerTop.x} ${routerTop.y}`, cls: 'dashed' },
-        { id: 's3-agent>s3-reflect', d: `M ${agentRight.x} ${agentRight.y} C ${agentRight.x + 60} ${agentRight.y}, ${reflectLeft.x - 60} ${reflectLeft.y}, ${reflectLeft.x} ${reflectLeft.y}`, cls: 'dashed' }
+        { id: 's3-agent>s3-reflect', d: `M ${agentBot.x} ${agentBot.y} C ${agentBot.x} ${agentBot.y + 40}, ${reflectTop.x} ${reflectTop.y - 40}, ${reflectTop.x} ${reflectTop.y}`, cls: 'dashed' }
       ];
-      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop, reflectLeft);
+      anchors.push(inputRight, agentLeft, agentRight, outputLeft, agentBot, summTop, extrTop, routeTop, routerTop, reflectTop);
     }
 
     paths.forEach(p => {
