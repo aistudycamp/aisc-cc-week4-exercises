@@ -98,10 +98,6 @@ A macOS notification should appear in the top-right corner of the screen: **"Rou
 
 Click each node on the diagram. Show the inspect panels — what each step does.
 
-Hit **Run Agent** to watch the Stage 2 architecture animation.
-
-> "The animation shows the architecture. The live panel shows the actual execution. Both are useful — the diagram gives you the mental model, the live interface gives you the proof."
-
 Try loading the other sample transcript ("Load client call") and run it again. Point out: the classification changes.
 
 ## Step 6: The big idea (2 min)

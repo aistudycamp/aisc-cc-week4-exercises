@@ -40,9 +40,9 @@ By the end: you'll have run a multi-specialist agentic workflow end-to-end — t
 
 > "Three system prompts. Three jobs. Same pattern you've already used."
 
-## Step 3: The architecture (2 min)
+## Step 3: One more node — Reflect (1 min)
 
-> "Look at the diagram on the Agentic tab. Top to bottom: transcript comes in, Analyst and Extractor run **in parallel** — same input, different specialists, finishing at the same time. Their outputs flow into Synthesizer, which combines them into one report. Then the Stage 2 Router takes the report, classifies the meeting type, saves the file, sends a notification. There's also a Reflect step that fires at the very end — it's the system's **self-eval / after-action report**. We'll see what it produces in Module 6, where it earns its place."
+> "One more node on the diagram: **Reflect** — fires at the very end, after the Router. It's the system's **self-eval / after-action report**. We'll see what it produces in Module 6, where it earns its place."
 
 > "Five specialists, one orchestrator. The orchestrator doesn't add intelligence — it coordinates. The specialists do the work."
 

@@ -105,13 +105,7 @@ Tell them:
 2. **Each agent gets its own prompt.** The system prompt shapes what the agent does — it defines its role, its output format, its rules. Change the prompt, change the agent. Three specialists = three prompts = three jobs.
 3. **Compose; don't conflate.** Build small pieces, then chain them. A bigger agent isn't always a better agent.
 
-## Step 6: The specialists in the example (2 min)
-
-Look back at the KEY THEMES section in the example output shown earlier. Point out:
-
-> "Each of those themes came from the Analyst specialist — one focused prompt, one job. The action items below it came from the Extractor — a different prompt, running in parallel. The meeting classification at the top came from the Router. Three specialists. One orchestrator that put it all together."
-
-## Step 7: Reflection (1 min)
+## Step 6: Reflection (1 min)
 
 Say:
 
@@ -129,7 +123,7 @@ Say:
 - Every specialist is a system prompt — that's the spine of the pattern you're about to build
 - Stage 3 is Stage 1 and Stage 2 wired together
 
-## Step 8: Wrap and commit (1 min)
+## Step 7: Wrap and commit (1 min)
 
 1. **Update `CLAUDE.md`**: Read CLAUDE.md, then change `- [ ] Module 1:` to `- [x] Module 1:` (Edit tool)
 2. **Commit** — run via Bash tool from the repo root:

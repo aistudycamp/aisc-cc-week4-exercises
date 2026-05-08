@@ -61,6 +61,8 @@ The system prompt is saved at `prompts/system.md`. You can read and edit it live
 
 > "That panel **is** the file. Whatever's in there is what shapes every output: KEY THEMES, ACTION ITEMS, RECOMMENDED NEXT STEP — all defined there. Change the panel, change the agent. That's the leverage."
 
+**Verification convention for the rest of this module:** every time Claude edits `prompts/system.md`, the system-prompt panel in the Chat tab shows the new contents — that's how you verify each edit landed. We won't repeat this for every edit below.
+
 ## Step 4: Start the server (1 min)
 
 The server should still be running from Module 2. If you've restarted your terminal, run `npm run server` again from `[repo-root]/student-output`. Open **http://localhost:3000** — the Chat tab should be there. Default port is 3000 — if something else is running there, check your terminal for the actual URL.
@@ -96,8 +98,6 @@ Say to Claude:
 
 > "Update `prompts/system.md` — change the first line from `You are a meeting analyst...` to: `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`"
 
-After Claude edits it, the system-prompt panel in the Chat tab will show the new prompt — verify the change there.
-
 Then restart the server so the new prompt takes effect. In your terminal: press `Ctrl+C` to stop, then:
 
 ```bash
@@ -128,8 +128,6 @@ This time we change BOTH the personality and the structure of the output. Say to
 > Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
 > ```"
 
-After Claude edits it, the system-prompt panel in the Chat tab will show the new prompt — verify the change there.
-
 Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question — or just send an empty message after loading to get the full report.
 
 > "Same code. Same Claude. Different prompt. The system prompt is the product spec — every word of output, AND its structure, is shaped by it. You went from a Renaissance scholar to a pirate captain by editing a single file. That's the leverage."
@@ -138,7 +136,7 @@ Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://loca
 
 Don't skip this — Module 4's workflow reads `system.md` and expects the original format.
 
-Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool. The system-prompt panel in the Chat tab will show the original prompt restored.
+Read `prompts/system-original.md` via Read tool. Write those contents to `prompts/system.md` via Edit tool.
 
 Restart the server (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask one question to confirm the original KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP format is back.
 
