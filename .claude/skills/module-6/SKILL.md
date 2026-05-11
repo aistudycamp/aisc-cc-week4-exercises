@@ -96,7 +96,9 @@ Wait for the student to run it.
 
 > "All five specialists fire this time. Analyst and Extractor in parallel, then Synthesizer, then Router. **Then Reflect** — the fifth specialist on the far right of the bottom row. The Conductor dispatches it last, after all the work is done. This is the agent's **self-eval / after-action report**. Reflect reads everything that just happened — themes, action items, the final report, the classification — and writes a structured review of how the run went."
 
-> "Click the **Reflect** node to read its system prompt. Then scroll down to the **Run Report** panel (below the step list) — that's where Reflect's actual output for this run lands. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**."
+> "When the run finishes, scroll the **Run Detail** panel on the right (below the step list) to find the **Run Report** — that's Reflect's actual output for this run. Four sections: **What happened**, **What went well**, **What was ambiguous**, **Recommendations**.
+>
+> If you want to see *how* Reflect produced that, click the **Reflect** node on the canvas — that opens its inspect panel with the system prompt (the instructions it ran on)."
 
 Wait for the student to read.
 
