@@ -125,11 +125,13 @@ Wait for the student's answer.
 
 1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 6: The Conductor")` via Bash tool and show the student the output: "Committed. Here's what went in: [changed files]" (or "No changes to commit." if nothing was staged.)
 2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 6:` to `- [x] Module 6:`.
-3. **Run `/compact`** — type `/compact` to clear context before Module 7. Stage boundary cleanup keeps Claude focused for the send-off.
+3. **Tell the student to run `/compact`.** Say this:
 
-After `/compact`:
+   > "Module 6 done. You've built a multi-agent system — a Conductor that decides which specialists to call, plus a self-eval that grades the run. Next is the send-off: a few examples of where this pattern goes from here.
+   >
+   > Type `/compact` now to clear context before the final stretch. **After `/compact` finishes, type `module-7` to continue.**"
 
-> "Module 6 done. You've built a multi-agent system. Type `module-7` when you're ready — that's the send-off, and a few examples of where this pattern goes next."
+   Wait for the student to run `/compact` before doing anything else.
 
 ## Coach guardrails
 

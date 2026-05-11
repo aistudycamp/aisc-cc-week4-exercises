@@ -168,10 +168,13 @@ What you've built so far:
    git add -A && (git diff --cached --quiet || git commit -m "Complete Module 3: Run the Chat Assistant")
    ```
    Show the student the changed files in the commit output.
-3. **Run `/compact`** — type `/compact` to clear context before Stage 2 (Module 4). Stage boundary cleanup keeps Claude focused for the new mental model coming next.
-4. Hand off:
+3. **Tell the student to run `/compact`.** Say this:
 
-> "Stage 1 done. You have a working chat assistant — interactive, back-and-forth, and driven entirely by a system prompt you can change anytime. Next: Stage 2. We build something that runs *automatically* every time a file appears — no typing required. Type `module-4` when you're ready."
+   > "Stage 1 is done. You built a chat assistant that's interactive, back-and-forth, and driven entirely by a system prompt you can change anytime. Next is Stage 2 — a workflow that runs *automatically* every time a file appears, no typing required.
+   >
+   > Type `/compact` now to clear context — stage boundaries are the right place to do it. **After `/compact` finishes, type `module-4` to continue.**"
+
+   Wait for the student to run `/compact` before doing anything else.
 
 ## Coach Guardrails
 

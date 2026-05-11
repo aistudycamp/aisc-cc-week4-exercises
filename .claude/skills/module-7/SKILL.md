@@ -58,11 +58,7 @@ You've built a multi-agent system end-to-end. This module is the send-off: three
 
 1. Run `git add -A && (git diff --cached --quiet || git commit -m "Complete Module 7: What's Next")` via Bash tool from the sprint repo root and show the student the changed files (or "No changes to commit." if nothing was staged.)
 2. Read `CLAUDE.md`, then update it via Edit tool: change `- [ ] Module 7:` to `- [x] Module 7:`.
-3. **Run `/compact`** — type `/compact` to end the session cleanly.
-
-After `/compact`:
-
-> "That's the sprint. You built a chat assistant, a workflow, a multi-specialist system, and a multi-agent system with a Conductor. Same pattern, four different shapes. Whatever you build next — same shape, different specialists. Go build it."
+3. **Tell the student:** *"That's the sprint. You built a chat assistant, a workflow, a multi-specialist system, and a multi-agent system with a Conductor. Same pattern, four different shapes. Whatever you build next — same shape, different specialists. Go build it. You can type `/compact` now to end the session cleanly, or just close out."*
 
 ## Coach guardrails
 
