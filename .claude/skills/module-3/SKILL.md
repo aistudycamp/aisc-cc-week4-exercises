@@ -90,13 +90,15 @@ Click the **Chat Assistant** node on the diagram. Show the inspect panel — thi
 
 ## Step 6: Edit the system prompt (5 min)
 
-Two quick edits. **Tell Claude to make each one** — you should not touch the file directly.
+Two quick edits. **You won't touch the file** — Claude (the coach) makes each edit while telling you what's changing and why.
 
-### Edit A: Change the role — Shakespeare
+### Edit A: Shakespeare
 
-Say to Claude:
+> "**Edit A — Shakespeare.** I'm going to rewrite the opening line of `prompts/system.md` so the analyst speaks in Elizabethan English. Same job, totally different voice — that's the point: change one file, change the whole product."
 
-> "Update `prompts/system.md` — change the first line from `You are a meeting analyst...` to: `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`"
+Coach: use the Edit tool to change the first line of `prompts/system.md` to:
+
+> `You art a meeting analyst most scholarly and verbose, speaking always in the manner of Shakespeare. Every response must be rendered in Elizabethan English, forsooth.`
 
 Then restart the server so the new prompt takes effect. In your terminal: press `Ctrl+C` to stop, then:
 
@@ -106,27 +108,27 @@ npm run server
 
 Go back to **http://localhost:3000**, reload the page, click **Load standup**, and ask: `Who looks most blocked?` — the response should be visibly, obviously different. The Shakespeare prompt makes the personality change unmistakable.
 
-### Edit B: Change the role AND the output format — Pirate Captain
+### Edit B: Captain Briggs
 
-This time we change BOTH the personality and the structure of the output. Say to Claude:
+> "**Edit B — Captain Briggs.** This time I'm replacing the whole prompt. The analyst becomes a pirate captain, and the output structure changes too — instead of KEY THEMES / ACTION ITEMS / RECOMMENDED NEXT STEP, the report becomes CAP'N'S VERDICT / TREASURE MAP / SCALLYWAG ALERT. Same code, same Claude. Totally different product. That's the leverage of the prompt."
 
-> "Update `prompts/system.md` — replace it entirely with this new system prompt:
->
-> ```
-> You are Captain Bartholomew "Barnacle" Briggs — a salty, sea-faring pirate captain who has somehow been put in charge of analyzing modern meeting transcripts. Every response is delivered in full pirate voice: ARRR, ye scallywags, ahoy, by the seven seas, etc. Be dramatic and theatrical, but still actually useful. Never break character.
->
-> When given a transcript, produce your report in this EXACT format:
->
-> ## CAP'N'S VERDICT
-> One sentence summary of the meeting in pirate voice. Make it dramatic.
->
-> ## TREASURE MAP
-> The action items, but written as map markers. Each line:
-> - **X marks the spot** for [crew member name]: [what they need to do] — by [deadline if mentioned, or 'next tide' otherwise]
->
-> ## SCALLYWAG ALERT
-> Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
-> ```"
+Coach: replace `prompts/system.md` entirely with this new prompt:
+
+```
+You are Captain Bartholomew "Barnacle" Briggs — a salty, sea-faring pirate captain who has somehow been put in charge of analyzing modern meeting transcripts. Every response is delivered in full pirate voice: ARRR, ye scallywags, ahoy, by the seven seas, etc. Be dramatic and theatrical, but still actually useful. Never break character.
+
+When given a transcript, produce your report in this EXACT format:
+
+## CAP'N'S VERDICT
+One sentence summary of the meeting in pirate voice. Make it dramatic.
+
+## TREASURE MAP
+The action items, but written as map markers. Each line:
+- **X marks the spot** for [crew member name]: [what they need to do] — by [deadline if mentioned, or 'next tide' otherwise]
+
+## SCALLYWAG ALERT
+Who's blocked, what's at risk, who might be slacking. Be specific. End with a single line: 'Sail on, ye scurvy dogs!' or 'Mutiny brewing!' depending on whether the meeting was productive.
+```
 
 Restart the server again (`Ctrl+C`, then `npm run server`). Reload **http://localhost:3000**, click **Load standup**, ask a question — or just send an empty message after loading to get the full report.
 
