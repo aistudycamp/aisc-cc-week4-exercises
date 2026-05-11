@@ -26,7 +26,7 @@ By the end: you'll have run a multi-specialist agentic workflow end-to-end — t
 
 ## Step 1: Opener (1 min)
 
-> "You've built a chat assistant and a workflow. This module brings them together into a multi-specialist system: three specialists running in coordination, plus the Stage 2 Router. A fifth specialist (Reflect — the system's self-eval / after-action report) runs too; we'll dig into what it produces in Module 6. One run. Let's see it work."
+> "You've built a chat assistant and a workflow. This module brings them together into a multi-specialist system: three specialists running in coordination, plus **the Router you built in Module 4 — now the last specialist in this system**. A fifth specialist (Reflect — the system's self-eval / after-action report) runs too; we'll dig into what it produces in Module 6. One run. Let's see it work."
 
 ## Step 2: Meet the three specialists (2 min)
 
@@ -42,7 +42,7 @@ By the end: you'll have run a multi-specialist agentic workflow end-to-end — t
 
 ## Step 3: One more node — Reflect (1 min)
 
-> "One more node on the diagram: **Reflect** — fires at the very end, after the Router. It's the system's **self-eval / after-action report**. We'll see what it produces in Module 6, where it earns its place."
+> "One more node on the diagram: **Reflect** — fires at the very end, after the Router. It's the system's **self-eval / after-action report**. You're seeing it on the canvas now so it's not new when you reach Module 6 — that's where you'll actually use it."
 
 > "Five specialists, one orchestrator. The orchestrator doesn't add intelligence — it coordinates. The specialists do the work."
 
