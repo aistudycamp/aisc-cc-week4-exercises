@@ -2163,6 +2163,29 @@ Respond with a single JSON object, no fences:
 
   // ============ STAGE-SPECIFIC ANIMATION SEQUENCES ============
 
+  // Stage 2 events are built per-run from the actual classifier result so
+  // the narration matches whichever path the Classifier picked. See
+  // buildStage2Events() below — the workflow handler passes the resulting
+  // array into playAnimation() as an override.
+  const STAGE2_TYPE_META = {
+    'team-standup':     { node: 'standup',  label: 'team standup' },
+    'client-call':      { node: 'client',   label: 'client call' },
+    'planning-session': { node: 'planning', label: 'planning session' }
+  };
+
+  function buildStage2Events(type, filename) {
+    const meta = STAGE2_TYPE_META[type] || { node: 'standup', label: type };
+    const nodeId = `s2-${meta.node}`;
+    return [
+      { t: 0,    src: 'input', srcLabel: 'incoming/',      msg: `File detected: <code>${filename}</code> dropped into the watch folder.`, node: 's2-input', state: 'active' },
+      { t: 700,  src: 'input', srcLabel: 'incoming/',      msg: 'Transcript read. Sending to the Classifier to identify the meeting type.', particle: 's2-input>s2-agent', complete: 's2-input' },
+      { t: 1400, src: 'orch',  srcLabel: 'The Classifier', msg: 'Got it. Reading the transcript…', node: 's2-agent', state: 'active' },
+      { t: 2600, src: 'orch',  srcLabel: 'The Classifier', msg: `This is a ${meta.label}. Three possible paths — routing to <em>${type}/</em>.`, complete: 's2-agent', particle: `s2-agent>${nodeId}` },
+      { t: 3500, src: 'output',srcLabel: `${type}/`,       msg: `Path chosen: ${type}. Writing document as <code>${filename}</code>.`, node: nodeId, state: 'active', complete: nodeId, particle: `${nodeId}>s2-notify` },
+      { t: 4500, src: 'output',srcLabel: 'Saved + Notified', msg: `Document written to <code>transcripts/${type}/</code>. macOS banner fired: "Routed to: ${type}". <em>Pipeline complete.</em>`, node: 's2-notify', state: 'active', report: true, complete: 's2-notify' }
+    ];
+  }
+
   const sequences = {
     1: [
       { t: 0,    src: 'input', srcLabel: 'A transcript', msg: 'Pasted a transcript · 442 words.', node: 's1-input', state: 'active' },
@@ -2172,14 +2195,7 @@ Respond with a single JSON object, no fences:
       { t: 3400, src: 'orch',  srcLabel: 'The Analyst',  msg: 'Done. <span class="arrow">→</span> Sending the report.', particle: 's1-agent>s1-output', complete: 's1-agent' },
       { t: 4200, src: 'output',srcLabel: 'A report',     msg: 'Printed to terminal. <em>Stage 1 done.</em>', node: 's1-output', state: 'active', report: true, complete: 's1-output' }
     ],
-    2: [
-      { t: 0,    src: 'input', srcLabel: 'incoming/',      msg: 'File detected: <code>meeting-notes.txt</code> dropped into the watch folder.', node: 's2-input', state: 'active' },
-      { t: 700,  src: 'input', srcLabel: 'incoming/',      msg: 'Transcript read. Sending to the Classifier to identify the meeting type.', particle: 's2-input>s2-agent', complete: 's2-input' },
-      { t: 1400, src: 'orch',  srcLabel: 'The Classifier', msg: 'Got it. Reading the transcript…', node: 's2-agent', state: 'active' },
-      { t: 2600, src: 'orch',  srcLabel: 'The Classifier', msg: 'This is a team standup. Three possible paths — routing to <em>team-standup/</em>.', complete: 's2-agent', particle: 's2-agent>s2-standup' },
-      { t: 3500, src: 'output',srcLabel: 'team-standup/',  msg: 'Path chosen: team-standup. Writing document as <code>2026-04-29-team-standup.txt</code>.', node: 's2-standup', state: 'active', complete: 's2-standup', particle: 's2-standup>s2-notify' },
-      { t: 4500, src: 'output',srcLabel: 'Saved + Notified', msg: 'Document written to <code>transcripts/team-standup/</code>. macOS banner fired: "Routed to: team-standup". <em>Pipeline complete.</em>', node: 's2-notify', state: 'active', report: true, complete: 's2-notify' }
-    ],
+    // Stage 2 is built per-run from the classifier result — see buildStage2Events().
     // Stage 3 — events tagged with `tools` so playAnimation can filter by the
     // Conductor's plan. An event with no `tools` always shows; an event with
     // `tools: [...]` only shows if at least one of those tools is in the active
@@ -2563,8 +2579,9 @@ Respond with a single JSON object, no fences:
 
   // Plays the animation for the current stage. Called by per-panel Run buttons.
   // Runs in parallel with the API call so the visualization feels alive.
-  async function playAnimation(activeTools = null) {
-    if (!sequences[currentStage]) return;
+  async function playAnimation(activeTools = null, overrideSequence = null) {
+    const sourceEvents = overrideSequence || sequences[currentStage];
+    if (!sourceEvents) return;
     document.querySelectorAll('.node').forEach(n => n.classList.remove('active','complete'));
     Object.keys(pathRefs).forEach(p => pathRefs[p].classList.remove('active','complete'));
     $('canvasStatus').textContent = '● running';
@@ -2572,7 +2589,7 @@ Respond with a single JSON object, no fences:
     // If the caller passed an active tools list (e.g., the Conductor's plan
     // limited the run to just ['router']), drop any event whose `tools` tag
     // doesn't intersect. Untagged events always play.
-    const allEvents = sequences[currentStage];
+    const allEvents = sourceEvents;
     const sequence = activeTools
       ? allEvents.filter(e => !e.tools || e.tools.some(t => activeTools.includes(t)))
       : allEvents;
@@ -2880,10 +2897,11 @@ Respond with a single JSON object, no fences:
     $('workflowSubmit').disabled = true;
     $('workflowSubmit').textContent = 'Running…';
     $('workflowResult').innerHTML = '';
-    // Kick off the canvas animation in parallel with the API call so the
-    // student sees the pipeline come alive while we wait for the network.
-    const animPromise = playAnimation();
+    $('canvasStatus').textContent = '● classifying…';
     try {
+      // Step 1 — call the workflow API. We need the actual classification
+      // and filename back before driving the animation so the narration
+      // matches the real run (instead of always saying "team-standup").
       const r = await fetch('/api/workflow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2891,6 +2909,12 @@ Respond with a single JSON object, no fences:
       });
       const { steps, classification, outputPath, error } = await r.json();
       if (error) throw new Error(error);
+
+      // Step 2 — build the Stage 2 animation events from the real result
+      // and kick the animation off. Result panel renders in parallel.
+      const filename = outputPath ? outputPath.split('/').pop() : 'meeting-notes.txt';
+      const animPromise = playAnimation(null, buildStage2Events(classification, filename));
+
       const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const wordCount = transcript.split(/\s+/).filter(Boolean).length;
       const preview = transcript.length > 140 ? transcript.slice(0, 140).replace(/\s+/g, ' ').trim() + '…' : transcript;
