@@ -23,12 +23,12 @@ async function orchestrator(transcript) {
 
   // 2. Dispatch to specialists in parallel
   const [themes, actions] = await Promise.all([
-    summarize(transcript),         // sub-agent #1
-    extractActions(transcript),    // sub-agent #2
+    analyst(transcript),    // specialist #1
+    extractor(transcript),  // specialist #2
   ]);
 
   // 3. Combine the results
-  const finalReport = await synthesize(themes, actions);
+  const finalReport = await synthesizer(themes, actions);
 
   return finalReport;
 }
@@ -36,7 +36,7 @@ async function orchestrator(transcript) {
 
 Read that carefully. The orchestrator **doesn't read the transcript itself**. It hands the transcript to two specialists, waits for their structured answers, then calls a third API to combine them into the final report.
 
-Each of those functions (`summarize`, `extractActions`, `synthesize`) is its own API call to Claude with its own system prompt. The orchestrator is just the choreographer.
+Each of those functions (`analyst`, `extractor`, `synthesizer`) is its own API call to Claude with its own system prompt. The orchestrator is just the choreographer.
 
 ## Why keep it thin
 
@@ -46,75 +46,73 @@ A thin orchestrator is *clear*. It routes. Specialists do the work. The main thr
 
 This is the first principle of agent architecture: **compose, don't conflate**.
 
-## The system prompt of an orchestrator
+## Does the orchestrator have its own system prompt?
 
-The orchestrator has its own system prompt — the one in `prompts/system.md`. Notice it doesn't try to *do* the work. It tells Claude:
+No, and that's worth noticing. `orchestrator()` itself is plain JavaScript: no system prompt, no API call of its own. It just decides who to call and in what order. Every actual Claude call happens inside one of the specialists (Analyst, Extractor, Synthesizer, Reflect) or the Conductor, each with its own prompt file (`prompts/analyst.md`, `prompts/extractor.md`, and so on).
 
-- Who you are (the orchestrator)
-- What sub-agents you have access to
-- When to call which
-- What format the final answer should take
+Compare the Analyst's prompt to the Extractor's: one tells Claude how to find themes, the other how to find action items. Different job, different prompt, different file.
 
-Compare to the summarizer's prompt — which tells Claude exactly how to read a transcript and find themes. Different role, different prompt, different file.
+**Each specialist in the system gets its own focused prompt; the orchestrator gets none, because it isn't making a judgment call. It's just wiring.**
 
-**Each agent in the system gets its own focused prompt.** That's what makes the system work.
+## The Conductor: deciding which tools to use
 
-## The planner: deciding which tools to use
-
-A more powerful orchestrator doesn't hard-code which tools to call. Instead, it runs a **planner** — a dedicated LLM call that reads the input and decides what's needed:
+A more powerful orchestrator doesn't hard-code which specialists to call. Instead, it runs the **Conductor**, a dedicated Claude call that reads the instruction and decides what's needed:
 
 ```js
-async function planner(transcript) {
-  // System prompt: "You are a router. Look at the input and pick which tools to call.
-  //   Tools: chat (quick Q&A), workflow (full pipeline + save), summarize, extract.
-  //   Return JSON: { tools: [...] }"
+async function conductor(transcript, instruction) {
+  // System prompt (prompts/conductor.md): "You are a routing planner.
+  //   Tools available: analyst, extractor, synthesizer, router, reflect.
+  //   Decide which ones to call. Return JSON: { tools: [...], reasoning: '...' }"
   const response = await client.messages.create({
-    system: promptRouter,
-    messages: [{ role: "user", content: transcript.slice(0, 800) }],
+    system: promptConductor,
+    messages: [{ role: "user", content: `TRANSCRIPT:\n${transcript}\nINSTRUCTION: ${instruction}` }],
   });
-  return JSON.parse(response.content[0].text); // e.g. { tools: ["summarize", "extract"] }
+  return JSON.parse(response.content[0].text); // e.g. { tools: ["extractor"], reasoning: "..." }
 }
 ```
 
-Then the orchestrator dispatches based on what the planner decided:
+Then the orchestrator dispatches based on what the Conductor decided:
 
 ```js
-async function orchestrator(transcript) {
-  const plan = await planner(transcript); // Step 1: decide
+async function orchestrator(transcript, instruction) {
+  const plan = instruction ? await conductor(transcript, instruction) : null;
+  const tools = plan ? plan.tools : ["analyst", "extractor", "synthesizer", "router", "reflect"];
 
   const results = {};
-  if (plan.tools.includes("chat"))      results.chat    = await ask("Quick summary?", transcript);
-  if (plan.tools.includes("workflow"))  results.workflow = await runWorkflow(transcript);
-  if (plan.tools.includes("summarize")) results.themes  = await summarize(transcript);
-  if (plan.tools.includes("extract"))   results.actions = await extractActions(transcript);
+  if (tools.includes("analyst"))     results.themes    = await analyst(transcript);
+  if (tools.includes("extractor"))   results.actions   = await extractor(transcript);
+  if (tools.includes("synthesizer")) results.report    = await synthesizer(results.themes, results.actions);
+  if (tools.includes("router"))      await runWorkflow(transcript, filename, results.report);
+  if (tools.includes("reflect"))     results.runReport = await reflect(/* ... */);
 
-  return await synthesize(results); // Step 3: combine
+  return results;
 }
 ```
 
-The orchestrator doesn't decide what to do — the planner does. This separation is what makes the system genuinely agentic: the path through the system varies based on the input.
+The orchestrator doesn't decide what to do; the Conductor does. This separation is what makes the system genuinely agentic: the path through the system varies based on the instruction. If no instruction is given, the orchestrator just runs the full pipeline: all five steps, in dependency order.
 
 ## Where this fits
 
-In Stage 3 you'll have four system prompts and a set of functions — each one a separate building block:
+In Stage 3 you'll have five system prompts and a set of functions, each one a separate building block:
 
 ```
 prompts/
-├── system.md            ← synthesis brain
-├── summarizer.md        ← finds themes
-├── action_extractor.md  ← finds action items
-└── router.md            ← planner: decides which tools to invoke
+├── analyst.md       ← finds themes
+├── extractor.md     ← finds action items
+├── synthesizer.md   ← combines both into the final report
+├── conductor.md     ← planner: decides which specialists to call
+└── reflect.md       ← after-action report on the run
 ```
 
 ```
 stage-3/orchestrator.js
-├── import { ask }         from '../stage-1/chat.js'    ← Stage 1 building block
-├── import { runWorkflow } from '../stage-2/workflow.js' ← Stage 2 building block
-├── async function planner(...)         ← LLM picks tools
-├── async function summarize(...)       ← specialist
-├── async function extractActions(...)  ← specialist
-├── async function synthesize(...)      ← combines all results
+├── import { runWorkflow } from '../stage-2/workflow.js' ← Stage 2 building block (the Router)
+├── async function analyst(...)      ← specialist
+├── async function extractor(...)    ← specialist
+├── async function synthesizer(...)  ← specialist
+├── async function reflect(...)      ← specialist (after-action report)
+├── async function conductor(...)    ← the planner
 └── export async function orchestrator(...) ← coordinates everything
 ```
 
-Four prompts. Six functions. Two imported building blocks. One agentic system — and every piece of it is something you built.
+Five prompts. Six functions. One imported building block (`runWorkflow`, reused as the Router). One agentic system, and every piece of it is something you built.

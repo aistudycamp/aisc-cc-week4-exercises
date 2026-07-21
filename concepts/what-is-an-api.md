@@ -26,7 +26,7 @@ Here's the request your code sends when you ask Claude something:
 
 ```json
 {
-  "model": "claude-sonnet-4-6",
+  "model": "<the model configured in this project>",
   "max_tokens": 1024,
   "system": "You are a meeting analyst. Find key themes.",
   "messages": [
@@ -35,7 +35,7 @@ Here's the request your code sends when you ask Claude something:
 }
 ```
 
-Five fields. That's the whole thing.
+Four fields. That's the whole thing.
 
 - **`model`** — which Claude you want. Sonnet, Opus, Haiku.
 - **`max_tokens`** — how long the response can be. (Tokens ≈ word pieces.)
@@ -80,9 +80,9 @@ In Stage 1, you're going to send your first JSON request to Claude and see the J
 
 Everything you'll build for the rest of the sprint — the workflow in Stage 2, the multi-agent system in Stage 3 — is just *more API calls, arranged thoughtfully.*
 
-The orchestrator in Stage 3? It's a function that makes 3 API calls.
+The orchestrator in Stage 3? It's a plain JavaScript function that makes zero API calls itself; it just coordinates specialists, and each specialist makes its own.
 
-The agentic system you'll build? It's a Node script that makes 3 API calls in a particular order.
+The agentic system you'll build? A Node script where up to five specialist calls fire, some in parallel, in whatever order the Conductor decides.
 
 Once you understand the doorbell, the rest is choreography.
 

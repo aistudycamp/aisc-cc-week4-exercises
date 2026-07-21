@@ -55,7 +55,7 @@ Remember the JSON shape from `what-is-an-api.md`:
 
 ```json
 {
-  "model": "claude-sonnet-4-6",
+  "model": "<the model configured in this project>",
   "system": "You are a meeting analyst. Find key themes.",
   "messages": [
     { "role": "user", "content": "Here's the transcript: ..." }
@@ -73,9 +73,12 @@ Throughout this sprint, you'll see system prompts saved as standalone markdown f
 
 ```
 prompts/
-├── system.md           ← orchestrator's instructions
-├── summarizer.md       ← summarizer sub-agent's instructions
-└── action_extractor.md ← extractor sub-agent's instructions
+├── system.md        ← Stage 1 chat assistant's instructions
+├── classifier.md    ← Stage 2 workflow's meeting-type classifier
+├── analyst.md       ← Stage 3 specialist: finds themes
+├── extractor.md     ← Stage 3 specialist: finds action items
+├── synthesizer.md   ← Stage 3 specialist: combines both into the final report
+└── conductor.md     ← Stage 3 planner: decides which specialists to call
 ```
 
 Why? Three reasons:
