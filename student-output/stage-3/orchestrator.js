@@ -9,7 +9,7 @@
 // Architecture (Conductor plans first, when an instruction is given):
 //   [Conductor]              ← optional planning step: decides which tools to run
 //            ↓
-//   [Analyst ‖ Extractor]    ← parallel (Promise.all) — both run simultaneously
+//   [Analyst ‖ Extractor]    ← parallel (Promise.all): both run simultaneously
 //            ↓
 //      [Synthesizer]         ← combines themes + actions into the final report
 //            ↓

@@ -54,7 +54,7 @@ Stage 3 — Agentic System
     [Router]  ← Stage 2's runWorkflow() — classifies, saves, notifies
 ```
 
-Each stage is genuinely different — not just a wrapper around the same API call. Stage 3 sits on top of Stage 1 (`ask()`) and Stage 2 (`runWorkflow()`).
+Each stage is genuinely different — not just a wrapper around the same API call. Stage 3 imports Stage 2's `runWorkflow()`; Stage 1's `ask()` is imported by `server.js` to power the browser chat.
 
 ## Student Progress
 
@@ -130,9 +130,9 @@ The system prompts in `student-output/prompts/`:
 - `system-original.md` — untouched backup (for restoring after Module 3 edits)
 
 The Node.js code:
-- `stage-1/chat.js` — interactive chat assistant; exports `ask()` for Stages 2+3 to import
+- `stage-1/chat.js` — interactive chat assistant; exports `ask()` and `chatTurn()`, imported by `server.js` to power the browser's Chat tab
 - `stage-2/workflow.js` — workflow pipeline; exports `runWorkflow()` for Stage 3 to import
-- `stage-3/orchestrator.js` — parallel orchestrator; imports `ask()` and `runWorkflow()` from Stages 1+2
+- `stage-3/orchestrator.js` — parallel orchestrator; imports `runWorkflow()` from Stage 2 as the Router step. Analyst, Extractor, and Synthesizer each make their own Claude call (same shape as `ask()`, just not literally reused)
 - `server.js` — Express server that backs the browser UI (`npm run server` → http://localhost:3000)
 
 ## When Students Hit Errors
