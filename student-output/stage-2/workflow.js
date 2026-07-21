@@ -1,10 +1,16 @@
 // Stage 2 — Workflow
-// An automated pipeline triggered by dropping a file into transcripts/incoming/.
-// The AI is one step in the pipeline — it classifies the meeting and decides
-// where the file goes. The workflow handles the rest automatically.
+// An automated pipeline. The AI is one step in the pipeline; it classifies
+// the meeting and decides where the file goes. The workflow handles the
+// rest automatically.
 //
-// Run it:  npm run stage-2
-//   Then run in a second terminal:  npm run drop-test
+// In the sprint, this is triggered from the browser: Module 4's Stage 2 tab,
+// "Run Workflow →" button, calls POST /api/workflow in server.js, which
+// calls runWorkflow() below directly.
+//
+// Optional: this file can also run as a standalone file-watcher from the
+// terminal instead:
+//   npm run stage-2
+//   Then in a second terminal:  npm run drop-test
 //   Watch the file get classified, routed, and a notification fire.
 //
 // Import as a building block:

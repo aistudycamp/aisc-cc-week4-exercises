@@ -1,17 +1,19 @@
 // Stage 1 — Chat Assistant
 // An interactive multi-turn chat loop with an AI meeting analyst.
-// Also exports ask() so Stage 2 and Stage 3 can use it as a building block.
+// Exports ask() and chatTurn(): server.js imports both to power the
+// browser's Chat tab (Modules 2-3), which is how this file is actually run
+// in the sprint.
 //
-// Run interactively (no transcript):
+// Optional: run it directly from the terminal instead of the browser:
 //   npm run stage-1
 //   Paste a transcript as your first message, then ask follow-up questions.
 //
-// Run with a transcript file pre-loaded:
+// Or pre-load a transcript file:
 //   npm run stage-1 -- transcripts/sample-transcript.txt
 //   The transcript loads automatically — just start asking questions.
 //
 // Import as a building block:
-//   import { ask } from '../stage-1/chat.js';
+//   import { ask, chatTurn } from '../stage-1/chat.js';
 
 import Anthropic from "@anthropic-ai/sdk";
 import readline from "node:readline";

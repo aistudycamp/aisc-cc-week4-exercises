@@ -1,20 +1,28 @@
 // Stage 3 — Agentic System
-// An orchestrator that dispatches specialists in parallel, then synthesizes results.
+// An orchestrator that dispatches specialists, in parallel where it can,
+// then synthesizes the results.
 //
-// The key insight: analyst, extractor, and synthesizer are ALL the same pattern
-// as the chat assistant you built in Stage 1 — just with different system prompts.
-// Same ask() function, different specialist = different result.
+// The key insight: Analyst, Extractor, and Synthesizer each make their own
+// Claude call, one system prompt each: the same one-shot shape as Stage 1's
+// ask(), just a separate function with a different prompt file.
 //
-// Architecture:
-//   [Analyst ‖ Extractor]   ← parallel (Promise.all) — both run simultaneously
+// Architecture (Conductor plans first, when an instruction is given):
+//   [Conductor]              ← optional planning step: decides which tools to run
+//            ↓
+//   [Analyst ‖ Extractor]    ← parallel (Promise.all) — both run simultaneously
 //            ↓
 //      [Synthesizer]         ← combines themes + actions into the final report
 //            ↓
 //        [Router]            ← Stage 2's runWorkflow() — classify, save, notify
 //            ↓
-//       [Reflect]            ← Conductor evaluates the run, produces recommendations
+//       [Reflect]            ← after-action report on the run
 //
-// Usage:  npm run stage-3 -- transcripts/sample-transcript.txt
+// In the sprint, this runs from the browser: Modules 5-6's Agentic System
+// tab, "Run Orchestrator →" button, calls server.js's /api/orchestrate/*
+// endpoints, which call the functions below directly.
+//
+// Optional: run it directly from the terminal instead:
+//   npm run stage-3 -- transcripts/sample-transcript.txt
 
 import Anthropic from "@anthropic-ai/sdk";
 import fs from "node:fs";
