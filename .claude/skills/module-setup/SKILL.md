@@ -85,7 +85,7 @@ If they have an older version (< 20):
 
 Say:
 
-> "Now we need an Anthropic API key. This is what lets your code talk to Claude. Three steps:"
+> "Now we need an Anthropic API key. This is what lets your code talk to Claude. If you already pay for Claude Pro or Max, this is a separate thing: that subscription covers Claude.ai and Claude Code, but the code you're about to write calls Claude directly, outside of either of those, so it needs its own key with its own billing. Three steps:"
 
 Walk them through:
 
