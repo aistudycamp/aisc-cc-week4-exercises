@@ -44,6 +44,8 @@ You've built a multi-agent system end-to-end. This module is the send-off: three
 
 > "Same pattern, different specialists. Same architecture you have running on your machine right now."
 
+> "One more connection, back to Week 3: this is the same skill-vs-agent line you learned for Claude Code itself. Know the steps in advance, write it down; let the path vary based on what it finds, make it agentic. You just built that split by hand, in raw code, instead of inside Claude Code."
+
 ## Step 3: Closing (1 min)
 
 > "You can build any of these by editing your three prompt files and changing what the specialists do. Same orchestrator code. Same Conductor."

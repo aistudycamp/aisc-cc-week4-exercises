@@ -122,6 +122,7 @@ Say:
 - Three stages, each uses the previous as a building block: chat → workflow → agentic system
 - Every specialist is a system prompt — that's the spine of the pattern you're about to build
 - Stage 3 is Stage 1 and Stage 2 wired together
+- Same distinction as Claude Code's own primitives from Week 3: if you know every step in advance, write it down (a skill in Claude Code, a workflow in code). If the path depends on what it finds, it's an agent. You're about to see that split from inside the code.
 
 ## Step 7: Wrap and commit (1 min)
 
