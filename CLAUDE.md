@@ -54,7 +54,7 @@ Stage 3 — Agentic System
     [Router]  ← Stage 2's runWorkflow() — classifies, saves, notifies
 ```
 
-Each stage is genuinely different — not just a wrapper around the same API call. Stage 3 imports Stage 2's `runWorkflow()`; Stage 1's `ask()` is imported by `server.js` to power the browser chat.
+Each stage is genuinely different, not just a wrapper around the same API call. Stage 3 imports Stage 2's `runWorkflow()`; Stage 1's `ask()` is imported by `server.js` to power the browser chat.
 
 ## Student Progress
 
@@ -121,7 +121,7 @@ After Module Setup, the student's working folder is `student-output/` — copied
 Every student builds a system that turns a meeting transcript into a structured insights report. Same scaffold for every module. Module 7 sends them off with three example agent systems and a "what will you build next?" close — they personalize from there on their own.
 
 The system prompts in `student-output/prompts/`:
-- `system.md` — the meeting analyst's core instructions (used by Stage 1 chat and the Stage 3 synthesizer)
+- `system.md`: the meeting analyst's core instructions (used by Stage 1 chat)
 - `classifier.md` — tells the AI how to classify meeting types (used by Stage 2 workflow)
 - `analyst.md` — Stage 3 specialist that finds key themes and decisions
 - `extractor.md` — Stage 3 specialist that pulls action items as JSON
@@ -130,9 +130,9 @@ The system prompts in `student-output/prompts/`:
 - `system-original.md` — untouched backup (for restoring after Module 3 edits)
 
 The Node.js code:
-- `stage-1/chat.js` — interactive chat assistant; exports `ask()` and `chatTurn()`, imported by `server.js` to power the browser's Chat tab
-- `stage-2/workflow.js` — workflow pipeline; exports `runWorkflow()` for Stage 3 to import
-- `stage-3/orchestrator.js` — parallel orchestrator; imports `runWorkflow()` from Stage 2 as the Router step. Analyst, Extractor, and Synthesizer each make their own Claude call (same shape as `ask()`, just not literally reused)
+- `stage-1/chat.js`: interactive chat assistant; exports `ask()` and `chatTurn()`, imported by `server.js` to power the browser's Chat tab
+- `stage-2/workflow.js`: workflow pipeline; exports `runWorkflow()` for Stage 3 to import
+- `stage-3/orchestrator.js`: parallel orchestrator; imports `runWorkflow()` from Stage 2 as the Router step. Analyst, Extractor, and Synthesizer each make their own Claude call (same shape as `ask()`, just not literally reused)
 - `server.js` — Express server that backs the browser UI (`npm run server` → http://localhost:3000)
 
 ## When Students Hit Errors
